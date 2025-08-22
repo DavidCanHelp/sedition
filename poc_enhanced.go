@@ -3,6 +3,7 @@ package poc
 
 import (
 	"crypto/ed25519"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
@@ -14,6 +15,7 @@ import (
 	"time"
 
 	"github.com/davidcanhelp/sedition/crypto"
+	"github.com/davidcanhelp/sedition/ml"
 )
 
 // EnhancedConsensusEngine implements PoC with real cryptographic primitives
@@ -32,6 +34,8 @@ type EnhancedConsensusEngine struct {
 	qualityAnalyzer   *QualityAnalyzer
 	reputationTracker *ReputationTracker
 	metricsCalculator *MetricsCalculator
+	mlAnalyzer        *ml.MLQualityAnalyzer
+	quantumConsensus  *crypto.QuantumResistantConsensus
 
 	// Consensus parameters
 	minStakeRequired *big.Int
@@ -86,8 +90,11 @@ type Commit struct {
 	LinesAdded    int
 	LinesModified int
 	LinesDeleted  int
+	Diff          string // Code diff for ML analysis
 	QualityScore  float64
+	MLMetrics     map[string]interface{} // ML-based quality metrics
 	Signature     []byte // Author's signature
+	SignatureType string // "Ed25519" or "SPHINCS+"
 }
 
 // NewEnhancedConsensusEngine creates a new consensus engine with cryptography
@@ -104,6 +111,8 @@ func NewEnhancedConsensusEngine(minStake *big.Int, blockTime time.Duration) *Enh
 		qualityAnalyzer:  NewQualityAnalyzer(),
 		reputationTracker: NewReputationTracker(),
 		metricsCalculator: NewMetricsCalculator(),
+		mlAnalyzer:       ml.NewMLQualityAnalyzer(),
+		quantumConsensus: crypto.NewQuantumResistantConsensus(),
 		minStakeRequired: minStake,
 		blockTime:        blockTime,
 		epochLength:      100,
@@ -150,6 +159,12 @@ func (e *EnhancedConsensusEngine) RegisterValidator(address string, stake *big.I
 	e.validators[address] = validator
 	e.signers[address] = signer
 	e.vrfs[address] = vrf
+
+	// Register with quantum-resistant consensus
+	if err := e.quantumConsensus.AddValidator(address, stake); err != nil {
+		// Non-fatal error - quantum consensus is optional for backward compatibility
+		fmt.Printf("Warning: Failed to register quantum-resistant validator: %v\n", err)
+	}
 
 	// Initialize reputation
 	e.reputationTracker.InitializeReputation(address)
@@ -259,16 +274,48 @@ func (e *EnhancedConsensusEngine) ProposeBlock(proposer string, commits []Commit
 
 	// Analyze and sign each commit
 	for i := range commits {
+		// Traditional quality analysis
 		quality := e.qualityAnalyzer.AnalyzeCommit(&commits[i])
-		commits[i].QualityScore = quality.OverallScore
-
-		// Sign commit
-		commitData := e.serializeCommit(&commits[i])
-		sig, err := signer.Sign(commitData)
-		if err != nil {
-			return nil, fmt.Errorf("failed to sign commit: %w", err)
+		
+		// Enhanced ML-based quality analysis
+		if commits[i].Diff != "" {
+			mlPrediction, err := e.mlAnalyzer.AnalyzeCode(commits[i].Diff, "go", map[string]interface{}{
+				"author": commits[i].Author,
+				"timestamp": commits[i].Timestamp,
+			})
+			if err == nil {
+				// Combine traditional and ML scores with weighted average
+				combinedScore := 0.4*quality.OverallScore + 0.6*mlPrediction.OverallQuality
+				commits[i].QualityScore = combinedScore
+				commits[i].MLMetrics = map[string]interface{}{
+					"ml_quality": mlPrediction.OverallQuality,
+					"confidence": mlPrediction.Confidence,
+					"recommendations": mlPrediction.Recommendations,
+					"risk_factors": mlPrediction.RiskFactors,
+				}
+			} else {
+				commits[i].QualityScore = quality.OverallScore
+			}
+		} else {
+			commits[i].QualityScore = quality.OverallScore
 		}
-		commits[i].Signature = sig
+
+		// Sign commit with quantum-resistant signature
+		commitData := e.serializeCommit(&commits[i])
+		
+		// Use quantum-resistant signature if available
+		if quantumSig, err := e.quantumConsensus.SignBlock(validatorAddr, commitData); err == nil {
+			commits[i].Signature = quantumSig
+			commits[i].SignatureType = "SPHINCS+"
+		} else {
+			// Fallback to traditional Ed25519
+			sig, err := signer.Sign(commitData)
+			if err != nil {
+				return nil, fmt.Errorf("failed to sign commit: %w", err)
+			}
+			commits[i].Signature = sig
+			commits[i].SignatureType = "Ed25519"
+		}
 	}
 
 	// Create Merkle tree of commits
