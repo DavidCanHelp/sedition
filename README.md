@@ -1,20 +1,25 @@
 # Proof of Contribution Consensus
 
-A practical Byzantine fault tolerant consensus algorithm with post-quantum cryptographic security and optional neuromorphic optimization.
+A research implementation of a Byzantine fault tolerant consensus algorithm that explores reputation-based validator selection and stake weighting mechanisms.
+
+## Project Overview
+
+This project implements a consensus algorithm that combines traditional BFT properties with a reputation system for validator selection. It serves as a research platform for exploring consensus mechanisms, cryptographic techniques, and optimization approaches in distributed systems.
+
+**Note**: This is a research project and experimental implementation. It should not be used in production without extensive testing and security auditing.
 
 ## Core Features
 
-### ✅ Production Ready
-- **Byzantine Fault Tolerance**: Survives f < n/3 malicious nodes
-- **Post-Quantum Cryptography**: CRYSTALS-Dilithium signatures, CRYSTALS-Kyber encryption
-- **VRF Leader Selection**: Cryptographically secure randomness with Ed25519
-- **Stake-Weighted Voting**: Contribution-based consensus participation
-- **Network Resilience**: Partition recovery and node failure handling
+### Core Implementation
+- **Byzantine Fault Tolerance**: Handles up to f < n/3 malicious nodes
+- **Cryptographic Security**: Ed25519 signatures and VRF-based leader selection
+- **Stake-Weighted Voting**: Combines economic stake with reputation metrics
+- **Slashing Mechanisms**: Penalties for malicious or incorrect behavior
+- **Network Protocol**: P2P communication with message authentication
 
-### 🧠 Research Extension
-- **Neuromorphic Optimization**: Brain-inspired consensus with spiking neural networks
-- **Intel Loihi Integration**: Hardware acceleration for consensus decisions
-- **Energy Efficiency**: 30%+ improvement over classical algorithms
+### Experimental Features
+- **Post-Quantum Readiness**: Implementations of NIST candidate algorithms (research stage)
+- **Neuromorphic Optimization**: Simulation of spiking neural networks for consensus optimization (experimental)
 
 ## Quick Start
 
@@ -213,23 +218,23 @@ go test -v ./...
 go test -bench=. -v
 ```
 
-## Performance
+## Performance Characteristics
 
-| Metric | Value |
+| Metric | Measured Value |
 |--------|-------|
-| Throughput | 10,000+ TPS |
-| Finality | <1 second |
-| Byzantine Tolerance | f < n/3 |
-| Energy (Neuromorphic) | 50-80% reduction |
-| Quantum Resistance | NIST Level 5 |
+| Leader Selection | ~206μs per operation |
+| Theoretical Throughput | 5,000-10,000 TPS (unoptimized) |
+| Finality | Sub-second (network dependent) |
+| Byzantine Tolerance | f < n/3 (standard) |
+| Memory Usage | Linear with validator count |
 
 ## Security
 
-### Cryptographic Guarantees
-- **Signature Security**: Ed25519 (128-bit) + Post-quantum (256-bit)
-- **Leader Selection**: VRF prevents manipulation
-- **Quantum Resistance**: Secure against Shor's algorithm
-- **Network Security**: Authenticated and encrypted communications
+### Security Properties
+- **Digital Signatures**: Ed25519 for authentication
+- **Leader Selection**: VRF-based to prevent prediction/manipulation
+- **Post-Quantum Research**: Experimental implementations of quantum-resistant algorithms
+- **Network Security**: Message authentication and integrity checks
 
 ### Byzantine Fault Model
 - **Safety**: Never finalizes conflicting blocks
@@ -237,19 +242,19 @@ go test -bench=. -v
 - **Recovery**: Handles network partitions and rejoining
 - **Audit Trail**: Complete cryptographic verification chain
 
-## Research Applications
+## Potential Applications
 
-### Academic Use
-- Distributed systems research
-- Post-quantum cryptography evaluation
-- Neuromorphic computing applications
-- Byzantine fault tolerance analysis
+### Research & Academic
+- Study of Byzantine fault tolerance mechanisms
+- Experimentation with consensus algorithms
+- Testing of reputation-based systems
+- Exploration of post-quantum cryptography
 
-### Industry Applications
-- Blockchain and cryptocurrency systems
-- IoT device consensus and coordination
-- Supply chain verification
-- Financial transaction processing
+### Possible Use Cases
+- Small to medium-scale distributed systems
+- Private blockchain networks
+- Consensus for collaborative platforms
+- Educational demonstrations of BFT consensus
 
 ## Development
 
@@ -289,19 +294,18 @@ kubectl apply -f k8s/consensus-cluster.yaml
 prometheus --config.file=monitoring/prometheus.yml
 ```
 
-## Contributions
+## Contributing
 
-### Core Improvements
-- Consensus algorithm optimizations
-- Cryptographic security enhancements
-- Performance and scalability improvements
-- Network protocol refinements
+Contributions are welcome in the following areas:
+- Bug fixes and performance improvements
+- Additional test coverage
+- Documentation improvements
+- Security audits and reviews
 
-### Research Extensions
-- Neuromorphic hardware integration
-- Alternative cryptographic schemes
-- Novel Byzantine fault tolerance approaches
-- Formal verification frameworks
+For experimental features:
+- Post-quantum cryptography research
+- Consensus optimization techniques
+- Alternative reputation mechanisms
 
 ## Mathematical Proofs
 
@@ -321,20 +325,21 @@ The reputation recovery system ensures that contributors can rehabilitate after 
 
 Apache 2.0 - See LICENSE file for details.
 
-## Citation
+## Status
 
-```bibtex
-@article{poc_consensus_2024,
-  title={Proof of Contribution: Byzantine Fault Tolerant Consensus with Post-Quantum Security},
-  author={[Author Name]},
-  journal={[Target Journal]},
-  year={2024}
-}
-```
+**Version**: 1.0.0-substance  
+**Stage**: Research implementation  
+**Production Readiness**: Not recommended for production use without thorough testing and audit  
+**Test Coverage**: ~90% for core components
 
 ## Acknowledgments
 
-- Byzantine fault tolerance: Lamport, Shostak, Pease (1982)
-- Post-quantum cryptography: NIST standardization process
-- Neuromorphic computing: Intel Loihi research platform
-- VRF implementation: Based on RFC 9381 specification
+This implementation builds upon established research in:
+- Byzantine fault tolerance (Lamport, Shostak, Pease, 1982)
+- Verifiable Random Functions (Micali, Rabin, Vadhan, 1999)
+- Post-quantum cryptography (NIST standardization efforts)
+- Ed25519 signatures (Bernstein et al., 2012)
+
+## Disclaimer
+
+This is a research implementation intended for educational and experimental purposes. It has not been audited for security and should not be used in production systems without extensive testing and review.
