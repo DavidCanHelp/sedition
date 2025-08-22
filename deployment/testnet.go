@@ -17,8 +17,53 @@ import (
 	"github.com/davidcanhelp/sedition/crypto"
 	"github.com/davidcanhelp/sedition/network"
 	"github.com/davidcanhelp/sedition/storage"
-	poc "github.com/davidcanhelp/sedition"
 )
+
+// EnhancedConsensusEngine represents the consensus engine
+type EnhancedConsensusEngine struct {
+	MinStakeRequired *big.Int
+	BlockTime        time.Duration
+	Validators       map[string]*Validator
+}
+
+// GenesisState represents the initial network state
+type GenesisState struct {
+	Validators []GenesisValidator
+	Timestamp  time.Time
+	ChainID    string
+}
+
+// GenesisValidator represents an initial validator
+type GenesisValidator struct {
+	Address    string
+	PublicKey  []byte
+	Stake      *big.Int
+	Reputation float64
+}
+
+// Validator represents a consensus validator
+type Validator struct {
+	Address    string
+	PublicKey  []byte
+	Stake      *big.Int
+	Reputation float64
+}
+
+// Commit represents a block commitment
+type Commit struct {
+	BlockHash  []byte
+	Height     int64
+	Signatures map[string][]byte
+}
+
+// NewEnhancedConsensusEngine creates a new consensus engine
+func NewEnhancedConsensusEngine(minStake *big.Int, blockTime time.Duration) *EnhancedConsensusEngine {
+	return &EnhancedConsensusEngine{
+		MinStakeRequired: minStake,
+		BlockTime:        blockTime,
+		Validators:       make(map[string]*Validator),
+	}
+}
 
 // TestnetConfig defines the testnet configuration
 type TestnetConfig struct {
@@ -94,8 +139,8 @@ type ValidatorConfig struct {
 type TestnetDeployment struct {
 	config         *TestnetConfig
 	validators     map[string]*TestnetValidator
-	consensus      *poc.EnhancedConsensusEngine
-	genesisState   *poc.GenesisState
+	consensus      *EnhancedConsensusEngine
+	genesisState   *GenesisState
 	
 	// Monitoring
 	metrics        *DeploymentMetrics
@@ -110,7 +155,7 @@ type TestnetDeployment struct {
 // TestnetValidator represents a validator node in the testnet
 type TestnetValidator struct {
 	config       *ValidatorConfig
-	consensus    *poc.EnhancedConsensusEngine
+	consensus    *EnhancedConsensusEngine
 	p2pNode      *network.P2PNode
 	database     *storage.BlockchainDB
 	signer       *crypto.Signer
@@ -340,14 +385,14 @@ func (d *TestnetDeployment) createGenesisState(validatorConfigs []*ValidatorConf
 	}
 	
 	// Create consensus engine
-	d.consensus = poc.NewEnhancedConsensusEngine(minStake, blockTime)
+	d.consensus = NewEnhancedConsensusEngine(minStake, blockTime)
 	
 	// Register genesis validators
-	genesisValidators := make([]poc.GenesisValidator, len(validatorConfigs))
+	genesisValidators := make([]GenesisValidator, len(validatorConfigs))
 	for i, config := range validatorConfigs {
 		stake, _ := big.NewInt(0).SetString(config.Stake, 10)
 		
-		genesisValidators[i] = poc.GenesisValidator{
+		genesisValidators[i] = GenesisValidator{
 			Address:         config.ID,
 			PublicKey:       config.ValidatorKey,
 			TokenStake:      config.Stake,
@@ -363,7 +408,7 @@ func (d *TestnetDeployment) createGenesisState(validatorConfigs []*ValidatorConf
 	}
 	
 	// Create genesis state
-	d.genesisState = &poc.GenesisState{
+	d.genesisState = &GenesisState{
 		Validators:  genesisValidators,
 		EpochLength: d.config.EpochLength,
 		BlockTime:   blockTime,
@@ -409,7 +454,7 @@ func (d *TestnetDeployment) createValidator(config *ValidatorConfig) (*TestnetVa
 	// Create consensus engine copy for this validator
 	minStake, _ := big.NewInt(0).SetString(d.config.MinStake, 10)
 	blockTime, _ := time.ParseDuration(d.config.BlockTime)
-	consensus := poc.NewEnhancedConsensusEngine(minStake, blockTime)
+	consensus := NewEnhancedConsensusEngine(minStake, blockTime)
 	
 	// Register all genesis validators
 	for _, genesisValidator := range d.genesisState.Validators {
@@ -505,14 +550,14 @@ func (d *TestnetDeployment) processConsensusRound(validator *TestnetValidator) {
 }
 
 // generateTestCommits generates test commits for block proposals
-func (d *TestnetDeployment) generateTestCommits(validatorID string) []poc.Commit {
+func (d *TestnetDeployment) generateTestCommits(validatorID string) []Commit {
 	numCommits := 1 + (time.Now().UnixNano() % 5) // 1-5 commits
-	commits := make([]poc.Commit, numCommits)
+	commits := make([]Commit, numCommits)
 	
 	for i := int64(0); i < numCommits; i++ {
 		quality := 60.0 + float64((time.Now().UnixNano()+i)%40) // 60-100 quality
 		
-		commits[i] = poc.Commit{
+		commits[i] = Commit{
 			ID:            fmt.Sprintf("%s_%d_%d", validatorID, time.Now().UnixNano(), i),
 			Author:        validatorID,
 			Hash:          make([]byte, 32),

@@ -29,6 +29,61 @@ type ExcellenceFramework struct {
 	qualityAssurance        *QualityAssurance
 }
 
+// OptimizationEvent records an optimization attempt
+type OptimizationEvent struct {
+	Timestamp    time.Time
+	Type         string
+	Before       float64
+	After        float64
+	Improvement  float64
+}
+
+// PerformanceModel models system performance
+type PerformanceModel struct {
+	Name        string
+	Parameters  map[string]float64
+	Predictions map[string]float64
+}
+
+// ReinforcementLearning for adaptive optimization
+type ReinforcementLearning struct {
+	QTable      map[string]map[string]float64
+	LearningRate float64
+	Epsilon     float64
+}
+
+// NeuralOptimizer uses neural networks
+type NeuralOptimizer struct {
+	Layers      []int
+	Weights     [][]float64
+	LearningRate float64
+}
+
+// GeneticAlgorithms for evolutionary optimization
+type GeneticAlgorithms struct {
+	PopulationSize int
+	MutationRate   float64
+	CrossoverRate  float64
+}
+
+// BayesianOptimization for probabilistic optimization
+type BayesianOptimization struct {
+	AcquisitionFunction string
+	Samples            [][]float64
+}
+
+// GradientDescent for continuous optimization
+type GradientDescent struct {
+	LearningRate float64
+	Momentum     float64
+}
+
+// SystemConfiguration represents system settings
+type SystemConfiguration struct {
+	Parameters map[string]interface{}
+	Score      float64
+}
+
 // AdaptiveOptimizer learns and improves over time
 type AdaptiveOptimizer struct {
 	learningRate            float64
@@ -42,6 +97,34 @@ type AdaptiveOptimizer struct {
 	currentConfiguration    *SystemConfiguration
 	optimalConfiguration    *SystemConfiguration
 	improvementRate         float64
+}
+
+// TrainingDataPoint for ML optimization
+type TrainingDataPoint struct {
+	Input  []float64
+	Output []float64
+	Weight float64
+}
+
+// ValidationMetrics for model validation
+type ValidationMetrics struct {
+	Accuracy  float64
+	Precision float64
+	Recall    float64
+	F1Score   float64
+}
+
+// CPUProfiler profiles CPU usage
+type CPUProfiler struct {
+	Samples []float64
+	Average float64
+}
+
+// MemoryProfiler profiles memory usage
+type MemoryProfiler struct {
+	HeapAlloc   uint64
+	HeapSys     uint64
+	HeapObjects uint64
 }
 
 // PerformanceProfiler identifies exactly where time is spent

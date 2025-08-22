@@ -14,9 +14,34 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/util"
-	
-	poc "github.com/davidcanhelp/sedition"
 )
+
+// Block represents a blockchain block
+type Block struct {
+	Height       uint64
+	PreviousHash []byte
+	Hash         []byte
+	Timestamp    time.Time
+	Data         []byte
+	Proposer     string
+	Signatures   map[string][]byte
+}
+
+// EnhancedValidator represents a consensus validator
+type EnhancedValidator struct {
+	Address    string
+	PublicKey  []byte
+	Stake      int64
+	Reputation float64
+	Active     bool
+}
+
+// Commit represents block commitment
+type Commit struct {
+	BlockHash  []byte
+	Height     int64
+	Signatures map[string][]byte
+}
 
 // Database key prefixes
 var (
@@ -107,7 +132,7 @@ func (db *BlockchainDB) Close() error {
 }
 
 // StoreBlock stores a block in the database
-func (db *BlockchainDB) StoreBlock(block *poc.Block) error {
+func (db *BlockchainDB) StoreBlock(block *Block) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 	
@@ -161,14 +186,14 @@ func (db *BlockchainDB) StoreBlock(block *poc.Block) error {
 }
 
 // GetBlock retrieves a block by hash
-func (db *BlockchainDB) GetBlock(hash []byte) (*poc.Block, error) {
+func (db *BlockchainDB) GetBlock(hash []byte) (*Block, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	
 	// Check cache
 	if cached := db.blockCache.Get(string(hash)); cached != nil {
 		db.cacheHits++
-		return cached.(*poc.Block), nil
+		return cached.(*Block), nil
 	}
 	db.cacheMisses++
 	
@@ -183,7 +208,7 @@ func (db *BlockchainDB) GetBlock(hash []byte) (*poc.Block, error) {
 	}
 	
 	// Deserialize block
-	var block poc.Block
+	var block Block
 	if err := json.Unmarshal(data, &block); err != nil {
 		return nil, fmt.Errorf("failed to deserialize block: %w", err)
 	}
@@ -196,7 +221,7 @@ func (db *BlockchainDB) GetBlock(hash []byte) (*poc.Block, error) {
 }
 
 // GetBlockByHeight retrieves a block by height
-func (db *BlockchainDB) GetBlockByHeight(height int64) (*poc.Block, error) {
+func (db *BlockchainDB) GetBlockByHeight(height int64) (*Block, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	
@@ -215,7 +240,7 @@ func (db *BlockchainDB) GetBlockByHeight(height int64) (*poc.Block, error) {
 }
 
 // GetLatestBlock returns the latest block
-func (db *BlockchainDB) GetLatestBlock() (*poc.Block, error) {
+func (db *BlockchainDB) GetLatestBlock() (*Block, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	
@@ -253,7 +278,7 @@ func (db *BlockchainDB) getChainHeight() (int64, error) {
 }
 
 // StoreValidator stores validator state
-func (db *BlockchainDB) StoreValidator(validator *poc.EnhancedValidator) error {
+func (db *BlockchainDB) StoreValidator(validator *EnhancedValidator) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 	
@@ -274,7 +299,7 @@ func (db *BlockchainDB) StoreValidator(validator *poc.EnhancedValidator) error {
 }
 
 // GetValidator retrieves validator state
-func (db *BlockchainDB) GetValidator(address string) (*poc.EnhancedValidator, error) {
+func (db *BlockchainDB) GetValidator(address string) (*EnhancedValidator, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	
@@ -287,7 +312,7 @@ func (db *BlockchainDB) GetValidator(address string) (*poc.EnhancedValidator, er
 		return nil, err
 	}
 	
-	var validator poc.EnhancedValidator
+	var validator EnhancedValidator
 	if err := json.Unmarshal(data, &validator); err != nil {
 		return nil, fmt.Errorf("failed to deserialize validator: %w", err)
 	}
@@ -296,17 +321,17 @@ func (db *BlockchainDB) GetValidator(address string) (*poc.EnhancedValidator, er
 }
 
 // GetAllValidators retrieves all validators
-func (db *BlockchainDB) GetAllValidators() ([]*poc.EnhancedValidator, error) {
+func (db *BlockchainDB) GetAllValidators() ([]*EnhancedValidator, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	
-	validators := make([]*poc.EnhancedValidator, 0)
+	validators := make([]*EnhancedValidator, 0)
 	
 	iter := db.db.NewIterator(util.BytesPrefix(validatorPrefix), nil)
 	defer iter.Release()
 	
 	for iter.Next() {
-		var validator poc.EnhancedValidator
+		var validator EnhancedValidator
 		if err := json.Unmarshal(iter.Value(), &validator); err != nil {
 			continue
 		}
@@ -379,7 +404,7 @@ func (db *BlockchainDB) GetState(key string, value interface{}) error {
 }
 
 // storeCommit stores a commit
-func (db *BlockchainDB) storeCommit(commit *poc.Commit, blockHeight int64) error {
+func (db *BlockchainDB) storeCommit(commit *Commit, blockHeight int64) error {
 	// Serialize commit
 	commitData, err := json.Marshal(commit)
 	if err != nil {
@@ -398,7 +423,7 @@ func (db *BlockchainDB) storeCommit(commit *poc.Commit, blockHeight int64) error
 }
 
 // GetCommit retrieves a commit by hash
-func (db *BlockchainDB) GetCommit(hash []byte) (*poc.Commit, error) {
+func (db *BlockchainDB) GetCommit(hash []byte) (*Commit, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	
@@ -411,7 +436,7 @@ func (db *BlockchainDB) GetCommit(hash []byte) (*poc.Commit, error) {
 		return nil, err
 	}
 	
-	var commit poc.Commit
+	var commit Commit
 	if err := json.Unmarshal(data, &commit); err != nil {
 		return nil, fmt.Errorf("failed to deserialize commit: %w", err)
 	}
@@ -420,11 +445,11 @@ func (db *BlockchainDB) GetCommit(hash []byte) (*poc.Commit, error) {
 }
 
 // GetBlocksByTimeRange retrieves blocks within a time range
-func (db *BlockchainDB) GetBlocksByTimeRange(start, end time.Time) ([]*poc.Block, error) {
+func (db *BlockchainDB) GetBlocksByTimeRange(start, end time.Time) ([]*Block, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	
-	blocks := make([]*poc.Block, 0)
+	blocks := make([]*Block, 0)
 	
 	startKey := makeTimeKey(start, nil)
 	endKey := makeTimeKey(end, []byte{0xff})
@@ -450,11 +475,11 @@ func (db *BlockchainDB) GetBlocksByTimeRange(start, end time.Time) ([]*poc.Block
 }
 
 // GetBlocksByProposer retrieves blocks by proposer
-func (db *BlockchainDB) GetBlocksByProposer(proposer string) ([]*poc.Block, error) {
+func (db *BlockchainDB) GetBlocksByProposer(proposer string) ([]*Block, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 	
-	blocks := make([]*poc.Block, 0)
+	blocks := make([]*Block, 0)
 	
 	prefix := append(proposerIndexPrefix, []byte(proposer)...)
 	iter := db.db.NewIterator(util.BytesPrefix(prefix), nil)
@@ -615,7 +640,7 @@ type Checkpoint struct {
 	BlockHash   []byte
 	StateRoot   []byte
 	Timestamp   time.Time
-	Validators  []*poc.EnhancedValidator
+	Validators  []*EnhancedValidator
 }
 
 // DBMetrics contains database metrics

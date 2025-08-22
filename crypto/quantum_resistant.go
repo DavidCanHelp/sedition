@@ -283,7 +283,8 @@ func (kp *KyberKeyPair) Encapsulate() ([]byte, *KyberCiphertext, error) {
 	ciphertext := encodeCiphertext(u, v, kp.config)
 
 	// Derive shared secret
-	sharedSecret := sha256.Sum256(append(m, sha256.Sum256(ciphertext)[:]...))
+	ctHash := sha256.Sum256(ciphertext)
+	sharedSecret := sha256.Sum256(append(m, ctHash[:]...))
 
 	return sharedSecret[:], &KyberCiphertext{
 		config:     kp.config,
@@ -314,11 +315,12 @@ func (kp *KyberKeyPair) Decapsulate(ct *KyberCiphertext) ([]byte, error) {
 	message := encodeMessage([]int16{mPrime})
 
 	// Verify by re-encapsulation
-	coins := sha256.Sum256(message)
+	// coins := sha256.Sum256(message) // Unused variable commented out
 	// ... verification logic ...
 
 	// Derive shared secret
-	sharedSecret := sha256.Sum256(append(message, sha256.Sum256(ct.ciphertext)[:]...))
+	ctHash := sha256.Sum256(ct.ciphertext)
+	sharedSecret := sha256.Sum256(append(message, ctHash[:]...))
 	return sharedSecret[:], nil
 }
 
@@ -404,7 +406,7 @@ func (qrc *QuantumResistantConsensus) VerifyBlockSignature(validatorAddr string,
 // EstablishSecureChannel creates a quantum-resistant secure channel between validators
 func (qrc *QuantumResistantConsensus) EstablishSecureChannel(validator1, validator2 string) ([]byte, error) {
 	v1, exists1 := qrc.validators[validator1]
-	v2, exists2 := qrc.validators[validator2]
+	_, exists2 := qrc.validators[validator2]
 	
 	if !exists1 || !exists2 {
 		return nil, errors.New("one or both validators not found")

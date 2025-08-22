@@ -1049,7 +1049,7 @@ func (eme *EconomicMechanismEngine) exploreNewStrategy(player *Player) {
 	strategies := eme.gameAnalyzer.strategies[player.ID]
 	if len(strategies) > 0 {
 		// Select a random strategy to explore
-		newStrategyIndex := int(time.Now().UnixNano()) % len(strategies)
+		_ = int(time.Now().UnixNano()) % len(strategies)
 		// Update player's current strategy (implementation depends on strategy representation)
 	}
 }

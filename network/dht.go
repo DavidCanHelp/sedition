@@ -4,7 +4,9 @@ package network
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"math/big"
+	"math/rand"
 	"sort"
 	"sync"
 	"time"

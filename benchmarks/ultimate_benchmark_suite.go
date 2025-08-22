@@ -11,6 +11,102 @@ import (
 	"time"
 )
 
+// PerformanceMetrics tracks performance data
+type PerformanceMetrics struct {
+	ThroughputHistory []float64
+	LatencyHistory    []time.Duration
+	CPUHistory        []float64
+	MemoryHistory     []int64
+}
+
+// ThroughputMetrics measures transaction processing
+type ThroughputMetrics struct {
+	TransactionsPerSecond float64
+	BlocksPerMinute       float64
+	PeakThroughput        float64
+}
+
+// ScalabilityMetrics measures scaling behavior
+type ScalabilityMetrics struct {
+	LinearScalability   float64
+	MaxNodes            int
+	ThroughputPerNode   float64
+}
+
+// ResourceMetrics tracks resource consumption
+type ResourceMetrics struct {
+	CPUUsagePercent     float64
+	MemoryUsageMB       int64
+	NetworkBandwidthMB  float64
+	DiskIOPS            float64
+}
+
+// ConsistencyMetrics measures consensus consistency
+type ConsistencyMetrics struct {
+	ConsistencyLevel    string
+	ForkProbability     float64
+	FinalityTime        time.Duration
+}
+
+// AvailabilityMetrics tracks system availability
+type AvailabilityMetrics struct {
+	Uptime              float64
+	FailureRecoveryTime time.Duration
+	ServiceLevel        float64
+}
+
+// PartitionMetrics measures partition tolerance
+type PartitionMetrics struct {
+	PartitionTolerance  bool
+	RecoveryTime        time.Duration
+	DataLossRate        float64
+}
+
+// ScalabilityTests defines scalability testing
+type ScalabilityTests struct {
+	NodeScaling       map[int]float64 // nodes -> throughput
+	TransactionScaling map[int]float64 // tx rate -> latency
+}
+
+// FaultToleranceTests for Byzantine resilience
+type FaultToleranceTests struct {
+	ByzantineNodeTests map[int]bool // byzantine nodes -> consensus achieved
+	NetworkPartitionTests map[string]time.Duration // partition type -> recovery time
+}
+
+// SecurityTests for cryptographic validation
+type SecurityTests struct {
+	CryptographicStrength int
+	QuantumResistance     bool
+	AttackVectors         []string
+}
+
+// RealWorldSimulations for practical scenarios
+type RealWorldSimulations struct {
+	Scenarios []string
+	Results   map[string]float64
+}
+
+// ComparisonMatrix for algorithm comparison
+type ComparisonMatrix struct {
+	Algorithms []string
+	Metrics    map[string]map[string]float64
+}
+
+// StatisticalAnalysis for result validation
+type StatisticalAnalysis struct {
+	Mean     float64
+	StdDev   float64
+	P95      float64
+	P99      float64
+}
+
+// ReportGenerator for output formatting
+type ReportGenerator struct {
+	Format string
+	Output string
+}
+
 // UltimateBenchmarkSuite compares our system against ALL major consensus algorithms
 // This proves where we excel and where we need improvement
 type UltimateBenchmarkSuite struct {
@@ -29,6 +125,14 @@ type UltimateBenchmarkSuite struct {
 	reportGenerator       *ReportGenerator
 }
 
+// ConsensusAlgorithm interface for different consensus implementations
+type ConsensusAlgorithm interface {
+	Initialize(config map[string]interface{}) error
+	ProposeBlock(data []byte) ([]byte, error)
+	ValidateBlock(block []byte) (bool, error)
+	GetMetrics() map[string]float64
+}
+
 // ConsensusImplementation wraps different consensus algorithms for comparison
 type ConsensusImplementation struct {
 	name                  string
@@ -38,6 +142,32 @@ type ConsensusImplementation struct {
 	characteristics       *AlgorithmCharacteristics
 	performanceProfile    *PerformanceProfile
 	resourceRequirements  *ResourceRequirements
+}
+
+// AlgorithmCharacteristics defines consensus algorithm properties
+type AlgorithmCharacteristics struct {
+	ByzantineFaultTolerance float64
+	NetworkLatency          time.Duration
+	MessageComplexity       string
+	StorageRequirements     int64
+}
+
+// PerformanceProfile captures performance characteristics
+type PerformanceProfile struct {
+	Throughput      float64
+	Latency         time.Duration
+	CPUUsage        float64
+	MemoryUsage     int64
+	NetworkBandwidth float64
+}
+
+// ResourceRequirements defines resource needs
+type ResourceRequirements struct {
+	MinNodes        int
+	MinCPUCores     int
+	MinMemoryGB     int
+	MinNetworkMbps  int
+	MinStorageGB    int
 }
 
 // BenchmarkScenario defines specific test scenarios
@@ -54,51 +184,17 @@ type BenchmarkScenario struct {
 	successCriteria       *SuccessCriteria
 }
 
-// PerformanceMetrics tracks all performance measurements
-type PerformanceMetrics struct {
-	latency               *LatencyMetrics
-	throughput            *ThroughputMetrics
-	scalability           *ScalabilityMetrics
-	resourceUsage         *ResourceMetrics
-	consistency           *ConsistencyMetrics
-	availability          *AvailabilityMetrics
-	partitionTolerance    *PartitionMetrics
+// LatencyMetrics tracks latency measurements
+type LatencyMetrics struct {
+	Min    time.Duration
+	Max    time.Duration
+	Avg    time.Duration
+	P50    time.Duration
+	P95    time.Duration
+	P99    time.Duration
 }
 
-// ComparisonMatrix shows head-to-head comparisons
-type ComparisonMatrix struct {
-	algorithms            []string
-	metrics               []string
-	matrix                [][]float64
-	rankings              map[string]int
-	strengths             map[string][]string
-	weaknesses            map[string][]string
-	recommendations       map[string][]string
-}
-
-// Core benchmark structures
-type AlgorithmCharacteristics struct {
-	consensusType         string // voting, lottery, proof-based
-	byzantineTolerance    float64
-	messagecomplexity     string // O(n), O(n²), O(log n)
-	timeComplexity        string
-	spaceComplexity       string
-	finality              string // instant, probabilistic, eventual
-	energyEfficiency      float64
-	quantumResistant      bool
-}
-
-type PerformanceProfile struct {
-	averageLatency        time.Duration
-	p50Latency            time.Duration
-	p95Latency            time.Duration
-	p99Latency            time.Duration
-	maxThroughput         float64
-	optimalNodeCount      int
-	scalabilityLimit      int
-	performanceUnderLoad  map[string]float64
-}
-
+// NetworkConditions defines network simulation parameters
 type NetworkConditions struct {
 	latency               time.Duration
 	packetLoss            float64
@@ -108,23 +204,11 @@ type NetworkConditions struct {
 	partitionGroups       [][]int
 }
 
-type LatencyMetrics struct {
-	measurements          []time.Duration
-	average               time.Duration
-	median                time.Duration
-	standardDeviation     time.Duration
-	percentiles           map[int]time.Duration
-	histogram             []int
-	outliers              []time.Duration
-}
-
-type ThroughputMetrics struct {
-	transactionsPerSecond float64
-	bytesPerSecond        float64
-	messagesPerSecond     float64
-	peakThroughput        float64
-	sustainedThroughput   float64
-	throughputVariance    float64
+// SuccessCriteria defines test success conditions
+type SuccessCriteria struct {
+	MinThroughput float64
+	MaxLatency    time.Duration
+	MaxFailures   int
 }
 
 // NewUltimateBenchmarkSuite creates comprehensive benchmarking suite
@@ -136,18 +220,17 @@ func NewUltimateBenchmarkSuite() *UltimateBenchmarkSuite {
 		cancel:                   cancel,
 		consensusImplementations: make(map[string]ConsensusImplementation),
 		benchmarkScenarios:       []*BenchmarkScenario{},
-		performanceMetrics:       NewPerformanceMetrics(),
-		scalabilityTests:         NewScalabilityTests(),
-		faultToleranceTests:      NewFaultToleranceTests(),
-		securityTests:            NewSecurityTests(),
-		realWorldSimulations:     NewRealWorldSimulations(),
-		comparisonMatrix:         NewComparisonMatrix(),
-		statisticalAnalysis:      NewStatisticalAnalysis(),
-		reportGenerator:          NewReportGenerator(),
+		performanceMetrics:       &PerformanceMetrics{},
+		scalabilityTests:         &ScalabilityTests{NodeScaling: make(map[int]float64), TransactionScaling: make(map[int]float64)},
+		faultToleranceTests:      &FaultToleranceTests{ByzantineNodeTests: make(map[int]bool), NetworkPartitionTests: make(map[string]time.Duration)},
+		securityTests:            &SecurityTests{},
+		realWorldSimulations:     &RealWorldSimulations{Results: make(map[string]float64)},
+		comparisonMatrix:         &ComparisonMatrix{Metrics: make(map[string]map[string]float64)},
+		statisticalAnalysis:      &StatisticalAnalysis{},
+		reportGenerator:          &ReportGenerator{Format: "markdown"},
 	}
 	
-	// Register all consensus algorithms
-	suite.registerAllAlgorithms()
+	// Initialize consensus algorithms (implementation pending)
 	
 	// Define benchmark scenarios
 	suite.defineBenchmarkScenarios()
@@ -706,7 +789,7 @@ type BenchmarkReport struct {
 	ScenarioResults  map[string]*ScenarioResult
 	ComparisonMatrix *ComparisonMatrix
 	Winners          map[string]string
-	StatisticalAnalysis *StatisticalResults
+	StatisticalAnalysisResult *StatisticalAnalysis
 	Recommendations  []string
 }
 
@@ -746,15 +829,7 @@ type PerformanceResult struct {
 	Metrics        map[string]float64
 }
 
-type SuccessCriteria struct {
-	maxLatency            time.Duration
-	minThroughput         float64
-	maxErrorRate          float64
-	maxEnergyPerTx        float64
-	minAvailability       float64
-	minByzantineTolerance float64
-	maxRecoveryTime       time.Duration
-}
+// (SuccessCriteria already defined above)
 
 type RankingEntry struct {
 	Algorithm string

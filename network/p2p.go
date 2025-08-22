@@ -5,7 +5,9 @@ import (
 	"bufio"
 	"context"
 	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,7 +18,6 @@ import (
 	"time"
 
 	"github.com/davidcanhelp/sedition/crypto"
-	poc "github.com/davidcanhelp/sedition"
 )
 
 // MessageType defines the type of P2P message
@@ -510,7 +511,17 @@ func (n *P2PNode) verifyMessage(peer *Peer, msg *Message) bool {
 }
 
 // BroadcastBlock broadcasts a block proposal to all peers
-func (n *P2PNode) BroadcastBlock(block *poc.Block) error {
+// Block represents a consensus block
+type Block struct {
+	Height       uint64
+	PreviousHash []byte
+	Timestamp    time.Time
+	Data         []byte
+	Proposer     string
+	Signatures   map[string][]byte
+}
+
+func (n *P2PNode) BroadcastBlock(block *Block) error {
 	data, err := json.Marshal(block)
 	if err != nil {
 		return err

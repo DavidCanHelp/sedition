@@ -1,19 +1,14 @@
 package ml
 
 import (
-	"bufio"
 	"crypto/sha256"
-	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"math"
 	"regexp"
-	"sort"
-	"strconv"
 	"strings"
-	"time"
 )
 
 // MLQualityAnalyzer provides machine learning-based code quality analysis
