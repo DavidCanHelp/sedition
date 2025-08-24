@@ -1,4 +1,8 @@
-package quantum
+// EXPERIMENTAL RESEARCH - NOT PRODUCTION READY
+// This package contains experimental research into quantum-resistant
+// consensus mechanisms. None of these implementations should be used
+// in production systems.
+package research
 
 import (
 	"context"
@@ -77,8 +81,9 @@ type PostQuantumCryptography struct {
 type QuantumProofSystem struct {
 	zeroKnowledgeProofs   *PostQuantumZKProofs
 	quantumCommitScheme   *QuantumCommitmentScheme
-	quantumProofVerifier  *QuantumProofVerifier
-	interactiveProofs     *QuantumInteractiveProofs
+	// TODO: Add quantum proof components when available
+	// quantumProofVerifier  *QuantumProofVerifier
+	// interactiveProofs     *QuantumInteractiveProofs
 	nonInteractiveProofs  *QuantumNIZKProofs
 	quantumSignatures     *QuantumDigitalSignatures
 	quantumMerkleProofs   *QuantumMerkleProofs
@@ -251,6 +256,121 @@ type QuantumCapabilities struct {
 	QuantumThreatDetection   *QuantumThreatCapabilities
 }
 
+// Missing type definitions
+type QuantumSlashingEvent struct {
+	EventID   string
+	Timestamp time.Time
+	Amount    uint64
+	Reason    string
+}
+
+type QuantumRewardEvent struct {
+	EventID   string
+	Timestamp time.Time
+	Amount    uint64
+	Type      string
+}
+
+type QuantumStakeProof struct {
+	ProofID   string
+	Timestamp time.Time
+	Data      []byte
+}
+
+type QuantumValidationEvent struct {
+	EventID   string
+	Timestamp time.Time
+	Result    bool
+}
+
+type QuantumOpeningProof struct {
+	ProofData []byte
+}
+
+type QuantumBindingProperties struct {
+	IsBound bool
+}
+
+type QuantumHidingProperties struct {
+	IsHidden bool
+}
+
+type QuantumHomomorphicProperties struct {
+	IsHomomorphic bool
+}
+
+type QuantumCommitmentScheme int
+
+// Additional missing quantum types
+type QuantumContribution struct {
+	ID          string
+	Timestamp   time.Time
+	Type        string
+	Quality     float64
+	ProofData   []byte
+}
+
+type QuantumPeerReview struct {
+	ReviewerID  string
+	ReviewedID  string
+	Score       float64
+	Timestamp   time.Time
+}
+
+type QuantumReputationProof struct {
+	ProofID     string
+	ValidatorID string
+	Reputation  float64
+	Proof       []byte
+	Timestamp   time.Time
+}
+
+type QuantumTrustNetwork struct {
+	Nodes map[string]*TrustNode
+	Edges map[string]map[string]float64
+}
+
+type TrustNode struct {
+	ID         string
+	TrustScore float64
+}
+
+type QuantumReputationDecay struct {
+	DecayRate     float64
+	LastDecayTime time.Time
+}
+
+type QuantumReputationBoost struct {
+	BoostAmount float64
+	Reason      string
+	Timestamp   time.Time
+}
+
+type QuantumKeyCapabilities struct {
+	KeyGenerationRate    float64
+	KeyDistributionRate  float64
+	KeyStorageCapacity   uint64
+	QuantumKeyPoolSize   int
+}
+
+type QuantumThreatCapabilities struct {
+	ThreatDetectionRate     float64
+	MitigationSuccessRate   float64
+	QuantumAttackResistance float64
+}
+
+type QuantumProofComplexity struct {
+	TimeComplexity  string
+	SpaceComplexity string
+	QuantumDepth    int
+}
+
+type QuantumProofSoundness struct {
+	SoundnessError     float64
+	CompletenessError  float64
+	KnowledgeExtractor bool
+}
+
 type QuantumCommitment struct {
 	CommitmentID        string
 	QuantumCommitValue  []byte
@@ -343,8 +463,9 @@ func NewQuantumResistantConsensus() *QuantumResistantConsensus {
 		quantumProofSystem: &QuantumProofSystem{
 			zeroKnowledgeProofs:      NewPostQuantumZKProofs(),
 			quantumCommitScheme:      NewQuantumCommitmentScheme(),
-			quantumProofVerifier:     NewQuantumProofVerifier(),
-			interactiveProofs:        NewQuantumInteractiveProofs(),
+			// TODO: Add when implemented  
+			// quantumProofVerifier:     NewQuantumProofVerifier(),
+			// interactiveProofs:        NewQuantumInteractiveProofs(),
 			nonInteractiveProofs:     NewQuantumNIZKProofs(),
 			quantumSignatures:        NewQuantumDigitalSignatures(),
 			quantumMerkleProofs:      NewQuantumMerkleProofs(),

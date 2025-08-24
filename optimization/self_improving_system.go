@@ -2,14 +2,105 @@ package optimization
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"math"
-	"math/rand"
 	"sync"
-	"sync/atomic"
 	"time"
 )
+
+// Missing type definitions for self-improving system
+type CircularBuffer struct {
+	data []interface{}
+	size int
+	head int
+	tail int
+}
+
+type PatternRecognizer struct {
+	patterns map[string]*Pattern
+}
+
+type Pattern struct {
+	id   string
+	data []float64
+}
+
+type OutcomePredictor struct {
+	model interface{}
+}
+
+type DecisionTree struct {
+	root *DecisionNode
+}
+
+type DecisionNode struct {
+	feature  string
+	value    float64
+	left     *DecisionNode
+	right    *DecisionNode
+	decision string
+}
+
+type ExperienceReplay struct {
+	buffer []*Experience
+}
+
+type Experience struct {
+	state  []float64
+	action string
+	reward float64
+	next   []float64
+}
+
+// Removed duplicate SuccessPattern and FailurePattern - using versions defined later
+
+type TimeSeriesDB struct {
+	data map[string][]TimePoint
+}
+
+type TimePoint struct {
+	timestamp int64
+	value     float64
+}
+
+type Action struct {
+	name   string
+	params map[string]interface{}
+}
+
+type Outcome struct {
+	success bool
+	reward  float64
+	metrics map[string]float64
+}
+
+// Optimizer types
+type OptimizationSpace struct {
+	dimensions []string
+	bounds     map[string][2]float64
+}
+
+type GradientOptimizer struct {
+	learningRate float64
+	momentum     float64
+	gradient     []float64
+}
+
+type SimulatedAnnealing struct {
+	temperature  float64
+	coolingRate  float64
+	minTemp      float64
+}
+
+type ParticleSwarmOptimizer struct {
+	swarmSize    int
+	particles    []*Particle
+	globalBest   []float64
+}
+
+type Particle struct {
+	position     []float64
+	velocity     []float64
+	personalBest []float64
+}
 
 // SelfImprovingSystem continuously learns and improves without human intervention
 // This makes the system genuinely better over time through experience

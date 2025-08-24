@@ -3,15 +3,10 @@ package sharding
 import (
 	"context"
 	"crypto/sha256"
-	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"math/big"
-	"sort"
 	"sync"
 	"time"
-
-	"github.com/davidcanhelp/sedition/crypto"
 )
 
 // ShardingManager manages horizontal scaling through dynamic sharding

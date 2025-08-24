@@ -342,7 +342,7 @@ type EvidenceCollector struct {
 	
 	// Evidence validation
 	evidenceValidator       *EvidenceValidator
-	authenticity Verifier   *AuthenticityVerifier
+	authenticityVerifier    *AuthenticityVerifier
 	integrityChecker        *EvidenceIntegrityChecker
 }
 

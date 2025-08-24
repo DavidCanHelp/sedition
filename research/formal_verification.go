@@ -1,4 +1,4 @@
-package quantum
+package research
 
 import (
 	"context"
@@ -306,18 +306,19 @@ type QuantumVerificationWorker struct {
 	mu                  sync.RWMutex
 }
 
-type QuantumVerificationEngine struct {
-	theoremProver       *QuantumTheoremProver
-	modelChecker        *QuantumModelChecker
-	constraintSolver    *QuantumConstraintSolver
-	symbolicExecutor    *QuantumSymbolicExecutor
-	abstractInterpreter *QuantumAbstractInterpreter
-	equivalenceChecker  *QuantumEquivalenceChecker
-	boundaryAnalyzer    *QuantumBoundaryAnalyzer
-	invariantGenerator  *QuantumInvariantGenerator
-	preconditionGenerator *QuantumPreconditionGenerator
-	postconditionChecker *QuantumPostconditionChecker
-}
+// Commented out duplicate - defined in architecture.go
+// type QuantumVerificationEngine struct {
+// 	theoremProver       *QuantumTheoremProver
+// 	modelChecker        *QuantumModelChecker
+// 	constraintSolver    *QuantumConstraintSolver
+// 	symbolicExecutor    *QuantumSymbolicExecutor
+// 	abstractInterpreter *QuantumAbstractInterpreter
+// 	equivalenceChecker  *QuantumEquivalenceChecker
+// 	boundaryAnalyzer    *QuantumBoundaryAnalyzer
+// 	invariantGenerator  *QuantumInvariantGenerator
+// 	preconditionGenerator *QuantumPreconditionGenerator
+// 	postconditionChecker *QuantumPostconditionChecker
+// }
 
 type QuantumTheoremProver struct {
 	coqInterface        *CoqInterface

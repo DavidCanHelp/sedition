@@ -17,9 +17,9 @@ This project implements a consensus algorithm that combines traditional BFT prop
 - **Slashing Mechanisms**: Penalties for malicious or incorrect behavior
 - **Network Protocol**: P2P communication with message authentication
 
-### Experimental Features
-- **Post-Quantum Readiness**: Implementations of NIST candidate algorithms (research stage)
-- **Neuromorphic Optimization**: Simulation of spiking neural networks for consensus optimization (experimental)
+### Experimental Research
+- **Post-Quantum Readiness**: Research into NIST candidate algorithms (not production-ready)
+- **Consensus Optimization**: Performance optimization and analysis frameworks
 
 ## Quick Start
 
@@ -29,13 +29,13 @@ git clone https://github.com/davidcanhelp/sedition.git
 cd sedition
 
 # Run demo
-go run demo/simple_poc_demo.go
+go run simple_poc_demo.go
 
 # Run tests
-go test ./...
+go test -v
 
-# Benchmark performance
-go run benchmarks/ultimate_benchmark_suite.go
+# Run specific package tests
+go test ./network ./storage ./crypto
 ```
 
 ## Overview

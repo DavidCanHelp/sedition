@@ -8,25 +8,27 @@ import (
 )
 
 // Block represents a block in the blockchain
-type Block struct {
-	Height    uint64
-	Proposer  string
-	Timestamp time.Time
-	Quality   float64
-	Commits   []Commit
-	Votes     map[string]bool
-	Hash      string
-}
+// Commented out - defined in poc_enhanced.go
+// type Block struct {
+// 	Height    uint64
+// 	Proposer  string
+// 	Timestamp time.Time
+// 	Quality   float64
+// 	Commits   []Commit
+// 	Votes     map[string]bool
+// 	Hash      string
+// }
 
 // Commit represents a code commit in a block
-type Commit struct {
-	Hash      string
-	Author    string
-	Message   string
-	Quality   float64
-	Timestamp time.Time
-	Files     []string
-}
+// Commented out - defined in poc_enhanced.go
+// type Commit struct {
+// 	Hash      string
+// 	Author    string
+// 	Message   string
+// 	Quality   float64
+// 	Timestamp time.Time
+// 	Files     []string
+// }
 
 // ValidatorState represents the simplified state of a validator for simulation
 type ValidatorState struct {
@@ -125,8 +127,17 @@ func (poc *ProofOfContribution) CalculateTotalStake(state *ValidatorState) uint6
 
 // ProcessBlock processes a new block
 func (poc *ProofOfContribution) ProcessBlock(block *Block) error {
+	// Calculate average quality from commits
+	avgQuality := 0.0
+	if len(block.Commits) > 0 {
+		for _, commit := range block.Commits {
+			avgQuality += commit.QualityScore
+		}
+		avgQuality /= float64(len(block.Commits))
+	}
+	
 	// Validate block quality
-	if block.Quality < 30 {
+	if avgQuality < 30 {
 		return errors.New("block quality too low")
 	}
 	

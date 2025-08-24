@@ -255,16 +255,15 @@ func (s *Simulator) createHonestProposal(node *SimulationNode, round int) *Block
 	quality := s.generateQualityScore()
 	
 	return &Block{
-		Height:    uint64(round),
+		Height:    int64(round),
 		Proposer:  node.ID,
 		Timestamp: time.Now(),
-		Quality:   quality,
 		Commits: []Commit{
 			{
-				Hash:    fmt.Sprintf("commit_%d_%s", round, node.ID),
-				Author:  node.ID,
-				Message: fmt.Sprintf("Round %d commit", round),
-				Quality: quality,
+				Hash:         []byte(fmt.Sprintf("commit_%d_%s", round, node.ID)),
+				Author:       node.ID,
+				Message:      fmt.Sprintf("Round %d commit", round),
+				QualityScore: quality,
 			},
 		},
 	}
@@ -276,16 +275,15 @@ func (s *Simulator) createByzantineProposal(node *SimulationNode, round int) *Bl
 	quality := rand.Float64() * 30 // Low quality
 	
 	return &Block{
-		Height:    uint64(round),
+		Height:    int64(round),
 		Proposer:  node.ID,
 		Timestamp: time.Now(),
-		Quality:   quality,
 		Commits: []Commit{
 			{
-				Hash:    fmt.Sprintf("byzantine_%d_%s", round, node.ID),
-				Author:  node.ID,
-				Message: "Malicious commit",
-				Quality: quality,
+				Hash:         []byte(fmt.Sprintf("byzantine_%d_%s", round, node.ID)),
+				Author:       node.ID,
+				Message:      "Malicious commit",
+				QualityScore: quality,
 			},
 		},
 	}
@@ -303,8 +301,15 @@ func (s *Simulator) collectVotes(proposal *Block) map[string]bool {
 		
 		// Simulate voting decision
 		if node.IsHonest {
-			// Honest nodes vote for valid proposals
-			if proposal.Quality >= 40 { // Minimum quality threshold
+			// Honest nodes vote based on average commit quality
+			avgQuality := 0.0
+			if len(proposal.Commits) > 0 {
+				for _, commit := range proposal.Commits {
+					avgQuality += commit.QualityScore
+				}
+				avgQuality /= float64(len(proposal.Commits))
+			}
+			if avgQuality >= 40 { // Minimum quality threshold
 				votes[node.ID] = true
 			}
 		} else {
@@ -335,9 +340,17 @@ func (s *Simulator) hasSupermajority(votes map[string]bool, proposal *Block) boo
 
 // finalizeBlock commits the block to the chain
 func (s *Simulator) finalizeBlock(block *Block) error {
-	// Record quality score
+	// Calculate and record average quality score
+	avgQuality := 0.0
+	if len(block.Commits) > 0 {
+		for _, commit := range block.Commits {
+			avgQuality += commit.QualityScore
+		}
+		avgQuality /= float64(len(block.Commits))
+	}
+	
 	s.metrics.mu.Lock()
-	s.metrics.QualityScores = append(s.metrics.QualityScores, block.Quality)
+	s.metrics.QualityScores = append(s.metrics.QualityScores, avgQuality)
 	s.metrics.mu.Unlock()
 	
 	// Process through consensus engine
@@ -368,7 +381,14 @@ func (s *Simulator) updateValidatorStates(block *Block) {
 		}
 		
 		// Check for slashing conditions
-		if !node.IsHonest && block.Quality < 30 && block.Proposer == nodeID {
+		avgQuality := 0.0
+		if len(block.Commits) > 0 {
+			for _, commit := range block.Commits {
+				avgQuality += commit.QualityScore
+			}
+			avgQuality /= float64(len(block.Commits))
+		}
+		if !node.IsHonest && avgQuality < 30 && block.Proposer == nodeID {
 			node.Stake = node.Stake / 2 // 50% slash
 			atomic.AddInt64(&s.metrics.SlashingEvents, 1)
 		}

@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"math/rand"
 	"net"
 	"sync"
@@ -997,11 +998,4 @@ func min(a, b int) int {
 		return a
 	}
 	return b
-}
-
-// math package helpers
-type math struct{}
-
-func (math) Sqrt(x float64) float64 {
-	return x // Simplified
 }

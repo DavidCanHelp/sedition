@@ -1233,13 +1233,12 @@ func (pm *ProductionMonitor) evaluateAlertRule(rule AlertRule) float64 {
 
 func (pm *ProductionMonitor) triggerAlert(rule AlertRule, value float64) {
 	alert := &Alert{
-		Name:        rule.Name,
+		ID:          rule.Name,
 		Value:       value,
-		Threshold:   rule.Threshold,
-		Severity:    rule.Severity,
-		Labels:      rule.Labels,
-		Annotations: rule.Annotations,
-		Timestamp:   time.Now(),
+		Threshold:   &AlertThreshold{Value: rule.Threshold},
+		Severity:    AlertSeverity(rule.Severity),
+		Message:     fmt.Sprintf("Alert: %s", rule.Name),
+		TriggeredAt: time.Now(),
 	}
 	
 	log.Printf("Alert triggered: %s = %f (threshold: %f)", rule.Name, value, rule.Threshold)
@@ -1254,11 +1253,11 @@ func (pm *ProductionMonitor) sendNotification(channel NotificationChannel, alert
 	// Simulate notification sending
 	switch channel.Type {
 	case "slack":
-		log.Printf("Sending Slack notification for alert: %s", alert.Name)
+		log.Printf("Sending Slack notification for alert: %s", alert.ID)
 	case "email":
-		log.Printf("Sending email notification for alert: %s", alert.Name)
+		log.Printf("Sending email notification for alert: %s", alert.ID)
 	case "pagerduty":
-		log.Printf("Sending PagerDuty notification for alert: %s", alert.Name)
+		log.Printf("Sending PagerDuty notification for alert: %s", alert.ID)
 	}
 }
 
@@ -2543,15 +2542,16 @@ func initSecurityMetrics() *SecurityMetrics {
 }
 
 // Stub implementations for complex types
-type Alert struct {
-	Name        string
-	Value       float64
-	Threshold   float64
-	Severity    Severity
-	Labels      map[string]string
-	Annotations map[string]string
-	Timestamp   time.Time
-}
+// Alert type is already defined in adaptive_consensus.go
+// type Alert struct {
+// 	Name        string
+// 	Value       float64
+// 	Threshold   float64
+// 	Severity    Severity
+// 	Labels      map[string]string
+// 	Annotations map[string]string
+// 	Timestamp   time.Time
+// }
 
 type AlertCondition int
 type AlertAction struct{}

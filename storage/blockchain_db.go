@@ -2,7 +2,6 @@
 package storage
 
 import (
-	"bytes"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
@@ -25,6 +24,8 @@ type Block struct {
 	Data         []byte
 	Proposer     string
 	Signatures   map[string][]byte
+	Commits      []Commit
+	StateRoot    []byte
 }
 
 // EnhancedValidator represents a consensus validator
@@ -41,6 +42,7 @@ type Commit struct {
 	BlockHash  []byte
 	Height     int64
 	Signatures map[string][]byte
+	Hash       []byte
 }
 
 // Database key prefixes
@@ -147,7 +149,7 @@ func (db *BlockchainDB) StoreBlock(block *Block) error {
 	db.batch.Put(blockKey, blockData)
 	
 	// Store block height index
-	heightKey := makeHeightKey(block.Height)
+	heightKey := makeHeightKey(int64(block.Height))
 	db.batch.Put(heightKey, block.Hash)
 	
 	// Store time index
@@ -155,19 +157,19 @@ func (db *BlockchainDB) StoreBlock(block *Block) error {
 	db.batch.Put(timeKey, []byte{1})
 	
 	// Store proposer index
-	proposerKey := makeProposerKey(block.Proposer, block.Height)
+	proposerKey := makeProposerKey(block.Proposer, int64(block.Height))
 	db.batch.Put(proposerKey, block.Hash)
 	
 	// Store commits
 	for _, commit := range block.Commits {
-		if err := db.storeCommit(&commit, block.Height); err != nil {
+		if err := db.storeCommit(&commit, int64(block.Height)); err != nil {
 			return err
 		}
 	}
 	
 	// Update chain tip if this is the new highest block
 	currentHeight, err := db.getChainHeight()
-	if err != nil || block.Height > currentHeight {
+	if err != nil || block.Height > uint64(currentHeight) {
 		db.batch.Put(chainTipKey, block.Hash)
 		db.batch.Put(chainHeightKey, encodeUint64(uint64(block.Height)))
 	}

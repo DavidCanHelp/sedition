@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 )
 
 // Signer handles digital signatures for consensus messages
@@ -126,6 +127,11 @@ func (m *MultiSignature) Verify(signers map[string]ed25519.PublicKey) bool {
 // HasSufficientSignatures checks if threshold is met
 func (m *MultiSignature) HasSufficientSignatures() bool {
 	return len(m.Signatures) >= m.Threshold
+}
+
+// GenerateRandom generates random bytes
+func GenerateRandom(b []byte) (int, error) {
+	return io.ReadFull(rand.Reader, b)
 }
 
 // SignedMessage represents a message with its signature

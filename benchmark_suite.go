@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"math/big"
 	"math/rand"
 	"os"
-	"path/filepath"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/davidcanhelp/sedition/consensus"
-	"github.com/davidcanhelp/sedition/crypto"
 )
 
 // BenchmarkSuite runs comprehensive performance comparisons
@@ -852,7 +852,3 @@ func RunBenchmarkSuite() error {
 	// Run all benchmarks
 	return suite.RunAllBenchmarks()
 }
-
-// Additional math import needed
-import "math"
-import "strings"

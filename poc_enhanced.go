@@ -2,6 +2,7 @@
 package poc
 
 import (
+	"bytes"
 	"crypto/ed25519"
 	"crypto/rand"
 	"crypto/sha256"
@@ -9,6 +10,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math"
 	"math/big"
 	"sort"
 	"sync"
@@ -52,6 +54,13 @@ type EnhancedConsensusEngine struct {
 	blockChain       []*Block
 }
 
+// GetValidators returns current validators
+func (e *EnhancedConsensusEngine) GetValidators() map[string]*EnhancedValidator {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+	return e.validators
+}
+
 // EnhancedValidator represents a validator with cryptographic identity
 type EnhancedValidator struct {
 	Address         string
@@ -91,6 +100,9 @@ type Commit struct {
 	LinesModified int
 	LinesDeleted  int
 	Diff          string // Code diff for ML analysis
+	TestCoverage  float64 // Test coverage percentage
+	Complexity    float64 // Cyclomatic complexity
+	Documentation float64 // Documentation coverage
 	QualityScore  float64
 	MLMetrics     map[string]interface{} // ML-based quality metrics
 	Signature     []byte // Author's signature
@@ -254,7 +266,7 @@ func (e *EnhancedConsensusEngine) ProposeBlock(proposer string, commits []Commit
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
-	validator, exists := e.validators[proposer]
+	_, exists := e.validators[proposer]
 	if !exists {
 		return nil, errors.New("proposer not found")
 	}
@@ -275,7 +287,16 @@ func (e *EnhancedConsensusEngine) ProposeBlock(proposer string, commits []Commit
 	// Analyze and sign each commit
 	for i := range commits {
 		// Traditional quality analysis
-		quality := e.qualityAnalyzer.AnalyzeCommit(&commits[i])
+		quality, _ := e.qualityAnalyzer.AnalyzeContribution(Contribution{
+			ID:           commits[i].ID,
+			Type:         CodeCommit,
+			LinesAdded:   commits[i].LinesAdded,
+			LinesModified: commits[i].LinesModified,
+			LinesDeleted: commits[i].LinesDeleted,
+			TestCoverage: commits[i].TestCoverage,
+			Complexity:   commits[i].Complexity,
+			Documentation: commits[i].Documentation,
+		})
 		
 		// Enhanced ML-based quality analysis
 		if commits[i].Diff != "" {
@@ -285,7 +306,7 @@ func (e *EnhancedConsensusEngine) ProposeBlock(proposer string, commits []Commit
 			})
 			if err == nil {
 				// Combine traditional and ML scores with weighted average
-				combinedScore := 0.4*quality.OverallScore + 0.6*mlPrediction.OverallQuality
+				combinedScore := 0.4*quality + 0.6*mlPrediction.OverallQuality
 				commits[i].QualityScore = combinedScore
 				commits[i].MLMetrics = map[string]interface{}{
 					"ml_quality": mlPrediction.OverallQuality,
@@ -294,17 +315,17 @@ func (e *EnhancedConsensusEngine) ProposeBlock(proposer string, commits []Commit
 					"risk_factors": mlPrediction.RiskFactors,
 				}
 			} else {
-				commits[i].QualityScore = quality.OverallScore
+				commits[i].QualityScore = quality
 			}
 		} else {
-			commits[i].QualityScore = quality.OverallScore
+			commits[i].QualityScore = quality
 		}
 
 		// Sign commit with quantum-resistant signature
 		commitData := e.serializeCommit(&commits[i])
 		
 		// Use quantum-resistant signature if available
-		if quantumSig, err := e.quantumConsensus.SignBlock(validatorAddr, commitData); err == nil {
+		if quantumSig, err := e.quantumConsensus.SignBlock(proposer, commitData); err == nil {
 			commits[i].Signature = quantumSig
 			commits[i].SignatureType = "SPHINCS+"
 		} else {
@@ -452,7 +473,7 @@ func (e *EnhancedConsensusEngine) VoteOnBlock(voter string, block *Block, approv
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
-	validator, exists := e.validators[voter]
+	_, exists := e.validators[voter]
 	if !exists {
 		return errors.New("voter not found")
 	}
@@ -517,7 +538,11 @@ func (e *EnhancedConsensusEngine) finalizeBlock(block *Block) {
 			validator.LastActivity = time.Now()
 
 			// Update reputation based on quality
-			e.reputationTracker.UpdateReputation(commit.Author, commit.QualityScore)
+			e.reputationTracker.UpdateReputation(commit.Author, Contribution{
+				ID:           commit.ID,
+				Timestamp:    commit.Timestamp,
+				QualityScore: commit.QualityScore,
+			})
 		}
 	}
 
@@ -774,16 +799,15 @@ func (e *EnhancedConsensusEngine) SlashValidator(address string, reason Slashing
 
 	// Record slashing event
 	event := SlashingEvent{
-		Timestamp: time.Now(),
-		Reason:    reason,
-		Amount:    slashAmount,
-		Evidence:  evidence,
+		Timestamp:     time.Now(),
+		Reason:        reason,
+		AmountSlashed: slashAmount,
+		Evidence:      evidence,
 	}
 	validator.SlashingEvents = append(validator.SlashingEvents, event)
 
 	// Apply reputation penalty
-	penalty := e.getReputationPenalty(reason)
-	e.reputationTracker.ApplySlashing(address, penalty)
+	e.reputationTracker.ApplySlashing(address, reason)
 
 	// Deactivate if stake below minimum
 	if validator.TokenStake.Cmp(e.minStakeRequired) < 0 {

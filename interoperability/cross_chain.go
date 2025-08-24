@@ -5,9 +5,9 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"math/big"
 	"sync"
 	"time"
@@ -1151,7 +1151,7 @@ func (ccm *CrossChainManager) GetMessageStatus(messageID string) (*CrossChainMes
 		return message, nil
 	}
 	
-	if receipt, exists := ccm.messageQueue.processedMessages[messageID]; exists {
+	if _, exists := ccm.messageQueue.processedMessages[messageID]; exists {
 		// Reconstruct message status from receipt
 		return &CrossChainMessage{
 			ID:     messageID,

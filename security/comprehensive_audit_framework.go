@@ -2,14 +2,11 @@ package security
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"math"
-	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -610,7 +607,7 @@ func (csaf *ComprehensiveSecurityAuditFramework) continuousMonitoringLoop(ctx co
 
 func (csaf *ComprehensiveSecurityAuditFramework) performContinuousSecurityMonitoring() {
 	// Monitor for security anomalies
-	anomalies := csaf.dynamicAnalyzer.anomalyDetector.DetectSecurityAnomalies()
+	anomalies := csaf.dynamicAnalyzer.anomalyDetector.DetectAnomalies()
 	for _, anomaly := range anomalies {
 		finding := csaf.convertAnomalyToFinding(anomaly)
 		csaf.processFinding(finding)
@@ -654,7 +651,7 @@ func (csaf *ComprehensiveSecurityAuditFramework) performScheduledVulnerabilitySc
 	
 	// Process scan results
 	for _, result := range scanResults {
-		if result.IsNewVulnerability() {
+		if scanResult, ok := result.(ScanResult); ok && scanResult.IsNewVulnerability() {
 			finding := csaf.convertScanResultToFinding(result)
 			csaf.processFinding(finding)
 		}

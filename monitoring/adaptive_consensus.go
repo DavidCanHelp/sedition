@@ -763,12 +763,12 @@ func (acm *AdaptiveConsensusMonitor) initializeDefaultAlerts() {
 
 // Additional utility functions
 func copyParameters(params *ConsensusParameters) *ConsensusParameters {
-	copy := *params
+	paramsCopy := *params
 	if params.RewardDistribution != nil {
-		copy.RewardDistribution = make([]float64, len(params.RewardDistribution))
-		copy(copy.RewardDistribution, params.RewardDistribution)
+		paramsCopy.RewardDistribution = make([]float64, len(params.RewardDistribution))
+		copy(paramsCopy.RewardDistribution, params.RewardDistribution)
 	}
-	return &copy
+	return &paramsCopy
 }
 
 func (acm *AdaptiveConsensusMonitor) updateMetricsHistory() {
@@ -842,7 +842,7 @@ func (acm *AdaptiveConsensusMonitor) getMetricValue(metricName string) float64 {
 
 func (acm *AdaptiveConsensusMonitor) isRuleTriggered(rule *AdaptationRule) bool {
 	// Simple rule evaluation (in practice, this would be more sophisticated)
-	metricValue := acm.getMetricValue(rule.TriggerCondition)
+	_ = acm.getMetricValue(rule.TriggerCondition)
 	currentParam := acm.getParameterValue(rule.TargetParameter)
 	
 	// Calculate if adaptation would make a significant change

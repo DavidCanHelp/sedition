@@ -156,7 +156,7 @@ func (dht *DHT) RemoveNode(nodeID string) {
 	dht.mu.Lock()
 	defer dht.mu.Unlock()
 	
-	node, exists := dht.routingTable[nodeID]
+	_, exists := dht.routingTable[nodeID]
 	if !exists {
 		return
 	}
@@ -310,7 +310,7 @@ func (dht *DHT) Lookup(target string, queryType QueryType) *DHTQuery {
 func (dht *DHT) simulateParallelQuery(nodes []*DHTNode, target string, queryType QueryType) []*DHTNode {
 	results := make([]*DHTNode, 0)
 	
-	for _, node := range nodes {
+	for range nodes {
 		// Simulate network delay
 		time.Sleep(time.Millisecond * 10)
 		

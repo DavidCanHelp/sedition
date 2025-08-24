@@ -55,14 +55,8 @@ go run demo/simple_poc_demo.go
 The demo can be extended with our research components:
 
 ```bash
-# Run with neuromorphic optimization (simulation)
-go run demo/simple_poc_demo.go --enable-neuromorphic
-
-# Run with DNA computing validation (simulation)
-go run demo/simple_poc_demo.go --enable-dna-computing
-
-# Run with photonic processing (simulation)
-go run demo/simple_poc_demo.go --enable-photonic
+# Run the working demo
+go run demo/simple_poc_demo.go
 ```
 
 ## Demo Flow
@@ -113,8 +107,8 @@ go run demo/simple_poc_demo.go --enable-photonic
 - **Measurable performance**: Concrete TPS and latency metrics
 
 ### 🔬 **Research Foundation**  
-- **Extensible architecture**: Ready for neuromorphic integration
-- **Modular design**: Easy to add DNA/photonic components
+- **Extensible architecture**: Clean modular design
+- **Research ready**: Foundation for consensus research
 - **Scientific rigor**: Each component backed by peer-reviewed research
 - **Clear pathway**: From demo to revolutionary capabilities
 
@@ -133,8 +127,8 @@ go run demo/simple_poc_demo.go --enable-photonic
 4. **Integration**: Connect with existing applications
 
 ### For Research
-1. **Intel Loihi integration**: Add neuromorphic optimization
-2. **University partnership**: Access DNA computing lab facilities
+1. **Performance optimization**: Improve throughput and latency
+2. **Multi-node deployment**: Scale to distributed environments
 3. **Silicon photonics**: Collaborate with manufacturers
 4. **Grant applications**: NSF/NIH funding for advanced research
 
