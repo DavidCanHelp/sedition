@@ -46,12 +46,12 @@ type EnhancedConsensusEngine struct {
 	committeeSize    int
 
 	// Current state
-	currentEpoch     int64
-	currentRound     uint64
-	lastBlockTime    time.Time
-	epochSeed        []byte
-	proposerHistory  []string
-	blockChain       []*Block
+	currentEpoch    int64
+	currentRound    uint64
+	lastBlockTime   time.Time
+	epochSeed       []byte
+	proposerHistory []string
+	blockChain      []*Block
 }
 
 // GetValidators returns current validators
@@ -77,15 +77,15 @@ type EnhancedValidator struct {
 
 // Block represents a block in the blockchain
 type Block struct {
-	Height       int64
-	PrevHash     []byte
-	Timestamp    time.Time
-	Proposer     string
-	VRFProof     []byte
-	Commits      []Commit
-	StateRoot    []byte
-	Signatures   map[string][]byte // validator -> signature
-	Hash         []byte
+	Height     int64
+	PrevHash   []byte
+	Timestamp  time.Time
+	Proposer   string
+	VRFProof   []byte
+	Commits    []Commit
+	StateRoot  []byte
+	Signatures map[string][]byte // validator -> signature
+	Hash       []byte
 }
 
 // Commit represents a code commit in a block
@@ -99,14 +99,14 @@ type Commit struct {
 	LinesAdded    int
 	LinesModified int
 	LinesDeleted  int
-	Diff          string // Code diff for ML analysis
+	Diff          string  // Code diff for ML analysis
 	TestCoverage  float64 // Test coverage percentage
 	Complexity    float64 // Cyclomatic complexity
 	Documentation float64 // Documentation coverage
 	QualityScore  float64
 	MLMetrics     map[string]interface{} // ML-based quality metrics
-	Signature     []byte // Author's signature
-	SignatureType string // "Ed25519" or "SPHINCS+"
+	Signature     []byte                 // Author's signature
+	SignatureType string                 // "Ed25519" or "SPHINCS+"
 }
 
 // NewEnhancedConsensusEngine creates a new consensus engine with cryptography
@@ -117,22 +117,22 @@ func NewEnhancedConsensusEngine(minStake *big.Int, blockTime time.Duration) *Enh
 
 	return &EnhancedConsensusEngine{
 		validators:        make(map[string]*EnhancedValidator),
-		signers:          make(map[string]*crypto.Signer),
-		vrfs:             make(map[string]*crypto.VRF),
-		merkleRoots:      make(map[int64][]byte),
-		qualityAnalyzer:  NewQualityAnalyzer(),
+		signers:           make(map[string]*crypto.Signer),
+		vrfs:              make(map[string]*crypto.VRF),
+		merkleRoots:       make(map[int64][]byte),
+		qualityAnalyzer:   NewQualityAnalyzer(),
 		reputationTracker: NewReputationTracker(),
 		metricsCalculator: NewMetricsCalculator(),
-		mlAnalyzer:       ml.NewMLQualityAnalyzer(),
-		quantumConsensus: crypto.NewQuantumResistantConsensus(),
-		minStakeRequired: minStake,
-		blockTime:        blockTime,
-		epochLength:      100,
-		committeeSize:    21,
-		currentEpoch:     0,
-		currentRound:     0,
-		epochSeed:        epochSeed,
-		blockChain:       make([]*Block, 0),
+		mlAnalyzer:        ml.NewMLQualityAnalyzer(),
+		quantumConsensus:  crypto.NewQuantumResistantConsensus(),
+		minStakeRequired:  minStake,
+		blockTime:         blockTime,
+		epochLength:       100,
+		committeeSize:     21,
+		currentEpoch:      0,
+		currentRound:      0,
+		epochSeed:         epochSeed,
+		blockChain:        make([]*Block, 0),
 	}
 }
 
@@ -288,20 +288,20 @@ func (e *EnhancedConsensusEngine) ProposeBlock(proposer string, commits []Commit
 	for i := range commits {
 		// Traditional quality analysis
 		quality, _ := e.qualityAnalyzer.AnalyzeContribution(Contribution{
-			ID:           commits[i].ID,
-			Type:         CodeCommit,
-			LinesAdded:   commits[i].LinesAdded,
+			ID:            commits[i].ID,
+			Type:          CodeCommit,
+			LinesAdded:    commits[i].LinesAdded,
 			LinesModified: commits[i].LinesModified,
-			LinesDeleted: commits[i].LinesDeleted,
-			TestCoverage: commits[i].TestCoverage,
-			Complexity:   commits[i].Complexity,
+			LinesDeleted:  commits[i].LinesDeleted,
+			TestCoverage:  commits[i].TestCoverage,
+			Complexity:    commits[i].Complexity,
 			Documentation: commits[i].Documentation,
 		})
-		
+
 		// Enhanced ML-based quality analysis
 		if commits[i].Diff != "" {
 			mlPrediction, err := e.mlAnalyzer.AnalyzeCode(commits[i].Diff, "go", map[string]interface{}{
-				"author": commits[i].Author,
+				"author":    commits[i].Author,
 				"timestamp": commits[i].Timestamp,
 			})
 			if err == nil {
@@ -309,10 +309,10 @@ func (e *EnhancedConsensusEngine) ProposeBlock(proposer string, commits []Commit
 				combinedScore := 0.4*quality + 0.6*mlPrediction.OverallQuality
 				commits[i].QualityScore = combinedScore
 				commits[i].MLMetrics = map[string]interface{}{
-					"ml_quality": mlPrediction.OverallQuality,
-					"confidence": mlPrediction.Confidence,
+					"ml_quality":      mlPrediction.OverallQuality,
+					"confidence":      mlPrediction.Confidence,
 					"recommendations": mlPrediction.Recommendations,
-					"risk_factors": mlPrediction.RiskFactors,
+					"risk_factors":    mlPrediction.RiskFactors,
 				}
 			} else {
 				commits[i].QualityScore = quality
@@ -323,7 +323,7 @@ func (e *EnhancedConsensusEngine) ProposeBlock(proposer string, commits []Commit
 
 		// Sign commit with quantum-resistant signature
 		commitData := e.serializeCommit(&commits[i])
-		
+
 		// Use quantum-resistant signature if available
 		if quantumSig, err := e.quantumConsensus.SignBlock(proposer, commitData); err == nil {
 			commits[i].Signature = quantumSig
@@ -584,7 +584,7 @@ func (e *EnhancedConsensusEngine) transitionEpoch() {
 func (e *EnhancedConsensusEngine) calculateEnhancedStake(v *EnhancedValidator) {
 	// Get current reputation
 	reputation := e.reputationTracker.GetReputation(v.Address)
-	
+
 	// Calculate reputation multiplier (0.5 to 2.0)
 	repMultiplier := math.Max(0.5, math.Min(2.0, reputation/5.0))
 
@@ -610,17 +610,17 @@ func (e *EnhancedConsensusEngine) calculateEnhancedStake(v *EnhancedValidator) {
 // calculateBlockHash computes the hash of a block
 func (e *EnhancedConsensusEngine) calculateBlockHash(block *Block) []byte {
 	data := make([]byte, 0)
-	
+
 	heightBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(heightBytes, uint64(block.Height))
 	data = append(data, heightBytes...)
-	
+
 	data = append(data, block.PrevHash...)
-	
+
 	timeBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(timeBytes, uint64(block.Timestamp.Unix()))
 	data = append(data, timeBytes...)
-	
+
 	data = append(data, []byte(block.Proposer)...)
 	data = append(data, block.VRFProof...)
 	data = append(data, block.StateRoot...)
@@ -635,13 +635,13 @@ func (e *EnhancedConsensusEngine) serializeCommit(commit *Commit) []byte {
 	data = append(data, []byte(commit.ID)...)
 	data = append(data, []byte(commit.Author)...)
 	data = append(data, commit.Hash...)
-	
+
 	timeBytes := make([]byte, 8)
 	binary.BigEndian.PutUint64(timeBytes, uint64(commit.Timestamp.Unix()))
 	data = append(data, timeBytes...)
-	
+
 	data = append(data, []byte(commit.Message)...)
-	
+
 	return data
 }
 
@@ -836,7 +836,7 @@ func (e *EnhancedConsensusEngine) calculateSlashAmount(stake *big.Int, reason Sl
 
 	slashAmount := new(big.Float).SetInt(stake)
 	slashAmount.Mul(slashAmount, big.NewFloat(percentage))
-	
+
 	result, _ := slashAmount.Int(nil)
 	return result
 }
@@ -875,21 +875,21 @@ func (e *EnhancedConsensusEngine) ExportGenesisState() *GenesisState {
 	}
 
 	return &GenesisState{
-		Validators:   validators,
-		EpochLength:  e.epochLength,
-		BlockTime:    e.blockTime,
-		MinStake:     e.minStakeRequired.String(),
-		GenesisTime:  time.Now(),
+		Validators:  validators,
+		EpochLength: e.epochLength,
+		BlockTime:   e.blockTime,
+		MinStake:    e.minStakeRequired.String(),
+		GenesisTime: time.Now(),
 	}
 }
 
 // GenesisState represents the initial state
 type GenesisState struct {
-	Validators   []GenesisValidator
-	EpochLength  int64
-	BlockTime    time.Duration
-	MinStake     string
-	GenesisTime  time.Time
+	Validators  []GenesisValidator
+	EpochLength int64
+	BlockTime   time.Duration
+	MinStake    string
+	GenesisTime time.Time
 }
 
 // GenesisValidator represents a validator in genesis

@@ -47,17 +47,17 @@ func TestPoCBenchmark(t *testing.T) {
 			RandomSeed:          42,
 		},
 	}
-	
+
 	RunBenchmark(configs)
 }
 
 // TestByzantineTolerance verifies Byzantine fault tolerance
 func TestByzantineTolerance(t *testing.T) {
 	testCases := []struct {
-		name         string
-		validators   int
-		byzantine    int
-		expectFail   bool
+		name       string
+		validators int
+		byzantine  int
+		expectFail bool
 	}{
 		{"10% Byzantine", 100, 10, false},
 		{"25% Byzantine", 100, 25, false},
@@ -65,7 +65,7 @@ func TestByzantineTolerance(t *testing.T) {
 		{"34% Byzantine (should fail)", 100, 34, true},
 		{"40% Byzantine (should fail)", 100, 40, true},
 	}
-	
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			config := SimulationConfig{
@@ -77,12 +77,12 @@ func TestByzantineTolerance(t *testing.T) {
 				QualityDistribution: "normal",
 				RandomSeed:          42,
 			}
-			
+
 			sim := NewSimulator(&config)
 			metrics, _ := sim.Run()
-			
+
 			successRate := float64(metrics.SuccessfulBlocks) / float64(metrics.TotalRounds)
-			
+
 			if tc.expectFail && successRate > 0.5 {
 				t.Errorf("Expected failure with %d%% Byzantine, but got %.2f%% success rate",
 					tc.byzantine*100/tc.validators, successRate*100)
@@ -105,21 +105,21 @@ func TestFinalityTime(t *testing.T) {
 		QualityDistribution: "normal",
 		RandomSeed:          42,
 	}
-	
+
 	sim := NewSimulator(&config)
 	metrics, err := sim.Run()
-	
+
 	if err != nil {
 		t.Fatalf("Simulation failed: %v", err)
 	}
-	
+
 	// Check that finality is achieved within target
 	targetFinality := 10.0 // seconds
 	if metrics.AverageFinality > targetFinality {
 		t.Errorf("Finality time %.2f exceeds target of %.2f seconds",
 			metrics.AverageFinality, targetFinality)
 	}
-	
+
 	t.Logf("Average finality achieved: %.3f seconds", metrics.AverageFinality)
 }
 
@@ -134,21 +134,21 @@ func TestThroughput(t *testing.T) {
 		QualityDistribution: "normal",
 		RandomSeed:          42,
 	}
-	
+
 	sim := NewSimulator(&config)
 	metrics, err := sim.Run()
-	
+
 	if err != nil {
 		t.Fatalf("Simulation failed: %v", err)
 	}
-	
+
 	// Check that throughput meets target
 	targetThroughput := 1000.0 // tx/s
 	if metrics.Throughput < targetThroughput {
 		t.Errorf("Throughput %.2f below target of %.2f tx/s",
 			metrics.Throughput, targetThroughput)
 	}
-	
+
 	t.Logf("Throughput achieved: %.2f tx/s", metrics.Throughput)
 }
 
@@ -163,21 +163,21 @@ func TestQualityIncentives(t *testing.T) {
 		QualityDistribution: "uniform",
 		RandomSeed:          42,
 	}
-	
+
 	sim := NewSimulator(&config)
-	
+
 	// Track initial reputations
 	initialReps := make(map[string]float64)
 	for id, node := range sim.nodes {
 		initialReps[id] = node.Reputation
 	}
-	
+
 	// Run simulation
 	metrics, err := sim.Run()
 	if err != nil {
 		t.Fatalf("Simulation failed: %v", err)
 	}
-	
+
 	// Check that high-quality contributors gained reputation
 	improvedCount := 0
 	for id, node := range sim.nodes {
@@ -185,12 +185,12 @@ func TestQualityIncentives(t *testing.T) {
 			improvedCount++
 		}
 	}
-	
+
 	if improvedCount < len(sim.nodes)/3 {
 		t.Errorf("Only %d/%d high-quality contributors improved reputation",
 			improvedCount, len(sim.nodes))
 	}
-	
+
 	t.Logf("Quality incentives working: %d validators improved reputation", improvedCount)
 	t.Logf("Average block quality: %.2f", averageQuality(metrics.QualityScores))
 }
@@ -206,26 +206,26 @@ func TestSlashingMechanism(t *testing.T) {
 		QualityDistribution: "normal",
 		RandomSeed:          42,
 	}
-	
+
 	sim := NewSimulator(&config)
-	
+
 	// Track initial stakes
 	initialStakes := make(map[string]uint64)
 	for id, node := range sim.nodes {
 		initialStakes[id] = node.Stake
 	}
-	
+
 	// Run simulation
 	metrics, err := sim.Run()
 	if err != nil {
 		t.Fatalf("Simulation failed: %v", err)
 	}
-	
+
 	// Check that slashing occurred
 	if metrics.SlashingEvents == 0 {
 		t.Error("No slashing events occurred despite Byzantine validators")
 	}
-	
+
 	// Verify Byzantine validators were slashed
 	slashedCount := 0
 	for id, node := range sim.nodes {
@@ -233,7 +233,7 @@ func TestSlashingMechanism(t *testing.T) {
 			slashedCount++
 		}
 	}
-	
+
 	t.Logf("Slashing mechanism active: %d events, %d validators slashed",
 		metrics.SlashingEvents, slashedCount)
 }
@@ -249,14 +249,14 @@ func TestNetworkPartitionRecovery(t *testing.T) {
 		QualityDistribution: "normal",
 		RandomSeed:          42,
 	}
-	
+
 	sim := NewSimulator(&config)
-	
+
 	// Start simulation in background
 	go func() {
 		// Create partition after 100 rounds
 		time.Sleep(5 * time.Second)
-		
+
 		// Partition 30% of nodes
 		partitionNodes := []string{}
 		count := 0
@@ -266,33 +266,33 @@ func TestNetworkPartitionRecovery(t *testing.T) {
 				count++
 			}
 		}
-		
+
 		t.Logf("Creating network partition of %d nodes", len(partitionNodes))
 		sim.SimulateNetworkPartition(partitionNodes, 2*time.Second)
 	}()
-	
+
 	metrics, err := sim.Run()
 	if err != nil {
 		t.Fatalf("Simulation failed: %v", err)
 	}
-	
+
 	// Should still achieve reasonable success rate despite partition
 	successRate := float64(metrics.SuccessfulBlocks) / float64(metrics.TotalRounds)
 	if successRate < 0.7 {
 		t.Errorf("Low success rate %.2f%% after partition recovery", successRate*100)
 	}
-	
+
 	t.Logf("Network partition recovery successful: %.2f%% success rate", successRate*100)
 }
 
 // BenchmarkPoCConsensus benchmarks the consensus algorithm performance
 func BenchmarkPoCConsensus(b *testing.B) {
 	sizes := []int{10, 50, 100, 500, 1000}
-	
+
 	for _, size := range sizes {
 		b.Run(fmt.Sprintf("validators_%d", size), func(b *testing.B) {
 			poc := NewProofOfContribution()
-			
+
 			// Register validators
 			for i := 0; i < size; i++ {
 				poc.RegisterValidator(&ValidatorState{
@@ -302,9 +302,9 @@ func BenchmarkPoCConsensus(b *testing.B) {
 					RecentContributions: 50,
 				})
 			}
-			
+
 			b.ResetTimer()
-			
+
 			for i := 0; i < b.N; i++ {
 				// Benchmark leader selection
 				leader := poc.SelectBlockProposer()
@@ -319,9 +319,9 @@ func BenchmarkPoCConsensus(b *testing.B) {
 // BenchmarkQualityAnalysis benchmarks code quality analysis
 func BenchmarkQualityAnalysis(b *testing.B) {
 	analyzer := NewCodeQualityAnalyzer()
-	
+
 	b.ResetTimer()
-	
+
 	for i := 0; i < b.N; i++ {
 		contribution := &Contribution{
 			Type:          CodeCommit,
@@ -333,7 +333,7 @@ func BenchmarkQualityAnalysis(b *testing.B) {
 			Complexity:    15,
 			QualityScore:  0,
 		}
-		
+
 		score, _ := analyzer.AnalyzeContribution(*contribution)
 		if score < 0 || score > 100 {
 			b.Fatalf("Invalid quality score: %f", score)

@@ -21,22 +21,22 @@ func NewMerkleTree(data [][]byte) (*MerkleTree, error) {
 	if len(data) == 0 {
 		return nil, errors.New("cannot create Merkle tree with no data")
 	}
-	
+
 	// Hash all data to create leaves
 	leaves := make([][]byte, len(data))
 	for i, d := range data {
 		hash := sha256.Sum256(d)
 		leaves[i] = hash[:]
 	}
-	
+
 	tree := &MerkleTree{
 		leaves: leaves,
 		levels: make([][][]byte, 0),
 	}
-	
+
 	// Build tree bottom-up
 	tree.build()
-	
+
 	return tree, nil
 }
 
@@ -45,10 +45,10 @@ func (m *MerkleTree) build() {
 	currentLevel := make([][]byte, len(m.leaves))
 	copy(currentLevel, m.leaves)
 	m.levels = append(m.levels, currentLevel)
-	
+
 	for len(currentLevel) > 1 {
 		nextLevel := make([][]byte, 0, (len(currentLevel)+1)/2)
-		
+
 		for i := 0; i < len(currentLevel); i += 2 {
 			var hash [32]byte
 			if i+1 < len(currentLevel) {
@@ -62,11 +62,11 @@ func (m *MerkleTree) build() {
 			}
 			nextLevel = append(nextLevel, hash[:])
 		}
-		
+
 		m.levels = append(m.levels, nextLevel)
 		currentLevel = nextLevel
 	}
-	
+
 	m.root = currentLevel[0]
 }
 
@@ -85,29 +85,29 @@ func (m *MerkleTree) GetProof(index int) (*MerkleProof, error) {
 	if index < 0 || index >= len(m.leaves) {
 		return nil, errors.New("index out of range")
 	}
-	
+
 	proof := &MerkleProof{
 		Leaf:     m.leaves[index],
 		Index:    index,
 		Siblings: make([][]byte, 0),
 	}
-	
+
 	// Traverse tree from leaf to root
 	currentIndex := index
 	for level := 0; level < len(m.levels)-1; level++ {
 		levelNodes := m.levels[level]
 		siblingIndex := currentIndex ^ 1 // XOR with 1 to get sibling
-		
+
 		if siblingIndex < len(levelNodes) {
 			proof.Siblings = append(proof.Siblings, levelNodes[siblingIndex])
 		} else {
 			// No sibling, use same node
 			proof.Siblings = append(proof.Siblings, levelNodes[currentIndex])
 		}
-		
+
 		currentIndex /= 2
 	}
-	
+
 	return proof, nil
 }
 
@@ -127,7 +127,7 @@ type MerkleProof struct {
 func VerifyMerkleProof(proof *MerkleProof, root []byte) bool {
 	currentHash := proof.Leaf
 	currentIndex := proof.Index
-	
+
 	for _, sibling := range proof.Siblings {
 		var combined []byte
 		if currentIndex%2 == 0 {
@@ -137,12 +137,12 @@ func VerifyMerkleProof(proof *MerkleProof, root []byte) bool {
 			// Current node is right child
 			combined = append(sibling, currentHash...)
 		}
-		
+
 		hash := sha256.Sum256(combined)
 		currentHash = hash[:]
 		currentIndex /= 2
 	}
-	
+
 	return bytes.Equal(currentHash, root)
 }
 
@@ -184,30 +184,30 @@ func (c *CompactMerkleTree) updateRoot() {
 		c.root = nil
 		return
 	}
-	
+
 	// Calculate tree height
 	height := int(math.Ceil(math.Log2(float64(c.leafCount))))
 	if c.leafCount == 1 {
 		height = 0
 	}
-	
+
 	// Build tree level by level
 	for level := 0; level < height; level++ {
 		levelSize := (c.leafCount + (1 << level) - 1) >> level
 		for i := 0; i < levelSize; i += 2 {
 			left := c.nodes[c.nodeKey(level, i)]
 			right := c.nodes[c.nodeKey(level, i+1)]
-			
+
 			if right == nil {
 				right = left // Duplicate if odd number
 			}
-			
+
 			combined := append(left, right...)
 			parentHash := c.hasher(combined)
 			c.nodes[c.nodeKey(level+1, i/2)] = parentHash
 		}
 	}
-	
+
 	c.root = c.nodes[c.nodeKey(height, 0)]
 }
 
@@ -240,7 +240,7 @@ func (s *SparseMerkleTree) Update(key, value []byte) error {
 	if len(key) != 32 {
 		return errors.New("key must be 32 bytes")
 	}
-	
+
 	path := s.getPath(key)
 	s.root = s.updateNode(s.root, path, 0, value)
 	return nil
@@ -252,7 +252,7 @@ func (s *SparseMerkleTree) getPath(key []byte) []bool {
 	for i := 0; i < s.depth; i++ {
 		byteIndex := i / 8
 		bitIndex := uint(7 - (i % 8))
-		path[i] = (key[byteIndex] >> bitIndex) & 1 == 1
+		path[i] = (key[byteIndex]>>bitIndex)&1 == 1
 	}
 	return path
 }
@@ -264,10 +264,10 @@ func (s *SparseMerkleTree) updateNode(nodeHash []byte, path []bool, depth int, v
 		hash := sha256.Sum256(value)
 		return hash[:]
 	}
-	
+
 	// Get current node
 	node := s.getNode(nodeHash)
-	
+
 	// Update appropriate child
 	if path[depth] {
 		// Update right child
@@ -276,14 +276,14 @@ func (s *SparseMerkleTree) updateNode(nodeHash []byte, path []bool, depth int, v
 		// Update left child
 		node.Left = s.updateNode(node.Left, path, depth+1, value)
 	}
-	
+
 	// Calculate new hash
 	combined := append(node.Left, node.Right...)
 	newHash := sha256.Sum256(combined)
-	
+
 	// Store updated node
 	s.storeNode(newHash[:], node)
-	
+
 	return newHash[:]
 }
 
@@ -301,7 +301,7 @@ func (s *SparseMerkleTree) getNode(hash []byte) *sparseNode {
 			Right: s.emptyVal,
 		}
 	}
-	
+
 	key := hex.EncodeToString(hash)
 	data, exists := s.db[key]
 	if !exists {
@@ -310,7 +310,7 @@ func (s *SparseMerkleTree) getNode(hash []byte) *sparseNode {
 			Right: s.emptyVal,
 		}
 	}
-	
+
 	// Decode node (simplified)
 	if len(data) >= 64 {
 		return &sparseNode{
@@ -318,7 +318,7 @@ func (s *SparseMerkleTree) getNode(hash []byte) *sparseNode {
 			Right: data[32:64],
 		}
 	}
-	
+
 	return &sparseNode{
 		Left:  s.emptyVal,
 		Right: s.emptyVal,
@@ -337,17 +337,17 @@ func (s *SparseMerkleTree) Get(key []byte) ([]byte, *SparseMerkleProof, error) {
 	if len(key) != 32 {
 		return nil, nil, errors.New("key must be 32 bytes")
 	}
-	
+
 	path := s.getPath(key)
 	proof := &SparseMerkleProof{
 		Key:      key,
 		Siblings: make([][]byte, s.depth),
 	}
-	
+
 	currentHash := s.root
 	for i := 0; i < s.depth; i++ {
 		node := s.getNode(currentHash)
-		
+
 		if path[i] {
 			proof.Siblings[i] = node.Left
 			currentHash = node.Right
@@ -356,7 +356,7 @@ func (s *SparseMerkleTree) Get(key []byte) ([]byte, *SparseMerkleProof, error) {
 			currentHash = node.Left
 		}
 	}
-	
+
 	return currentHash, proof, nil
 }
 
@@ -373,12 +373,12 @@ func (p *SparseMerkleProof) Verify(root []byte, depth int) bool {
 	for i := 0; i < depth; i++ {
 		byteIndex := i / 8
 		bitIndex := uint(7 - (i % 8))
-		path[i] = (p.Key[byteIndex] >> bitIndex) & 1 == 1
+		path[i] = (p.Key[byteIndex]>>bitIndex)&1 == 1
 	}
-	
+
 	currentHash := sha256.Sum256(p.Value)
 	hash := currentHash[:]
-	
+
 	for i := depth - 1; i >= 0; i-- {
 		var combined []byte
 		if path[i] {
@@ -386,11 +386,11 @@ func (p *SparseMerkleProof) Verify(root []byte, depth int) bool {
 		} else {
 			combined = append(hash, p.Siblings[i]...)
 		}
-		
+
 		newHash := sha256.Sum256(combined)
 		hash = newHash[:]
 	}
-	
+
 	return bytes.Equal(hash, root)
 }
 

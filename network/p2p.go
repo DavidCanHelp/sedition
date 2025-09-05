@@ -70,37 +70,37 @@ type P2PNode struct {
 	mu sync.RWMutex
 
 	// Identity
-	id        string
-	signer    *crypto.Signer
-	address   string
+	id         string
+	signer     *crypto.Signer
+	address    string
 	listenAddr string
 
 	// Network state
-	peers          map[string]*Peer
-	bannedPeers    map[string]time.Time
-	maxPeers       int
-	listener       net.Listener
-	
+	peers       map[string]*Peer
+	bannedPeers map[string]time.Time
+	maxPeers    int
+	listener    net.Listener
+
 	// Message handling
 	messageHandlers map[MessageType]MessageHandler
 	messageQueue    chan *MessageEnvelope
-	
+
 	// Gossip protocol
-	gossipPool      map[string]*GossipMessage
-	gossipTTL       int
-	
+	gossipPool map[string]*GossipMessage
+	gossipTTL  int
+
 	// Discovery
-	bootstrapNodes  []string
+	bootstrapNodes []string
 	dht            *DHT
-	
+
 	// Metrics
-	totalMessages   int64
-	totalBytes      int64
-	startTime       time.Time
-	
+	totalMessages int64
+	totalBytes    int64
+	startTime     time.Time
+
 	// Control
-	ctx            context.Context
-	cancel         context.CancelFunc
+	ctx    context.Context
+	cancel context.CancelFunc
 }
 
 // MessageHandler processes received messages
@@ -124,7 +124,7 @@ type GossipMessage struct {
 // NewP2PNode creates a new P2P node
 func NewP2PNode(listenAddr string, signer *crypto.Signer, bootstrapNodes []string) (*P2PNode, error) {
 	ctx, cancel := context.WithCancel(context.Background())
-	
+
 	node := &P2PNode{
 		id:              signer.GetAddress(),
 		signer:          signer,
@@ -179,7 +179,7 @@ func (n *P2PNode) Start() error {
 // Stop gracefully shuts down the node
 func (n *P2PNode) Stop() {
 	n.cancel()
-	
+
 	n.mu.Lock()
 	defer n.mu.Unlock()
 
@@ -423,7 +423,7 @@ func (n *P2PNode) disconnectPeer(peerID string) {
 // handlePeerMessages reads and processes messages from a peer
 func (n *P2PNode) handlePeerMessages(peer *Peer) {
 	reader := bufio.NewReader(peer.conn)
-	
+
 	for {
 		select {
 		case <-n.ctx.Done():
@@ -460,7 +460,7 @@ func (n *P2PNode) handlePeerMessages(peer *Peer) {
 				From:    peer,
 				Message: msg,
 			}
-			
+
 			select {
 			case n.messageQueue <- envelope:
 			default:
@@ -477,7 +477,7 @@ func (n *P2PNode) readMessage(reader *bufio.Reader) (*Message, error) {
 	if _, err := io.ReadFull(reader, lengthBytes); err != nil {
 		return nil, err
 	}
-	
+
 	length := binary.BigEndian.Uint32(lengthBytes)
 	if length > 10*1024*1024 { // Max 10MB
 		return nil, errors.New("message too large")
@@ -633,7 +633,7 @@ func (n *P2PNode) sendMessage(peer *Peer, msg *Message) error {
 // Gossip propagates a message through the network
 func (n *P2PNode) Gossip(msg *Message) {
 	msgID := n.getMessageID(msg)
-	
+
 	n.mu.Lock()
 	// Check if we've seen this message
 	if _, exists := n.gossipPool[msgID]; exists {
@@ -685,7 +685,7 @@ func (n *P2PNode) propagateGossip(msgID string) {
 
 	for i := 0; i < numToSend && i < len(peers); i++ {
 		go n.sendMessage(peers[i], gossip.Message)
-		
+
 		n.mu.Lock()
 		gossip.SeenPeers[peers[i].ID] = true
 		n.mu.Unlock()
@@ -751,7 +751,7 @@ func (n *P2PNode) handlePing(peer *Peer, msg *Message) error {
 		Sender:    n.id,
 		Payload:   msg.Payload,
 	}
-	
+
 	return n.sendMessage(peer, pong)
 }
 
@@ -958,7 +958,7 @@ func (n *P2PNode) GetPeers() []*Peer {
 	for _, peer := range n.peers {
 		peers = append(peers, peer)
 	}
-	
+
 	return peers
 }
 

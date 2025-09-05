@@ -14,81 +14,81 @@ type ShardingManager struct {
 	mu sync.RWMutex
 
 	// Shard management
-	shards              map[string]*Shard
-	shardTopology       *ShardTopology
-	shardAllocator      *ShardAllocator
-	crossShardRouter    *CrossShardRouter
-	
+	shards           map[string]*Shard
+	shardTopology    *ShardTopology
+	shardAllocator   *ShardAllocator
+	crossShardRouter *CrossShardRouter
+
 	// Dynamic scaling
-	autoScaler          *AutoScaler
-	loadBalancer        *ShardLoadBalancer
-	reshardingEngine    *ReshardingEngine
-	migrationManager    *MigrationManager
-	
+	autoScaler       *AutoScaler
+	loadBalancer     *ShardLoadBalancer
+	reshardingEngine *ReshardingEngine
+	migrationManager *MigrationManager
+
 	// State management
-	globalState         *GlobalState
-	shardStates         map[string]*ShardState
-	stateSync           *StateSynchronizer
-	
+	globalState *GlobalState
+	shardStates map[string]*ShardState
+	stateSync   *StateSynchronizer
+
 	// Consensus coordination
-	beaconChain         *BeaconChain
-	epochManager        *EpochManager
-	validatorAssigner   *ValidatorAssigner
-	
+	beaconChain       *BeaconChain
+	epochManager      *EpochManager
+	validatorAssigner *ValidatorAssigner
+
 	// Performance optimization
-	adaptiveSharding    *AdaptiveShardingEngine
-	performanceMonitor  *ShardingPerformanceMonitor
-	cacheManager        *ShardCacheManager
-	
+	adaptiveSharding   *AdaptiveShardingEngine
+	performanceMonitor *ShardingPerformanceMonitor
+	cacheManager       *ShardCacheManager
+
 	// Security and verification
-	crossShardVerifier  *CrossShardVerifier
-	fraudDetector       *ShardFraudDetector
-	attestationManager  *AttestationManager
-	
+	crossShardVerifier *CrossShardVerifier
+	fraudDetector      *ShardFraudDetector
+	attestationManager *AttestationManager
+
 	// Configuration and metrics
-	config              *ShardingConfig
-	metrics             *ShardingMetrics
-	eventLog            []ShardingEvent
-	
+	config   *ShardingConfig
+	metrics  *ShardingMetrics
+	eventLog []ShardingEvent
+
 	// Control
-	running             bool
-	stopCh              chan struct{}
+	running bool
+	stopCh  chan struct{}
 }
 
 // Shard represents a horizontal partition of the blockchain
 type Shard struct {
-	ID                  string            `json:"id"`
-	Index               uint32            `json:"index"`
-	CreatedAt           time.Time         `json:"created_at"`
-	
+	ID        string    `json:"id"`
+	Index     uint32    `json:"index"`
+	CreatedAt time.Time `json:"created_at"`
+
 	// Shard boundaries
-	KeyRange            *KeyRange         `json:"key_range"`
-	AddressSpace        *AddressSpace     `json:"address_space"`
-	
+	KeyRange     *KeyRange     `json:"key_range"`
+	AddressSpace *AddressSpace `json:"address_space"`
+
 	// Validators and consensus
-	Validators          []*ShardValidator `json:"validators"`
-	ValidatorSet        *ValidatorSet     `json:"validator_set"`
-	ConsensusEngine     *ShardConsensus   `json:"consensus_engine"`
-	
+	Validators      []*ShardValidator `json:"validators"`
+	ValidatorSet    *ValidatorSet     `json:"validator_set"`
+	ConsensusEngine *ShardConsensus   `json:"consensus_engine"`
+
 	// State and transactions
-	State               *ShardState       `json:"state"`
-	TransactionPool     *ShardTxPool      `json:"transaction_pool"`
-	BlockChain          []*ShardBlock     `json:"blockchain"`
-	
+	State           *ShardState   `json:"state"`
+	TransactionPool *ShardTxPool  `json:"transaction_pool"`
+	BlockChain      []*ShardBlock `json:"blockchain"`
+
 	// Cross-shard communication
-	CrossShardQueue     *CrossShardQueue  `json:"cross_shard_queue"`
-	PendingReceipts     map[string]*Receipt `json:"pending_receipts"`
-	
+	CrossShardQueue *CrossShardQueue    `json:"cross_shard_queue"`
+	PendingReceipts map[string]*Receipt `json:"pending_receipts"`
+
 	// Performance and health
-	LoadMetrics         *ShardLoadMetrics `json:"load_metrics"`
-	HealthStatus        ShardHealthStatus `json:"health_status"`
-	LastActivity        time.Time         `json:"last_activity"`
-	
+	LoadMetrics  *ShardLoadMetrics `json:"load_metrics"`
+	HealthStatus ShardHealthStatus `json:"health_status"`
+	LastActivity time.Time         `json:"last_activity"`
+
 	// Sharding metadata
-	ParentShard         *string           `json:"parent_shard,omitempty"`
-	ChildShards         []string          `json:"child_shards"`
-	SplitHeight         *int64            `json:"split_height,omitempty"`
-	MergeTarget         *string           `json:"merge_target,omitempty"`
+	ParentShard *string  `json:"parent_shard,omitempty"`
+	ChildShards []string `json:"child_shards"`
+	SplitHeight *int64   `json:"split_height,omitempty"`
+	MergeTarget *string  `json:"merge_target,omitempty"`
 }
 
 type ShardHealthStatus int
@@ -104,17 +104,17 @@ const (
 
 // KeyRange defines the key space assigned to a shard
 type KeyRange struct {
-	StartKey    []byte `json:"start_key"`
-	EndKey      []byte `json:"end_key"`
-	Inclusive   bool   `json:"inclusive"`
+	StartKey     []byte `json:"start_key"`
+	EndKey       []byte `json:"end_key"`
+	Inclusive    bool   `json:"inclusive"`
 	HashFunction string `json:"hash_function"`
 }
 
 // AddressSpace defines the address space managed by a shard
 type AddressSpace struct {
-	Prefix      string   `json:"prefix"`
-	StartAddr   []byte   `json:"start_addr"`
-	EndAddr     []byte   `json:"end_addr"`
+	Prefix      string      `json:"prefix"`
+	StartAddr   []byte      `json:"start_addr"`
+	EndAddr     []byte      `json:"end_addr"`
 	AddressType AddressType `json:"address_type"`
 }
 
@@ -129,13 +129,13 @@ const (
 
 // ShardValidator represents a validator assigned to a specific shard
 type ShardValidator struct {
-	ValidatorID     string            `json:"validator_id"`
-	PublicKey       []byte            `json:"public_key"`
-	Stake          *big.Int          `json:"stake"`
-	ShardAssignment []string          `json:"shard_assignment"`
-	Performance    *ValidatorPerformance `json:"performance"`
-	LastSeen       time.Time         `json:"last_seen"`
-	Status         ValidatorStatus   `json:"status"`
+	ValidatorID     string                `json:"validator_id"`
+	PublicKey       []byte                `json:"public_key"`
+	Stake           *big.Int              `json:"stake"`
+	ShardAssignment []string              `json:"shard_assignment"`
+	Performance     *ValidatorPerformance `json:"performance"`
+	LastSeen        time.Time             `json:"last_seen"`
+	Status          ValidatorStatus       `json:"status"`
 }
 
 type ValidatorStatus int
@@ -149,50 +149,50 @@ const (
 )
 
 type ValidatorPerformance struct {
-	UpTime              float64   `json:"uptime"`
+	UpTime              float64       `json:"uptime"`
 	ResponseTime        time.Duration `json:"response_time"`
-	AttestationRate     float64   `json:"attestation_rate"`
+	AttestationRate     float64       `json:"attestation_rate"`
 	CrossShardLatency   time.Duration `json:"cross_shard_latency"`
-	LastPerformanceEval time.Time `json:"last_performance_eval"`
+	LastPerformanceEval time.Time     `json:"last_performance_eval"`
 }
 
 // ShardTopology manages the relationship between shards
 type ShardTopology struct {
-	ShardGraph          *ShardGraph       `json:"shard_graph"`
-	RoutingTable        *RoutingTable     `json:"routing_table"`
-	NetworkPartitions   []*NetworkPartition `json:"network_partitions"`
-	TopologyHistory     []TopologySnapshot `json:"topology_history"`
-	OptimalTopology     *OptimalTopologyModel `json:"optimal_topology"`
+	ShardGraph        *ShardGraph           `json:"shard_graph"`
+	RoutingTable      *RoutingTable         `json:"routing_table"`
+	NetworkPartitions []*NetworkPartition   `json:"network_partitions"`
+	TopologyHistory   []TopologySnapshot    `json:"topology_history"`
+	OptimalTopology   *OptimalTopologyModel `json:"optimal_topology"`
 }
 
 type ShardGraph struct {
-	Nodes       map[string]*ShardNode `json:"nodes"`
-	Edges       []*ShardEdge         `json:"edges"`
-	Clusters    []*ShardCluster      `json:"clusters"`
+	Nodes    map[string]*ShardNode `json:"nodes"`
+	Edges    []*ShardEdge          `json:"edges"`
+	Clusters []*ShardCluster       `json:"clusters"`
 }
 
 type ShardNode struct {
-	ShardID     string            `json:"shard_id"`
-	Connections []string          `json:"connections"`
-	Weight      float64           `json:"weight"`
-	Position    []float64         `json:"position"`
+	ShardID     string                 `json:"shard_id"`
+	Connections []string               `json:"connections"`
+	Weight      float64                `json:"weight"`
+	Position    []float64              `json:"position"`
 	Metadata    map[string]interface{} `json:"metadata"`
 }
 
 type ShardEdge struct {
-	FromShard   string    `json:"from_shard"`
-	ToShard     string    `json:"to_shard"`
-	Weight      float64   `json:"weight"`
-	Latency     time.Duration `json:"latency"`
-	Bandwidth   int64     `json:"bandwidth"`
-	CostMetric  float64   `json:"cost_metric"`
+	FromShard  string        `json:"from_shard"`
+	ToShard    string        `json:"to_shard"`
+	Weight     float64       `json:"weight"`
+	Latency    time.Duration `json:"latency"`
+	Bandwidth  int64         `json:"bandwidth"`
+	CostMetric float64       `json:"cost_metric"`
 }
 
 type ShardCluster struct {
-	ID          string    `json:"id"`
-	Shards      []string  `json:"shards"`
+	ID          string      `json:"id"`
+	Shards      []string    `json:"shards"`
 	ClusterType ClusterType `json:"cluster_type"`
-	Affinity    float64   `json:"affinity"`
+	Affinity    float64     `json:"affinity"`
 }
 
 type ClusterType int
@@ -206,10 +206,10 @@ const (
 
 // RoutingTable manages cross-shard message routing
 type RoutingTable struct {
-	Routes          map[string]*Route     `json:"routes"`
-	DefaultRoute    *Route               `json:"default_route"`
-	RoutingRules    []*RoutingRule       `json:"routing_rules"`
-	LastUpdate      time.Time            `json:"last_update"`
+	Routes       map[string]*Route `json:"routes"`
+	DefaultRoute *Route            `json:"default_route"`
+	RoutingRules []*RoutingRule    `json:"routing_rules"`
+	LastUpdate   time.Time         `json:"last_update"`
 }
 
 type Route struct {
@@ -222,10 +222,10 @@ type Route struct {
 }
 
 type RoutingRule struct {
-	Condition   RoutingCondition `json:"condition"`
-	Action      RoutingAction    `json:"action"`
-	Priority    int              `json:"priority"`
-	Enabled     bool             `json:"enabled"`
+	Condition RoutingCondition `json:"condition"`
+	Action    RoutingAction    `json:"action"`
+	Priority  int              `json:"priority"`
+	Enabled   bool             `json:"enabled"`
 }
 
 type RoutingCondition struct {
@@ -247,9 +247,9 @@ const (
 )
 
 type RoutingAction struct {
-	Type        ActionType `json:"type"`
-	Parameters  map[string]interface{} `json:"parameters"`
-	Fallback    *RoutingAction `json:"fallback,omitempty"`
+	Type       ActionType             `json:"type"`
+	Parameters map[string]interface{} `json:"parameters"`
+	Fallback   *RoutingAction         `json:"fallback,omitempty"`
 }
 
 type ActionType int
@@ -265,30 +265,30 @@ const (
 
 // AutoScaler handles automatic shard scaling
 type AutoScaler struct {
-	scalingRules        []*ScalingRule
-	scalingHistory      []ScalingEvent
-	cooldownPeriod      time.Duration
-	lastScalingAction   time.Time
-	scalingMetrics      *ScalingMetrics
-	predictiveModel     *ScalingPredictionModel
+	scalingRules      []*ScalingRule
+	scalingHistory    []ScalingEvent
+	cooldownPeriod    time.Duration
+	lastScalingAction time.Time
+	scalingMetrics    *ScalingMetrics
+	predictiveModel   *ScalingPredictionModel
 }
 
 type ScalingRule struct {
-	Name            string           `json:"name"`
-	Trigger         *ScalingTrigger  `json:"trigger"`
-	Action          *ScalingAction   `json:"action"`
-	Cooldown        time.Duration    `json:"cooldown"`
-	MaxShards       int              `json:"max_shards"`
-	MinShards       int              `json:"min_shards"`
-	Enabled         bool             `json:"enabled"`
-	Priority        int              `json:"priority"`
+	Name      string          `json:"name"`
+	Trigger   *ScalingTrigger `json:"trigger"`
+	Action    *ScalingAction  `json:"action"`
+	Cooldown  time.Duration   `json:"cooldown"`
+	MaxShards int             `json:"max_shards"`
+	MinShards int             `json:"min_shards"`
+	Enabled   bool            `json:"enabled"`
+	Priority  int             `json:"priority"`
 }
 
 type ScalingTrigger struct {
-	MetricName      string      `json:"metric_name"`
-	Threshold       float64     `json:"threshold"`
-	Direction       Direction   `json:"direction"`
-	Duration        time.Duration `json:"duration"`
+	MetricName      string          `json:"metric_name"`
+	Threshold       float64         `json:"threshold"`
+	Direction       Direction       `json:"direction"`
+	Duration        time.Duration   `json:"duration"`
 	AggregationType AggregationType `json:"aggregation_type"`
 }
 
@@ -310,10 +310,10 @@ const (
 )
 
 type ScalingAction struct {
-	Type            ScalingActionType `json:"type"`
+	Type             ScalingActionType `json:"type"`
 	TargetShardCount int               `json:"target_shard_count"`
-	ScalingFactor   float64           `json:"scaling_factor"`
-	Strategy        ScalingStrategy   `json:"strategy"`
+	ScalingFactor    float64           `json:"scaling_factor"`
+	Strategy         ScalingStrategy   `json:"strategy"`
 }
 
 type ScalingActionType int
@@ -337,25 +337,25 @@ const (
 
 // ReshardingEngine manages shard reorganization
 type ReshardingEngine struct {
-	reshardingQueue     []*ReshardingOperation
-	activeOperations    map[string]*ReshardingOperation
-	reshardingStrategy  ReshardingStrategy
-	costCalculator      *ReshardingCostCalculator
-	migrationPlanner    *MigrationPlanner
+	reshardingQueue    []*ReshardingOperation
+	activeOperations   map[string]*ReshardingOperation
+	reshardingStrategy ReshardingStrategy
+	costCalculator     *ReshardingCostCalculator
+	migrationPlanner   *MigrationPlanner
 }
 
 type ReshardingOperation struct {
-	ID              string                `json:"id"`
-	Type            ReshardingType        `json:"type"`
-	SourceShards    []string              `json:"source_shards"`
-	TargetShards    []string              `json:"target_shards"`
-	State           ReshardingState       `json:"state"`
-	Progress        float64               `json:"progress"`
-	StartTime       time.Time             `json:"start_time"`
-	EstimatedEnd    time.Time             `json:"estimated_end"`
-	MigrationPlan   *MigrationPlan        `json:"migration_plan"`
-	RollbackPlan    *RollbackPlan         `json:"rollback_plan"`
-	Checkpoints     []ReshardingCheckpoint `json:"checkpoints"`
+	ID            string                 `json:"id"`
+	Type          ReshardingType         `json:"type"`
+	SourceShards  []string               `json:"source_shards"`
+	TargetShards  []string               `json:"target_shards"`
+	State         ReshardingState        `json:"state"`
+	Progress      float64                `json:"progress"`
+	StartTime     time.Time              `json:"start_time"`
+	EstimatedEnd  time.Time              `json:"estimated_end"`
+	MigrationPlan *MigrationPlan         `json:"migration_plan"`
+	RollbackPlan  *RollbackPlan          `json:"rollback_plan"`
+	Checkpoints   []ReshardingCheckpoint `json:"checkpoints"`
 }
 
 type ReshardingType int
@@ -388,56 +388,56 @@ const (
 
 // BeaconChain coordinates global consensus across shards
 type BeaconChain struct {
-	blocks              []*BeaconBlock
-	currentEpoch        uint64
-	epochDuration       time.Duration
-	finalizedEpoch      uint64
-	justifiedEpoch      uint64
-	
+	blocks         []*BeaconBlock
+	currentEpoch   uint64
+	epochDuration  time.Duration
+	finalizedEpoch uint64
+	justifiedEpoch uint64
+
 	// Validator management
-	globalValidatorSet  *GlobalValidatorSet
-	validatorQueue      *ValidatorQueue
-	slashingTracker     *SlashingTracker
-	
+	globalValidatorSet *GlobalValidatorSet
+	validatorQueue     *ValidatorQueue
+	slashingTracker    *SlashingTracker
+
 	// Cross-shard coordination
-	shardCommittees     map[string]*ShardCommittee
-	attestationPool     *AttestationPool
-	crosslinkPool       *CrosslinkPool
-	
+	shardCommittees map[string]*ShardCommittee
+	attestationPool *AttestationPool
+	crosslinkPool   *CrosslinkPool
+
 	// Randomness and VDF
-	randomnessSource    *RandomnessSource
-	vdfChain            *VDFChain
-	
+	randomnessSource *RandomnessSource
+	vdfChain         *VDFChain
+
 	// Finality and checkpoints
-	finalityTracker     *FinalityTracker
-	checkpointManager   *CheckpointManager
+	finalityTracker   *FinalityTracker
+	checkpointManager *CheckpointManager
 }
 
 type BeaconBlock struct {
-	Slot                uint64            `json:"slot"`
-	Epoch               uint64            `json:"epoch"`
-	ProposerIndex       uint64            `json:"proposer_index"`
-	ParentRoot          []byte            `json:"parent_root"`
-	StateRoot           []byte            `json:"state_root"`
-	
+	Slot          uint64 `json:"slot"`
+	Epoch         uint64 `json:"epoch"`
+	ProposerIndex uint64 `json:"proposer_index"`
+	ParentRoot    []byte `json:"parent_root"`
+	StateRoot     []byte `json:"state_root"`
+
 	// Attestations and crosslinks
-	Attestations        []*Attestation    `json:"attestations"`
-	Crosslinks          []*Crosslink      `json:"crosslinks"`
-	
+	Attestations []*Attestation `json:"attestations"`
+	Crosslinks   []*Crosslink   `json:"crosslinks"`
+
 	// Validator operations
-	ValidatorDeposits   []*ValidatorDeposit `json:"validator_deposits"`
-	ValidatorExits      []*ValidatorExit    `json:"validator_exits"`
-	Slashings           []*SlashingEvidence `json:"slashings"`
-	
+	ValidatorDeposits []*ValidatorDeposit `json:"validator_deposits"`
+	ValidatorExits    []*ValidatorExit    `json:"validator_exits"`
+	Slashings         []*SlashingEvidence `json:"slashings"`
+
 	// Randomness and VDF proof
-	RandaoReveal        []byte            `json:"randao_reveal"`
-	VDFProof            []byte            `json:"vdf_proof"`
-	
+	RandaoReveal []byte `json:"randao_reveal"`
+	VDFProof     []byte `json:"vdf_proof"`
+
 	// Block metadata
-	Signature           []byte            `json:"signature"`
-	Timestamp           time.Time         `json:"timestamp"`
-	GasUsed             uint64            `json:"gas_used"`
-	GasLimit            uint64            `json:"gas_limit"`
+	Signature []byte    `json:"signature"`
+	Timestamp time.Time `json:"timestamp"`
+	GasUsed   uint64    `json:"gas_used"`
+	GasLimit  uint64    `json:"gas_limit"`
 }
 
 // CrossShardTransaction represents a transaction spanning multiple shards
@@ -446,32 +446,32 @@ type CrossShardTransaction struct {
 	OriginShard     string                    `json:"origin_shard"`
 	TargetShards    []string                  `json:"target_shards"`
 	TransactionType CrossShardTransactionType `json:"transaction_type"`
-	
+
 	// Transaction components
-	Inputs          []*TransactionInput       `json:"inputs"`
-	Outputs         []*TransactionOutput      `json:"outputs"`
-	ContractCalls   []*CrossShardContractCall `json:"contract_calls"`
-	
+	Inputs        []*TransactionInput       `json:"inputs"`
+	Outputs       []*TransactionOutput      `json:"outputs"`
+	ContractCalls []*CrossShardContractCall `json:"contract_calls"`
+
 	// Execution state
-	State           TransactionState          `json:"state"`
-	ExecutionPlan   *ExecutionPlan            `json:"execution_plan"`
-	CompletedSteps  []ExecutionStep           `json:"completed_steps"`
-	PendingSteps    []ExecutionStep           `json:"pending_steps"`
-	
+	State          TransactionState `json:"state"`
+	ExecutionPlan  *ExecutionPlan   `json:"execution_plan"`
+	CompletedSteps []ExecutionStep  `json:"completed_steps"`
+	PendingSteps   []ExecutionStep  `json:"pending_steps"`
+
 	// Consensus and finality
-	Confirmations   map[string]*Confirmation  `json:"confirmations"`
-	FinalityProof   []byte                    `json:"finality_proof"`
-	
+	Confirmations map[string]*Confirmation `json:"confirmations"`
+	FinalityProof []byte                   `json:"finality_proof"`
+
 	// Atomicity and recovery
-	AtomicityGuard  *AtomicityGuard          `json:"atomicity_guard"`
-	RollbackPlan    *TransactionRollbackPlan `json:"rollback_plan"`
-	Timeout         time.Time                 `json:"timeout"`
-	
+	AtomicityGuard *AtomicityGuard          `json:"atomicity_guard"`
+	RollbackPlan   *TransactionRollbackPlan `json:"rollback_plan"`
+	Timeout        time.Time                `json:"timeout"`
+
 	// Metadata
-	CreatedAt       time.Time                 `json:"created_at"`
-	UpdatedAt       time.Time                 `json:"updated_at"`
-	GasEstimate     *big.Int                  `json:"gas_estimate"`
-	Fee             *big.Int                  `json:"fee"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	GasEstimate *big.Int  `json:"gas_estimate"`
+	Fee         *big.Int  `json:"fee"`
 }
 
 type CrossShardTransactionType int
@@ -495,132 +495,132 @@ const (
 
 // GlobalState manages the overall state across all shards
 type GlobalState struct {
-	stateRoot           []byte
-	shardRoots          map[string][]byte
-	epochNumber         uint64
-	blockNumber         uint64
-	
+	stateRoot   []byte
+	shardRoots  map[string][]byte
+	epochNumber uint64
+	blockNumber uint64
+
 	// State synchronization
-	stateSyncer         *StateSynchronizer
-	merkleForest        *MerkleForest
-	witnessRepository   *WitnessRepository
-	
+	stateSyncer       *StateSynchronizer
+	merkleForest      *MerkleForest
+	witnessRepository *WitnessRepository
+
 	// Cross-shard state tracking
-	crossShardAccounts  map[string]*CrossShardAccount
-	globalContracts     map[string]*GlobalContract
-	reservedNamespaces  map[string]*Namespace
-	
+	crossShardAccounts map[string]*CrossShardAccount
+	globalContracts    map[string]*GlobalContract
+	reservedNamespaces map[string]*Namespace
+
 	// Consensus state
-	validatorRegistry   *ValidatorRegistry
-	stakingState        *StakingState
-	slashingState       *SlashingState
-	
+	validatorRegistry *ValidatorRegistry
+	stakingState      *StakingState
+	slashingState     *SlashingState
+
 	// Economic state
-	feeMarket           *FeeMarket
-	rewardDistribution  *RewardDistribution
-	burnedFees          *big.Int
-	
-	lastUpdate          time.Time
+	feeMarket          *FeeMarket
+	rewardDistribution *RewardDistribution
+	burnedFees         *big.Int
+
+	lastUpdate time.Time
 }
 
 // ShardingMetrics tracks comprehensive sharding performance
 type ShardingMetrics struct {
 	// Throughput metrics
-	TotalTPS            float64           `json:"total_tps"`
-	ShardTPS            map[string]float64 `json:"shard_tps"`
-	CrossShardTPS       float64           `json:"cross_shard_tps"`
-	
+	TotalTPS      float64            `json:"total_tps"`
+	ShardTPS      map[string]float64 `json:"shard_tps"`
+	CrossShardTPS float64            `json:"cross_shard_tps"`
+
 	// Latency metrics
-	IntraShardLatency   time.Duration     `json:"intra_shard_latency"`
-	CrossShardLatency   time.Duration     `json:"cross_shard_latency"`
-	ConsensusLatency    time.Duration     `json:"consensus_latency"`
-	
+	IntraShardLatency time.Duration `json:"intra_shard_latency"`
+	CrossShardLatency time.Duration `json:"cross_shard_latency"`
+	ConsensusLatency  time.Duration `json:"consensus_latency"`
+
 	// Load distribution
-	ShardLoadBalance    float64           `json:"shard_load_balance"`
-	LoadVariance        float64           `json:"load_variance"`
-	HotSpotCount        int               `json:"hot_spot_count"`
-	
+	ShardLoadBalance float64 `json:"shard_load_balance"`
+	LoadVariance     float64 `json:"load_variance"`
+	HotSpotCount     int     `json:"hot_spot_count"`
+
 	// Scaling efficiency
-	ScalingFactor       float64           `json:"scaling_factor"`
-	ScalingOverhead     float64           `json:"scaling_overhead"`
-	ReshardingCost      *big.Int          `json:"resharding_cost"`
-	
+	ScalingFactor   float64  `json:"scaling_factor"`
+	ScalingOverhead float64  `json:"scaling_overhead"`
+	ReshardingCost  *big.Int `json:"resharding_cost"`
+
 	// Network health
-	ActiveShardCount    int               `json:"active_shard_count"`
-	HealthyShardRatio   float64           `json:"healthy_shard_ratio"`
-	NetworkPartitions   int               `json:"network_partitions"`
-	
+	ActiveShardCount  int     `json:"active_shard_count"`
+	HealthyShardRatio float64 `json:"healthy_shard_ratio"`
+	NetworkPartitions int     `json:"network_partitions"`
+
 	// Security metrics
-	CrossShardAttacks   int               `json:"cross_shard_attacks"`
-	ShardCompromises    int               `json:"shard_compromises"`
-	SecurityScore       float64           `json:"security_score"`
-	
-	LastUpdated         time.Time         `json:"last_updated"`
+	CrossShardAttacks int     `json:"cross_shard_attacks"`
+	ShardCompromises  int     `json:"shard_compromises"`
+	SecurityScore     float64 `json:"security_score"`
+
+	LastUpdated time.Time `json:"last_updated"`
 }
 
 // ShardingConfig defines configuration parameters
 type ShardingConfig struct {
 	// Basic sharding parameters
-	InitialShardCount   int               `json:"initial_shard_count"`
-	MaxShardCount       int               `json:"max_shard_count"`
-	MinShardCount       int               `json:"min_shard_count"`
-	ShardSize           int               `json:"shard_size"`
-	
+	InitialShardCount int `json:"initial_shard_count"`
+	MaxShardCount     int `json:"max_shard_count"`
+	MinShardCount     int `json:"min_shard_count"`
+	ShardSize         int `json:"shard_size"`
+
 	// Validator assignment
-	ValidatorsPerShard  int               `json:"validators_per_shard"`
-	ValidatorRotation   time.Duration     `json:"validator_rotation"`
-	CommitteeSize       int               `json:"committee_size"`
-	
+	ValidatorsPerShard int           `json:"validators_per_shard"`
+	ValidatorRotation  time.Duration `json:"validator_rotation"`
+	CommitteeSize      int           `json:"committee_size"`
+
 	// Cross-shard communication
-	CrossShardTimeout   time.Duration     `json:"cross_shard_timeout"`
-	MaxHopCount         int               `json:"max_hop_count"`
-	BatchSize           int               `json:"batch_size"`
-	
+	CrossShardTimeout time.Duration `json:"cross_shard_timeout"`
+	MaxHopCount       int           `json:"max_hop_count"`
+	BatchSize         int           `json:"batch_size"`
+
 	// Auto-scaling
-	AutoScalingEnabled  bool              `json:"auto_scaling_enabled"`
-	ScalingCooldown     time.Duration     `json:"scaling_cooldown"`
-	LoadThreshold       float64           `json:"load_threshold"`
-	
+	AutoScalingEnabled bool          `json:"auto_scaling_enabled"`
+	ScalingCooldown    time.Duration `json:"scaling_cooldown"`
+	LoadThreshold      float64       `json:"load_threshold"`
+
 	// Performance optimization
-	CacheEnabled        bool              `json:"cache_enabled"`
-	CacheSize           int               `json:"cache_size"`
-	PrefetchingEnabled  bool              `json:"prefetching_enabled"`
-	
+	CacheEnabled       bool `json:"cache_enabled"`
+	CacheSize          int  `json:"cache_size"`
+	PrefetchingEnabled bool `json:"prefetching_enabled"`
+
 	// Security settings
-	FraudProofTimeout   time.Duration     `json:"fraud_proof_timeout"`
-	ChallengeWindow     time.Duration     `json:"challenge_window"`
-	SlashingEnabled     bool              `json:"slashing_enabled"`
+	FraudProofTimeout time.Duration `json:"fraud_proof_timeout"`
+	ChallengeWindow   time.Duration `json:"challenge_window"`
+	SlashingEnabled   bool          `json:"slashing_enabled"`
 }
 
 // NewShardingManager creates a new sharding manager
 func NewShardingManager(config *ShardingConfig) *ShardingManager {
 	return &ShardingManager{
-		shards:              make(map[string]*Shard),
-		shardStates:         make(map[string]*ShardState),
-		config:              config,
-		metrics:             &ShardingMetrics{},
-		eventLog:            make([]ShardingEvent, 0),
-		stopCh:              make(chan struct{}),
-		
+		shards:      make(map[string]*Shard),
+		shardStates: make(map[string]*ShardState),
+		config:      config,
+		metrics:     &ShardingMetrics{},
+		eventLog:    make([]ShardingEvent, 0),
+		stopCh:      make(chan struct{}),
+
 		// Initialize components
-		shardTopology:       NewShardTopology(),
-		shardAllocator:      NewShardAllocator(config),
-		crossShardRouter:    NewCrossShardRouter(),
-		autoScaler:          NewAutoScaler(config),
-		loadBalancer:        NewShardLoadBalancer(),
-		reshardingEngine:    NewReshardingEngine(),
-		migrationManager:    NewMigrationManager(),
-		globalState:         NewGlobalState(),
-		stateSync:           NewStateSynchronizer(),
-		beaconChain:         NewBeaconChain(config),
-		epochManager:        NewEpochManager(),
-		validatorAssigner:   NewValidatorAssigner(),
-		adaptiveSharding:    NewAdaptiveShardingEngine(),
-		performanceMonitor:  NewShardingPerformanceMonitor(),
-		cacheManager:        NewShardCacheManager(),
-		crossShardVerifier:  NewCrossShardVerifier(),
-		fraudDetector:       NewShardFraudDetector(),
-		attestationManager:  NewAttestationManager(),
+		shardTopology:      NewShardTopology(),
+		shardAllocator:     NewShardAllocator(config),
+		crossShardRouter:   NewCrossShardRouter(),
+		autoScaler:         NewAutoScaler(config),
+		loadBalancer:       NewShardLoadBalancer(),
+		reshardingEngine:   NewReshardingEngine(),
+		migrationManager:   NewMigrationManager(),
+		globalState:        NewGlobalState(),
+		stateSync:          NewStateSynchronizer(),
+		beaconChain:        NewBeaconChain(config),
+		epochManager:       NewEpochManager(),
+		validatorAssigner:  NewValidatorAssigner(),
+		adaptiveSharding:   NewAdaptiveShardingEngine(),
+		performanceMonitor: NewShardingPerformanceMonitor(),
+		cacheManager:       NewShardCacheManager(),
+		crossShardVerifier: NewCrossShardVerifier(),
+		fraudDetector:      NewShardFraudDetector(),
+		attestationManager: NewAttestationManager(),
 	}
 }
 
@@ -656,11 +656,11 @@ func (sm *ShardingManager) Start(ctx context.Context) error {
 func (sm *ShardingManager) Stop() {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
-	
+
 	if !sm.running {
 		return
 	}
-	
+
 	close(sm.stopCh)
 	sm.running = false
 }
@@ -668,7 +668,7 @@ func (sm *ShardingManager) Stop() {
 // CreateShard creates a new shard with the specified key range
 func (sm *ShardingManager) CreateShard(keyRange *KeyRange, validators []*ShardValidator) (*Shard, error) {
 	shardID := sm.generateShardID()
-	
+
 	shard := &Shard{
 		ID:              shardID,
 		Index:           uint32(len(sm.shards)),
@@ -728,12 +728,12 @@ func (sm *ShardingManager) SplitShard(shardID string, splitPoints [][]byte) ([]*
 		sm.mu.Unlock()
 		return nil, fmt.Errorf("shard %s not found", shardID)
 	}
-	
+
 	if sourceShard.HealthStatus != ShardHealthStatusHealthy {
 		sm.mu.Unlock()
 		return nil, fmt.Errorf("cannot split unhealthy shard %s", shardID)
 	}
-	
+
 	// Mark shard as splitting
 	sourceShard.HealthStatus = ShardHealthStatusSplitting
 	sm.mu.Unlock()
@@ -750,14 +750,14 @@ func (sm *ShardingManager) SplitShard(shardID string, splitPoints [][]byte) ([]*
 	for i, keyRange := range sm.calculateSplitRanges(sourceShard.KeyRange, splitPoints) {
 		// Assign validators to child shards
 		childValidators := sm.validatorAssigner.AssignValidators(len(sourceShard.Validators) / len(childShards))
-		
+
 		childShard, err := sm.CreateShard(keyRange, childValidators)
 		if err != nil {
 			// Rollback on failure
 			sm.rollbackSplitOperation(sourceShard, childShards[:i])
 			return nil, fmt.Errorf("failed to create child shard: %w", err)
 		}
-		
+
 		childShard.ParentShard = &shardID
 		childShards[i] = childShard
 	}
@@ -886,14 +886,14 @@ func (sm *ShardingManager) evaluateScalingRules() {
 func (sm *ShardingManager) evaluateScalingTrigger(trigger *ScalingTrigger) bool {
 	// Get current metric value
 	currentValue := sm.getMetricValue(trigger.MetricName)
-	
+
 	switch trigger.Direction {
 	case DirectionUp:
 		return currentValue > trigger.Threshold
 	case DirectionDown:
 		return currentValue < trigger.Threshold
 	}
-	
+
 	return false
 }
 
@@ -959,7 +959,7 @@ func (sm *ShardingManager) assessShardHealth(shard *Shard) ShardHealthStatus {
 			activeValidators++
 		}
 	}
-	
+
 	participationRate := float64(activeValidators) / float64(len(shard.Validators))
 	if participationRate < 0.67 {
 		return ShardHealthStatusUnhealthy
@@ -998,7 +998,7 @@ func (sm *ShardingManager) calculateAddressSpace(keyRange *KeyRange) (*AddressSp
 
 func (sm *ShardingManager) calculateSplitRanges(originalRange *KeyRange, splitPoints [][]byte) []*KeyRange {
 	ranges := make([]*KeyRange, len(splitPoints)+1)
-	
+
 	// First range: start to first split point
 	ranges[0] = &KeyRange{
 		StartKey:     originalRange.StartKey,
@@ -1006,7 +1006,7 @@ func (sm *ShardingManager) calculateSplitRanges(originalRange *KeyRange, splitPo
 		Inclusive:    originalRange.Inclusive,
 		HashFunction: originalRange.HashFunction,
 	}
-	
+
 	// Middle ranges
 	for i := 1; i < len(splitPoints); i++ {
 		ranges[i] = &KeyRange{
@@ -1016,7 +1016,7 @@ func (sm *ShardingManager) calculateSplitRanges(originalRange *KeyRange, splitPo
 			HashFunction: originalRange.HashFunction,
 		}
 	}
-	
+
 	// Last range: last split point to end
 	ranges[len(splitPoints)] = &KeyRange{
 		StartKey:     splitPoints[len(splitPoints)-1],
@@ -1024,7 +1024,7 @@ func (sm *ShardingManager) calculateSplitRanges(originalRange *KeyRange, splitPo
 		Inclusive:    originalRange.Inclusive,
 		HashFunction: originalRange.HashFunction,
 	}
-	
+
 	return ranges
 }
 
@@ -1050,37 +1050,37 @@ func (sm *ShardingManager) initializeShards() error {
 	for i := range keySpace {
 		keySpace[i] = 0xFF
 	}
-	
+
 	shardSize := new(big.Int).SetBytes(keySpace)
 	shardSize.Div(shardSize, big.NewInt(int64(shardCount)))
-	
+
 	for i := 0; i < shardCount; i++ {
 		startKey := new(big.Int).Mul(big.NewInt(int64(i)), shardSize)
 		endKey := new(big.Int).Mul(big.NewInt(int64(i+1)), shardSize)
-		
+
 		keyRange := &KeyRange{
 			StartKey:     startKey.Bytes(),
 			EndKey:       endKey.Bytes(),
 			Inclusive:    true,
 			HashFunction: "sha256",
 		}
-		
+
 		// Assign validators
 		validators := sm.validatorAssigner.AssignValidators(sm.config.ValidatorsPerShard)
-		
+
 		_, err := sm.CreateShard(keyRange, validators)
 		if err != nil {
 			return fmt.Errorf("failed to create initial shard %d: %w", i, err)
 		}
 	}
-	
+
 	return nil
 }
 
 func (sm *ShardingManager) emitEvent(event ShardingEvent) {
 	sm.mu.Lock()
 	sm.eventLog = append(sm.eventLog, event)
-	
+
 	// Limit event log size
 	if len(sm.eventLog) > 10000 {
 		sm.eventLog = sm.eventLog[1:]
@@ -1104,40 +1104,40 @@ func (sm *ShardingManager) GetShardMetrics() *ShardingMetrics {
 func (sm *ShardingManager) GetShardByID(shardID string) (*Shard, error) {
 	sm.mu.RLock()
 	defer sm.mu.RUnlock()
-	
+
 	shard, exists := sm.shards[shardID]
 	if !exists {
 		return nil, fmt.Errorf("shard %s not found", shardID)
 	}
-	
+
 	return shard, nil
 }
 
 func (sm *ShardingManager) GetShardForAddress(address []byte) (*Shard, error) {
 	// Hash address to determine shard
 	hash := sha256.Sum256(address)
-	
+
 	sm.mu.RLock()
 	defer sm.mu.RUnlock()
-	
+
 	for _, shard := range sm.shards {
 		if sm.isInKeyRange(hash[:], shard.KeyRange) {
 			return shard, nil
 		}
 	}
-	
+
 	return nil, fmt.Errorf("no shard found for address")
 }
 
 func (sm *ShardingManager) isInKeyRange(key []byte, keyRange *KeyRange) bool {
 	start := keyRange.StartKey
 	end := keyRange.EndKey
-	
+
 	// Convert to big.Int for comparison
 	keyInt := new(big.Int).SetBytes(key)
 	startInt := new(big.Int).SetBytes(start)
 	endInt := new(big.Int).SetBytes(end)
-	
+
 	if keyRange.Inclusive {
 		return keyInt.Cmp(startInt) >= 0 && keyInt.Cmp(endInt) <= 0
 	}
@@ -1147,10 +1147,10 @@ func (sm *ShardingManager) isInKeyRange(key []byte, keyRange *KeyRange) bool {
 // Placeholder implementations for referenced types and functions
 
 type ShardingEvent struct {
-	Type      ShardingEventType          `json:"type"`
-	ShardID   string                     `json:"shard_id"`
-	Timestamp time.Time                  `json:"timestamp"`
-	Data      map[string]interface{}     `json:"data"`
+	Type      ShardingEventType      `json:"type"`
+	ShardID   string                 `json:"shard_id"`
+	Timestamp time.Time              `json:"timestamp"`
+	Data      map[string]interface{} `json:"data"`
 }
 
 type ShardingEventType int
@@ -1168,9 +1168,9 @@ const (
 // Placeholder constructors and types
 func NewShardTopology() *ShardTopology {
 	return &ShardTopology{
-		ShardGraph:       &ShardGraph{Nodes: make(map[string]*ShardNode), Edges: make([]*ShardEdge, 0)},
-		RoutingTable:     &RoutingTable{Routes: make(map[string]*Route)},
-		TopologyHistory:  make([]TopologySnapshot, 0),
+		ShardGraph:      &ShardGraph{Nodes: make(map[string]*ShardNode), Edges: make([]*ShardEdge, 0)},
+		RoutingTable:    &RoutingTable{Routes: make(map[string]*Route)},
+		TopologyHistory: make([]TopologySnapshot, 0),
 	}
 }
 
@@ -1189,24 +1189,24 @@ func (st *ShardTopology) UpdateAfterSplit(parentShardID string, childShards []*S
 }
 
 type TopologySnapshot struct {
-	Timestamp time.Time `json:"timestamp"`
-	ShardCount int      `json:"shard_count"`
-	Topology  string   `json:"topology"`
+	Timestamp  time.Time `json:"timestamp"`
+	ShardCount int       `json:"shard_count"`
+	Topology   string    `json:"topology"`
 }
 
 type OptimalTopologyModel struct {
-	ModelType   string                 `json:"model_type"`
-	Parameters  map[string]float64     `json:"parameters"`
-	Accuracy    float64                `json:"accuracy"`
-	LastTrained time.Time              `json:"last_trained"`
+	ModelType   string             `json:"model_type"`
+	Parameters  map[string]float64 `json:"parameters"`
+	Accuracy    float64            `json:"accuracy"`
+	LastTrained time.Time          `json:"last_trained"`
 }
 
 type NetworkPartition struct {
-	ID          string    `json:"id"`
-	Shards      []string  `json:"shards"`
-	DetectedAt  time.Time `json:"detected_at"`
-	ResolvedAt  *time.Time `json:"resolved_at,omitempty"`
-	Severity    int       `json:"severity"`
+	ID         string     `json:"id"`
+	Shards     []string   `json:"shards"`
+	DetectedAt time.Time  `json:"detected_at"`
+	ResolvedAt *time.Time `json:"resolved_at,omitempty"`
+	Severity   int        `json:"severity"`
 }
 
 // Additional placeholder implementations
@@ -1258,10 +1258,10 @@ func NewStateSynchronizer() *StateSynchronizer {
 
 func NewBeaconChain(config *ShardingConfig) *BeaconChain {
 	return &BeaconChain{
-		blocks:            make([]*BeaconBlock, 0),
-		currentEpoch:      0,
-		epochDuration:     10 * time.Minute,
-		shardCommittees:   make(map[string]*ShardCommittee),
+		blocks:          make([]*BeaconBlock, 0),
+		currentEpoch:    0,
+		epochDuration:   10 * time.Minute,
+		shardCommittees: make(map[string]*ShardCommittee),
 	}
 }
 
@@ -1416,28 +1416,35 @@ type MigrationPlanner struct{}
 type GlobalValidatorSet struct{}
 
 // Method placeholders
-func (sm *ShardingManager) stateSynchronizationLoop(ctx context.Context) {}
+func (sm *ShardingManager) stateSynchronizationLoop(ctx context.Context)  {}
 func (sm *ShardingManager) performanceMonitoringLoop(ctx context.Context) {}
-func (sm *ShardingManager) reshardingLoop(ctx context.Context) {}
-func (sm *ShardingManager) beaconChainLoop(ctx context.Context) {}
-func (sm *ShardingManager) validatorAssignmentLoop(ctx context.Context) {}
+func (sm *ShardingManager) reshardingLoop(ctx context.Context)            {}
+func (sm *ShardingManager) beaconChainLoop(ctx context.Context)           {}
+func (sm *ShardingManager) validatorAssignmentLoop(ctx context.Context)   {}
 
-func (sm *ShardingManager) updateShardMetrics() {}
-func (sm *ShardingManager) cleanupInactiveShards() {}
+func (sm *ShardingManager) updateShardMetrics()           {}
+func (sm *ShardingManager) cleanupInactiveShards()        {}
 func (sm *ShardingManager) updateCrossShardRoutingTable() {}
-func (sm *ShardingManager) handleHealthStatusChange(shardID string, shard *Shard, newStatus ShardHealthStatus) {}
+func (sm *ShardingManager) handleHealthStatusChange(shardID string, shard *Shard, newStatus ShardHealthStatus) {
+}
 
-func (sm *ShardingManager) executeSplitScaling(action *ScalingAction) {}
-func (sm *ShardingManager) executeMergeScaling(action *ScalingAction) {}
-func (sm *ShardingManager) executeAddShardScaling(action *ScalingAction) {}
+func (sm *ShardingManager) executeSplitScaling(action *ScalingAction)     {}
+func (sm *ShardingManager) executeMergeScaling(action *ScalingAction)     {}
+func (sm *ShardingManager) executeAddShardScaling(action *ScalingAction)  {}
 func (sm *ShardingManager) executeRebalanceScaling(action *ScalingAction) {}
 
 func (sm *ShardingManager) rollbackSplitOperation(sourceShard *Shard, childShards []*Shard) {}
 
 func (sm *ShardingManager) validateCrossShardTransaction(tx *CrossShardTransaction) error { return nil }
-func (sm *ShardingManager) createExecutionPlan(tx *CrossShardTransaction) (*ExecutionPlan, error) { return &ExecutionPlan{}, nil }
-func (sm *ShardingManager) createAtomicityGuard(tx *CrossShardTransaction) (*AtomicityGuard, error) { return &AtomicityGuard{}, nil }
-func (sm *ShardingManager) executeTransactionStep(tx *CrossShardTransaction, step ExecutionStep) error { return nil }
+func (sm *ShardingManager) createExecutionPlan(tx *CrossShardTransaction) (*ExecutionPlan, error) {
+	return &ExecutionPlan{}, nil
+}
+func (sm *ShardingManager) createAtomicityGuard(tx *CrossShardTransaction) (*AtomicityGuard, error) {
+	return &AtomicityGuard{}, nil
+}
+func (sm *ShardingManager) executeTransactionStep(tx *CrossShardTransaction, step ExecutionStep) error {
+	return nil
+}
 func (sm *ShardingManager) rollbackTransaction(tx *CrossShardTransaction) error { return nil }
 func (sm *ShardingManager) finalizeTransaction(tx *CrossShardTransaction) error { return nil }
 

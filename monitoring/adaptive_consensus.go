@@ -14,77 +14,77 @@ type AdaptiveConsensusMonitor struct {
 	mu sync.RWMutex
 
 	// Performance metrics
-	metrics           *PerformanceMetrics
-	metricsHistory    []MetricsSnapshot
-	adaptationRules   []*AdaptationRule
-	
+	metrics         *PerformanceMetrics
+	metricsHistory  []MetricsSnapshot
+	adaptationRules []*AdaptationRule
+
 	// Current system state
 	currentParameters *ConsensusParameters
 	baseParameters    *ConsensusParameters
 	adaptationEnabled bool
-	
+
 	// Monitoring configuration
 	monitoringInterval time.Duration
 	historyWindow      time.Duration
 	adaptationCooldown time.Duration
 	lastAdaptation     time.Time
-	
+
 	// Alert system
-	alertThresholds   map[string]*AlertThreshold
-	activeAlerts      map[string]*Alert
-	alertCallbacks    []AlertCallback
-	
+	alertThresholds map[string]*AlertThreshold
+	activeAlerts    map[string]*Alert
+	alertCallbacks  []AlertCallback
+
 	// Machine learning optimization
-	optimizer         *ConsensusOptimizer
-	adaptationLog     []AdaptationEvent
-	
+	optimizer     *ConsensusOptimizer
+	adaptationLog []AdaptationEvent
+
 	// Network health tracking
-	networkHealth     *NetworkHealthTracker
-	nodeStates        map[string]*NodeState
-	
+	networkHealth *NetworkHealthTracker
+	nodeStates    map[string]*NodeState
+
 	// Stop channel for graceful shutdown
-	stopCh            chan struct{}
-	running           bool
+	stopCh  chan struct{}
+	running bool
 }
 
 // PerformanceMetrics tracks real-time consensus performance
 type PerformanceMetrics struct {
 	// Throughput metrics
-	TPS                  float64   `json:"transactions_per_second"`
-	BlocksPerMinute      float64   `json:"blocks_per_minute"`
-	CommitsPerBlock      float64   `json:"commits_per_block"`
-	
+	TPS             float64 `json:"transactions_per_second"`
+	BlocksPerMinute float64 `json:"blocks_per_minute"`
+	CommitsPerBlock float64 `json:"commits_per_block"`
+
 	// Latency metrics
-	BlockLatency         time.Duration `json:"block_latency"`
-	ConsensusLatency     time.Duration `json:"consensus_latency"`
-	PropagationLatency   time.Duration `json:"propagation_latency"`
-	FinalizationLatency  time.Duration `json:"finalization_latency"`
-	
+	BlockLatency        time.Duration `json:"block_latency"`
+	ConsensusLatency    time.Duration `json:"consensus_latency"`
+	PropagationLatency  time.Duration `json:"propagation_latency"`
+	FinalizationLatency time.Duration `json:"finalization_latency"`
+
 	// Quality metrics
-	AverageQuality       float64   `json:"average_quality_score"`
-	QualityVariance      float64   `json:"quality_variance"`
-	MLAccuracy           float64   `json:"ml_accuracy"`
-	SecurityScore        float64   `json:"security_score"`
-	
+	AverageQuality  float64 `json:"average_quality_score"`
+	QualityVariance float64 `json:"quality_variance"`
+	MLAccuracy      float64 `json:"ml_accuracy"`
+	SecurityScore   float64 `json:"security_score"`
+
 	// Network metrics
-	NetworkUtilization   float64   `json:"network_utilization"`
+	NetworkUtilization     float64 `json:"network_utilization"`
 	ValidatorParticipation float64 `json:"validator_participation"`
-	ByzantineNodes       int       `json:"byzantine_nodes"`
-	NetworkPartitions    int       `json:"network_partitions"`
-	
+	ByzantineNodes         int     `json:"byzantine_nodes"`
+	NetworkPartitions      int     `json:"network_partitions"`
+
 	// Resource metrics
-	CPUUsage             float64   `json:"cpu_usage"`
-	MemoryUsage          float64   `json:"memory_usage"`
-	DiskUsage            float64   `json:"disk_usage"`
-	NetworkBandwidth     float64   `json:"network_bandwidth"`
-	
+	CPUUsage         float64 `json:"cpu_usage"`
+	MemoryUsage      float64 `json:"memory_usage"`
+	DiskUsage        float64 `json:"disk_usage"`
+	NetworkBandwidth float64 `json:"network_bandwidth"`
+
 	// Consensus health
-	ForkCount            int       `json:"fork_count"`
-	OrphanBlocks         int       `json:"orphan_blocks"`
-	RoundDuration        time.Duration `json:"round_duration"`
-	CommitteeEfficiency  float64   `json:"committee_efficiency"`
-	
-	Timestamp            time.Time `json:"timestamp"`
+	ForkCount           int           `json:"fork_count"`
+	OrphanBlocks        int           `json:"orphan_blocks"`
+	RoundDuration       time.Duration `json:"round_duration"`
+	CommitteeEfficiency float64       `json:"committee_efficiency"`
+
+	Timestamp time.Time `json:"timestamp"`
 }
 
 // MetricsSnapshot captures metrics at a specific point in time
@@ -95,51 +95,51 @@ type MetricsSnapshot struct {
 
 // ConsensusParameters represents adaptive consensus configuration
 type ConsensusParameters struct {
-	BlockTime            time.Duration `json:"block_time"`
-	CommitteeSize        int           `json:"committee_size"`
-	MinStakeRequired     int64         `json:"min_stake_required"`
-	QualityThreshold     float64       `json:"quality_threshold"`
-	ReputationWeight     float64       `json:"reputation_weight"`
-	VRFDifficulty        int           `json:"vrf_difficulty"`
-	MaxBlockSize         int           `json:"max_block_size"`
-	EpochLength          int64         `json:"epoch_length"`
-	SlashingPenalty      float64       `json:"slashing_penalty"`
-	RewardDistribution   []float64     `json:"reward_distribution"`
+	BlockTime          time.Duration `json:"block_time"`
+	CommitteeSize      int           `json:"committee_size"`
+	MinStakeRequired   int64         `json:"min_stake_required"`
+	QualityThreshold   float64       `json:"quality_threshold"`
+	ReputationWeight   float64       `json:"reputation_weight"`
+	VRFDifficulty      int           `json:"vrf_difficulty"`
+	MaxBlockSize       int           `json:"max_block_size"`
+	EpochLength        int64         `json:"epoch_length"`
+	SlashingPenalty    float64       `json:"slashing_penalty"`
+	RewardDistribution []float64     `json:"reward_distribution"`
 }
 
 // AdaptationRule defines rules for parameter adaptation
 type AdaptationRule struct {
-	Name              string                 `json:"name"`
-	TriggerCondition  string                 `json:"trigger_condition"`
-	TargetParameter   string                 `json:"target_parameter"`
+	Name               string `json:"name"`
+	TriggerCondition   string `json:"trigger_condition"`
+	TargetParameter    string `json:"target_parameter"`
 	AdaptationFunction func(current float64, metrics *PerformanceMetrics) float64
-	MinValue          float64                `json:"min_value"`
-	MaxValue          float64                `json:"max_value"`
-	AdaptationRate    float64                `json:"adaptation_rate"`
-	Enabled           bool                   `json:"enabled"`
-	Priority          int                    `json:"priority"`
+	MinValue           float64 `json:"min_value"`
+	MaxValue           float64 `json:"max_value"`
+	AdaptationRate     float64 `json:"adaptation_rate"`
+	Enabled            bool    `json:"enabled"`
+	Priority           int     `json:"priority"`
 }
 
 // AlertThreshold defines performance alert criteria
 type AlertThreshold struct {
-	MetricName   string        `json:"metric_name"`
-	MinValue     *float64      `json:"min_value,omitempty"`
-	MaxValue     *float64      `json:"max_value,omitempty"`
-	Duration     time.Duration `json:"duration"`
-	Severity     AlertSeverity `json:"severity"`
-	Description  string        `json:"description"`
+	MetricName  string        `json:"metric_name"`
+	MinValue    *float64      `json:"min_value,omitempty"`
+	MaxValue    *float64      `json:"max_value,omitempty"`
+	Duration    time.Duration `json:"duration"`
+	Severity    AlertSeverity `json:"severity"`
+	Description string        `json:"description"`
 }
 
 // Alert represents an active performance alert
 type Alert struct {
-	ID          string        `json:"id"`
+	ID          string          `json:"id"`
 	Threshold   *AlertThreshold `json:"threshold"`
-	TriggeredAt time.Time     `json:"triggered_at"`
-	Value       float64       `json:"value"`
-	Severity    AlertSeverity `json:"severity"`
-	Message     string        `json:"message"`
-	Resolved    bool          `json:"resolved"`
-	ResolvedAt  *time.Time    `json:"resolved_at,omitempty"`
+	TriggeredAt time.Time       `json:"triggered_at"`
+	Value       float64         `json:"value"`
+	Severity    AlertSeverity   `json:"severity"`
+	Message     string          `json:"message"`
+	Resolved    bool            `json:"resolved"`
+	ResolvedAt  *time.Time      `json:"resolved_at,omitempty"`
 }
 
 type AlertSeverity int
@@ -156,14 +156,14 @@ type AlertCallback func(alert *Alert)
 
 // AdaptationEvent records parameter adaptations
 type AdaptationEvent struct {
-	Timestamp     time.Time              `json:"timestamp"`
-	Rule          string                 `json:"rule"`
-	Parameter     string                 `json:"parameter"`
-	OldValue      float64                `json:"old_value"`
-	NewValue      float64                `json:"new_value"`
-	TriggerMetric string                 `json:"trigger_metric"`
-	MetricValue   float64                `json:"metric_value"`
-	Reason        string                 `json:"reason"`
+	Timestamp     time.Time `json:"timestamp"`
+	Rule          string    `json:"rule"`
+	Parameter     string    `json:"parameter"`
+	OldValue      float64   `json:"old_value"`
+	NewValue      float64   `json:"new_value"`
+	TriggerMetric string    `json:"trigger_metric"`
+	MetricValue   float64   `json:"metric_value"`
+	Reason        string    `json:"reason"`
 }
 
 // ConsensusOptimizer uses machine learning to optimize consensus parameters
@@ -177,19 +177,19 @@ type ConsensusOptimizer struct {
 
 // OptimizationModel represents the ML model for parameter optimization
 type OptimizationModel struct {
-	Weights          [][]float64 `json:"weights"`
-	Biases           []float64   `json:"biases"`
-	Architecture     []int       `json:"architecture"`
-	TrainingMetrics  map[string]float64 `json:"training_metrics"`
-	LastUpdated      time.Time   `json:"last_updated"`
+	Weights         [][]float64        `json:"weights"`
+	Biases          []float64          `json:"biases"`
+	Architecture    []int              `json:"architecture"`
+	TrainingMetrics map[string]float64 `json:"training_metrics"`
+	LastUpdated     time.Time          `json:"last_updated"`
 }
 
 // OptimizationSample represents training data for the optimizer
 type OptimizationSample struct {
-	Parameters  ConsensusParameters `json:"parameters"`
-	Metrics     PerformanceMetrics  `json:"metrics"`
-	Objective   float64             `json:"objective"`
-	Timestamp   time.Time           `json:"timestamp"`
+	Parameters ConsensusParameters `json:"parameters"`
+	Metrics    PerformanceMetrics  `json:"metrics"`
+	Objective  float64             `json:"objective"`
+	Timestamp  time.Time           `json:"timestamp"`
 }
 
 // OptimizationResult represents optimization recommendations
@@ -211,22 +211,22 @@ const (
 
 // NetworkHealthTracker monitors network-wide health metrics
 type NetworkHealthTracker struct {
-	nodes              map[string]*NodeState
-	networkTopology    *NetworkTopology
-	partitionDetector  *PartitionDetector
-	healingStrategies  []HealingStrategy
+	nodes             map[string]*NodeState
+	networkTopology   *NetworkTopology
+	partitionDetector *PartitionDetector
+	healingStrategies []HealingStrategy
 }
 
 // NodeState represents the state of a validator node
 type NodeState struct {
-	NodeID           string        `json:"node_id"`
-	LastSeen         time.Time     `json:"last_seen"`
-	Status           NodeStatus    `json:"status"`
-	PerformanceScore float64       `json:"performance_score"`
-	ReputationScore  float64       `json:"reputation_score"`
-	Latency          time.Duration `json:"latency"`
+	NodeID           string          `json:"node_id"`
+	LastSeen         time.Time       `json:"last_seen"`
+	Status           NodeStatus      `json:"status"`
+	PerformanceScore float64         `json:"performance_score"`
+	ReputationScore  float64         `json:"reputation_score"`
+	Latency          time.Duration   `json:"latency"`
 	NetworkPosition  NetworkPosition `json:"network_position"`
-	FaultHistory     []FaultEvent  `json:"fault_history"`
+	FaultHistory     []FaultEvent    `json:"fault_history"`
 }
 
 type NodeStatus int
@@ -240,9 +240,9 @@ const (
 )
 
 type NetworkPosition struct {
-	RegionID    string  `json:"region_id"`
+	RegionID    string    `json:"region_id"`
 	Coordinates []float64 `json:"coordinates"`
-	Connections []string `json:"connections"`
+	Connections []string  `json:"connections"`
 }
 
 type FaultEvent struct {
@@ -260,11 +260,11 @@ type NetworkTopology struct {
 }
 
 type Region struct {
-	ID              string            `json:"id"`
-	Name            string            `json:"name"`
-	NodeCount       int               `json:"node_count"`
-	AverageLatency  time.Duration     `json:"average_latency"`
-	ConnectedRegions []string          `json:"connected_regions"`
+	ID               string        `json:"id"`
+	Name             string        `json:"name"`
+	NodeCount        int           `json:"node_count"`
+	AverageLatency   time.Duration `json:"average_latency"`
+	ConnectedRegions []string      `json:"connected_regions"`
 }
 
 // PartitionDetector identifies network partitions
@@ -274,26 +274,26 @@ type PartitionDetector struct {
 }
 
 type PartitionEvent struct {
-	Timestamp     time.Time `json:"timestamp"`
-	PartitionType string    `json:"partition_type"`
-	AffectedNodes []string  `json:"affected_nodes"`
+	Timestamp     time.Time     `json:"timestamp"`
+	PartitionType string        `json:"partition_type"`
+	AffectedNodes []string      `json:"affected_nodes"`
 	Duration      time.Duration `json:"duration"`
-	Resolved      bool      `json:"resolved"`
+	Resolved      bool          `json:"resolved"`
 }
 
 type PartitionDetectionConfig struct {
-	TimeoutThreshold      time.Duration `json:"timeout_threshold"`
-	MinPartitionSize      int           `json:"min_partition_size"`
-	ConsensusRequirement  float64       `json:"consensus_requirement"`
+	TimeoutThreshold     time.Duration `json:"timeout_threshold"`
+	MinPartitionSize     int           `json:"min_partition_size"`
+	ConsensusRequirement float64       `json:"consensus_requirement"`
 }
 
 // HealingStrategy defines network healing approaches
 type HealingStrategy struct {
-	Name          string                 `json:"name"`
-	Trigger       PartitionTrigger       `json:"trigger"`
-	Action        func(*PartitionEvent) error
-	Priority      int                    `json:"priority"`
-	Enabled       bool                   `json:"enabled"`
+	Name     string           `json:"name"`
+	Trigger  PartitionTrigger `json:"trigger"`
+	Action   func(*PartitionEvent) error
+	Priority int  `json:"priority"`
+	Enabled  bool `json:"enabled"`
 }
 
 type PartitionTrigger struct {
@@ -319,18 +319,18 @@ func NewAdaptiveConsensusMonitor(baseParams *ConsensusParameters) *AdaptiveConse
 		alertCallbacks:     make([]AlertCallback, 0),
 		adaptationLog:      make([]AdaptationEvent, 0),
 		nodeStates:         make(map[string]*NodeState),
-		stopCh:            make(chan struct{}),
+		stopCh:             make(chan struct{}),
 	}
 
 	// Initialize default adaptation rules
 	monitor.initializeDefaultRules()
-	
+
 	// Initialize default alert thresholds
 	monitor.initializeDefaultAlerts()
-	
+
 	// Initialize optimizer
 	monitor.optimizer = NewConsensusOptimizer()
-	
+
 	// Initialize network health tracker
 	monitor.networkHealth = NewNetworkHealthTracker()
 
@@ -349,13 +349,13 @@ func (acm *AdaptiveConsensusMonitor) Start(ctx context.Context) error {
 
 	// Start monitoring goroutine
 	go acm.monitoringLoop(ctx)
-	
+
 	// Start adaptation goroutine
 	go acm.adaptationLoop(ctx)
-	
+
 	// Start alert processing goroutine
 	go acm.alertProcessingLoop(ctx)
-	
+
 	// Start network health monitoring
 	go acm.networkHealthLoop(ctx)
 
@@ -366,11 +366,11 @@ func (acm *AdaptiveConsensusMonitor) Start(ctx context.Context) error {
 func (acm *AdaptiveConsensusMonitor) Stop() {
 	acm.mu.Lock()
 	defer acm.mu.Unlock()
-	
+
 	if !acm.running {
 		return
 	}
-	
+
 	close(acm.stopCh)
 	acm.running = false
 }
@@ -401,10 +401,10 @@ func (acm *AdaptiveConsensusMonitor) collectMetrics() {
 
 	// Collect system metrics (simplified implementation)
 	now := time.Now()
-	
+
 	// Update metrics (in real implementation, these would come from system monitoring)
 	acm.metrics.Timestamp = now
-	
+
 	// Simulate metrics collection
 	acm.metrics.TPS = acm.calculateTPS()
 	acm.metrics.BlocksPerMinute = acm.calculateBlocksPerMinute()
@@ -441,19 +441,19 @@ func (acm *AdaptiveConsensusMonitor) adaptationLoop(ctx context.Context) {
 func (acm *AdaptiveConsensusMonitor) shouldAdapt() bool {
 	acm.mu.RLock()
 	defer acm.mu.RUnlock()
-	
+
 	// Check cooldown period
 	if time.Since(acm.lastAdaptation) < acm.adaptationCooldown {
 		return false
 	}
-	
+
 	// Check if any adaptation rules are triggered
 	for _, rule := range acm.adaptationRules {
 		if rule.Enabled && acm.isRuleTriggered(rule) {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -461,23 +461,23 @@ func (acm *AdaptiveConsensusMonitor) shouldAdapt() bool {
 func (acm *AdaptiveConsensusMonitor) performAdaptation() {
 	acm.mu.Lock()
 	defer acm.mu.Unlock()
-	
+
 	// Sort rules by priority
 	rules := make([]*AdaptationRule, len(acm.adaptationRules))
 	copy(rules, acm.adaptationRules)
-	
+
 	// Apply triggered rules
 	for _, rule := range rules {
 		if rule.Enabled && acm.isRuleTriggered(rule) {
 			oldValue := acm.getParameterValue(rule.TargetParameter)
 			newValue := rule.AdaptationFunction(oldValue, acm.metrics)
-			
+
 			// Clamp to bounds
 			newValue = math.Max(rule.MinValue, math.Min(rule.MaxValue, newValue))
-			
+
 			if math.Abs(newValue-oldValue) > 0.001 { // Avoid tiny changes
 				acm.setParameterValue(rule.TargetParameter, newValue)
-				
+
 				// Log adaptation
 				event := AdaptationEvent{
 					Timestamp:     time.Now(),
@@ -490,11 +490,11 @@ func (acm *AdaptiveConsensusMonitor) performAdaptation() {
 					Reason:        fmt.Sprintf("Rule '%s' triggered", rule.Name),
 				}
 				acm.adaptationLog = append(acm.adaptationLog, event)
-				
+
 				acm.lastAdaptation = time.Now()
-				
+
 				// Notify about adaptation
-				fmt.Printf("Adapted %s from %.3f to %.3f (rule: %s)\n", 
+				fmt.Printf("Adapted %s from %.3f to %.3f (rule: %s)\n",
 					rule.TargetParameter, oldValue, newValue, rule.Name)
 			}
 		}
@@ -505,11 +505,11 @@ func (acm *AdaptiveConsensusMonitor) performAdaptation() {
 func (acm *AdaptiveConsensusMonitor) OptimizeParameters() *OptimizationResult {
 	acm.mu.RLock()
 	defer acm.mu.RUnlock()
-	
+
 	if acm.optimizer == nil {
 		return nil
 	}
-	
+
 	// Use current metrics and historical data to optimize
 	return acm.optimizer.Optimize(acm.currentParameters, acm.metrics, acm.metricsHistory)
 }
@@ -534,19 +534,19 @@ func (acm *AdaptiveConsensusMonitor) alertProcessingLoop(ctx context.Context) {
 func (acm *AdaptiveConsensusMonitor) processAlerts() {
 	acm.mu.Lock()
 	defer acm.mu.Unlock()
-	
+
 	// Check for resolved alerts
 	for id, alert := range acm.activeAlerts {
 		if !alert.Resolved && acm.isAlertResolved(alert) {
 			alert.Resolved = true
 			now := time.Now()
 			alert.ResolvedAt = &now
-			
+
 			// Notify callbacks
 			for _, callback := range acm.alertCallbacks {
 				go callback(alert)
 			}
-			
+
 			fmt.Printf("Alert resolved: %s\n", alert.Message)
 			delete(acm.activeAlerts, id)
 		}
@@ -574,10 +574,10 @@ func (acm *AdaptiveConsensusMonitor) updateNetworkHealth() {
 	if acm.networkHealth == nil {
 		return
 	}
-	
+
 	acm.mu.Lock()
 	defer acm.mu.Unlock()
-	
+
 	// Update node states
 	for nodeID, node := range acm.nodeStates {
 		// Check node health (simplified)
@@ -588,7 +588,7 @@ func (acm *AdaptiveConsensusMonitor) updateNetworkHealth() {
 			}
 		}
 	}
-	
+
 	// Detect network partitions
 	acm.networkHealth.DetectPartitions()
 }
@@ -681,7 +681,7 @@ func (acm *AdaptiveConsensusMonitor) initializeDefaultRules() {
 			}
 			return current
 		},
-		MinValue:       1000.0, // 1 second
+		MinValue:       1000.0,  // 1 second
 		MaxValue:       30000.0, // 30 seconds
 		AdaptationRate: 0.1,
 		Enabled:        true,
@@ -774,14 +774,14 @@ func copyParameters(params *ConsensusParameters) *ConsensusParameters {
 func (acm *AdaptiveConsensusMonitor) updateMetricsHistory() {
 	acm.mu.Lock()
 	defer acm.mu.Unlock()
-	
+
 	snapshot := MetricsSnapshot{
 		Metrics:   *acm.metrics,
 		Timestamp: time.Now(),
 	}
-	
+
 	acm.metricsHistory = append(acm.metricsHistory, snapshot)
-	
+
 	// Limit history size
 	cutoff := time.Now().Add(-acm.historyWindow)
 	var filtered []MetricsSnapshot
@@ -796,7 +796,7 @@ func (acm *AdaptiveConsensusMonitor) updateMetricsHistory() {
 func (acm *AdaptiveConsensusMonitor) checkAlertThresholds() {
 	for id, threshold := range acm.alertThresholds {
 		value := acm.getMetricValue(threshold.MetricName)
-		
+
 		shouldAlert := false
 		if threshold.MinValue != nil && value < *threshold.MinValue {
 			shouldAlert = true
@@ -804,7 +804,7 @@ func (acm *AdaptiveConsensusMonitor) checkAlertThresholds() {
 		if threshold.MaxValue != nil && value > *threshold.MaxValue {
 			shouldAlert = true
 		}
-		
+
 		if shouldAlert && acm.activeAlerts[id] == nil {
 			alert := &Alert{
 				ID:          id,
@@ -814,9 +814,9 @@ func (acm *AdaptiveConsensusMonitor) checkAlertThresholds() {
 				Severity:    threshold.Severity,
 				Message:     fmt.Sprintf("%s: %.2f", threshold.Description, value),
 			}
-			
+
 			acm.activeAlerts[id] = alert
-			
+
 			// Notify callbacks
 			for _, callback := range acm.alertCallbacks {
 				go callback(alert)
@@ -844,7 +844,7 @@ func (acm *AdaptiveConsensusMonitor) isRuleTriggered(rule *AdaptationRule) bool 
 	// Simple rule evaluation (in practice, this would be more sophisticated)
 	_ = acm.getMetricValue(rule.TriggerCondition)
 	currentParam := acm.getParameterValue(rule.TargetParameter)
-	
+
 	// Calculate if adaptation would make a significant change
 	newValue := rule.AdaptationFunction(currentParam, acm.metrics)
 	return math.Abs(newValue-currentParam) > 0.01
@@ -852,7 +852,7 @@ func (acm *AdaptiveConsensusMonitor) isRuleTriggered(rule *AdaptationRule) bool 
 
 func (acm *AdaptiveConsensusMonitor) isAlertResolved(alert *Alert) bool {
 	value := acm.getMetricValue(alert.Threshold.MetricName)
-	
+
 	if alert.Threshold.MinValue != nil && value >= *alert.Threshold.MinValue {
 		return true
 	}
@@ -866,7 +866,7 @@ func (acm *AdaptiveConsensusMonitor) isAlertResolved(alert *Alert) bool {
 func (acm *AdaptiveConsensusMonitor) GetCurrentMetrics() *PerformanceMetrics {
 	acm.mu.RLock()
 	defer acm.mu.RUnlock()
-	
+
 	copy := *acm.metrics
 	return &copy
 }
@@ -874,14 +874,14 @@ func (acm *AdaptiveConsensusMonitor) GetCurrentMetrics() *PerformanceMetrics {
 func (acm *AdaptiveConsensusMonitor) GetCurrentParameters() *ConsensusParameters {
 	acm.mu.RLock()
 	defer acm.mu.RUnlock()
-	
+
 	return copyParameters(acm.currentParameters)
 }
 
 func (acm *AdaptiveConsensusMonitor) GetAdaptationHistory() []AdaptationEvent {
 	acm.mu.RLock()
 	defer acm.mu.RUnlock()
-	
+
 	history := make([]AdaptationEvent, len(acm.adaptationLog))
 	copy(history, acm.adaptationLog)
 	return history
@@ -890,7 +890,7 @@ func (acm *AdaptiveConsensusMonitor) GetAdaptationHistory() []AdaptationEvent {
 func (acm *AdaptiveConsensusMonitor) GetActiveAlerts() []*Alert {
 	acm.mu.RLock()
 	defer acm.mu.RUnlock()
-	
+
 	alerts := make([]*Alert, 0, len(acm.activeAlerts))
 	for _, alert := range acm.activeAlerts {
 		alerts = append(alerts, alert)
@@ -901,14 +901,14 @@ func (acm *AdaptiveConsensusMonitor) GetActiveAlerts() []*Alert {
 func (acm *AdaptiveConsensusMonitor) RegisterAlertCallback(callback AlertCallback) {
 	acm.mu.Lock()
 	defer acm.mu.Unlock()
-	
+
 	acm.alertCallbacks = append(acm.alertCallbacks, callback)
 }
 
 func (acm *AdaptiveConsensusMonitor) ExportMetrics() ([]byte, error) {
 	acm.mu.RLock()
 	defer acm.mu.RUnlock()
-	
+
 	export := struct {
 		Metrics           *PerformanceMetrics  `json:"current_metrics"`
 		Parameters        *ConsensusParameters `json:"current_parameters"`
@@ -922,7 +922,7 @@ func (acm *AdaptiveConsensusMonitor) ExportMetrics() ([]byte, error) {
 		ActiveAlerts:      acm.GetActiveAlerts(),
 		Timestamp:         time.Now(),
 	}
-	
+
 	return json.MarshalIndent(export, "", "  ")
 }
 
@@ -940,17 +940,17 @@ func (co *ConsensusOptimizer) Optimize(params *ConsensusParameters, metrics *Per
 	return &OptimizationResult{
 		RecommendedParameters: *params,
 		ExpectedImprovement:   0.05,
-		Confidence:           0.7,
-		Reasoning:            []string{"Current parameters are near optimal"},
+		Confidence:            0.7,
+		Reasoning:             []string{"Current parameters are near optimal"},
 	}
 }
 
 func NewNetworkHealthTracker() *NetworkHealthTracker {
 	return &NetworkHealthTracker{
-		nodes:              make(map[string]*NodeState),
-		networkTopology:    &NetworkTopology{},
-		partitionDetector:  &PartitionDetector{},
-		healingStrategies:  make([]HealingStrategy, 0),
+		nodes:             make(map[string]*NodeState),
+		networkTopology:   &NetworkTopology{},
+		partitionDetector: &PartitionDetector{},
+		healingStrategies: make([]HealingStrategy, 0),
 	}
 }
 

@@ -14,7 +14,7 @@ func TestPoCDemo(t *testing.T) {
 	fmt.Println("2. Achieves >1000 tx/s throughput")
 	fmt.Println("3. Provides <10 second finality")
 	fmt.Print("4. Tolerates up to 33% Byzantine validators\n\n")
-	
+
 	// Create a small network for demonstration
 	config := SimulationConfig{
 		NumValidators:       10,
@@ -25,18 +25,18 @@ func TestPoCDemo(t *testing.T) {
 		QualityDistribution: "normal",
 		RandomSeed:          42,
 	}
-	
-	fmt.Printf("Setting up network with %d validators (%d Byzantine)...\n", 
+
+	fmt.Printf("Setting up network with %d validators (%d Byzantine)...\n",
 		config.NumValidators, config.NumByzantine)
-	
+
 	sim := NewSimulator(&config)
-	
+
 	// Run the simulation
 	metrics, err := sim.Run()
 	if err != nil {
 		t.Logf("Simulation completed with metrics: %+v", metrics)
 	}
-	
+
 	// Display results
 	fmt.Println("\n=== RESULTS ===")
 	fmt.Printf("✅ Achieved %.2f%% success rate with 30%% Byzantine validators\n",
@@ -44,14 +44,14 @@ func TestPoCDemo(t *testing.T) {
 	fmt.Printf("⚡ Average finality: %.3f seconds\n", metrics.AverageFinality)
 	fmt.Printf("📈 Throughput: %.2f tx/s\n", metrics.Throughput)
 	fmt.Printf("🔨 Slashing events: %d (Byzantine validators punished)\n", metrics.SlashingEvents)
-	
+
 	// Verify Byzantine fault tolerance
 	successRate := float64(metrics.SuccessfulBlocks) / float64(metrics.TotalRounds)
 	if successRate > 0.8 {
 		fmt.Println("\n✅ BYZANTINE FAULT TOLERANCE VERIFIED")
 		fmt.Println("The network maintained consensus despite 30% malicious validators!")
 	}
-	
+
 	// Test with just the consensus engine directly
 	fmt.Println("\n=== DIRECT CONSENSUS ENGINE TEST ===")
 	testDirectConsensus(t)
@@ -59,7 +59,7 @@ func TestPoCDemo(t *testing.T) {
 
 func testDirectConsensus(t *testing.T) {
 	poc := NewProofOfContribution()
-	
+
 	// Register some validators
 	validators := []struct {
 		address string
@@ -73,11 +73,11 @@ func testDirectConsensus(t *testing.T) {
 		{"david", 3000, 0.8, 90},
 		{"eve", 15000, 0.3, 20}, // Low reputation despite high stake
 	}
-	
+
 	fmt.Println("\nValidator States:")
 	fmt.Println("Name     | Stake  | Reputation | Contributions | Total Weight")
 	fmt.Println("---------|--------|------------|---------------|-------------")
-	
+
 	for _, v := range validators {
 		state := &ValidatorState{
 			Address:             v.address,
@@ -87,12 +87,12 @@ func testDirectConsensus(t *testing.T) {
 			LastActive:          time.Now(),
 		}
 		poc.RegisterValidator(state)
-		
+
 		totalStake := poc.CalculateTotalStake(state)
 		fmt.Printf("%-8s | %6d | %10.2f | %13.0f | %12d\n",
 			v.address, v.stake, v.rep, v.contrib, totalStake)
 	}
-	
+
 	// Run leader selection multiple times
 	fmt.Println("\n=== Leader Selection (10 rounds) ===")
 	leaders := make(map[string]int)
@@ -102,19 +102,19 @@ func testDirectConsensus(t *testing.T) {
 			leaders[leader.Address]++
 		}
 	}
-	
+
 	fmt.Println("\nLeader Selection Results:")
 	for addr, count := range leaders {
 		fmt.Printf("%s: selected %d times\n", addr, count)
 	}
-	
+
 	fmt.Println("\n📊 Notice how selection probability correlates with contribution quality,")
 	fmt.Println("   not just stake amount. Eve has the most tokens but low selection rate!")
-	
+
 	// Test quality analysis
 	fmt.Println("\n=== CODE QUALITY ANALYSIS ===")
 	analyzer := NewQualityAnalyzer()
-	
+
 	contributions := []Contribution{
 		{
 			Type:          CodeCommit,
@@ -133,7 +133,7 @@ func testDirectConsensus(t *testing.T) {
 			Complexity:    50,
 		},
 	}
-	
+
 	fmt.Println("\nContribution Quality Scores:")
 	for i, contrib := range contributions {
 		score, _ := analyzer.AnalyzeContribution(contrib)
@@ -144,7 +144,7 @@ func testDirectConsensus(t *testing.T) {
 			fmt.Println("  ❌ Low test coverage, poor documentation, high complexity")
 		}
 	}
-	
+
 	fmt.Println("\n=== THEORETICAL PROPERTIES ACHIEVED ===")
 	fmt.Println("✅ Byzantine Fault Tolerance: f < n/3")
 	fmt.Println("✅ Probabilistic Finality: O(log n) rounds")

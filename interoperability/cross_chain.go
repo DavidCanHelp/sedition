@@ -20,68 +20,68 @@ type CrossChainManager struct {
 	mu sync.RWMutex
 
 	// Network configuration
-	localChainID     string
-	supportedChains  map[string]*ChainConfig
-	bridgeContracts  map[string]*BridgeContract
-	
+	localChainID    string
+	supportedChains map[string]*ChainConfig
+	bridgeContracts map[string]*BridgeContract
+
 	// Relay network
-	relayNodes       map[string]*RelayNode
-	relaySelector    *RelaySelector
-	messageQueue     *MessageQueue
-	
+	relayNodes    map[string]*RelayNode
+	relaySelector *RelaySelector
+	messageQueue  *MessageQueue
+
 	// Cross-chain protocols
-	ibcProtocol      *IBCProtocol
-	atomicSwaps      *AtomicSwapManager
-	stateProofs      *StateProofManager
-	
+	ibcProtocol *IBCProtocol
+	atomicSwaps *AtomicSwapManager
+	stateProofs *StateProofManager
+
 	// Security and verification
-	validatorSet     *CrossChainValidatorSet
-	lightClients     map[string]*LightClient
-	fraudProofs      *FraudProofSystem
-	
+	validatorSet *CrossChainValidatorSet
+	lightClients map[string]*LightClient
+	fraudProofs  *FraudProofSystem
+
 	// Asset management
-	tokenRegistry    *TokenRegistry
-	liquidityPools   map[string]*LiquidityPool
-	wrappedTokens    map[string]*WrappedToken
-	
+	tokenRegistry  *TokenRegistry
+	liquidityPools map[string]*LiquidityPool
+	wrappedTokens  map[string]*WrappedToken
+
 	// Event handling
-	eventProcessor   *CrossChainEventProcessor
-	callbacks        map[string][]CrossChainCallback
-	
+	eventProcessor *CrossChainEventProcessor
+	callbacks      map[string][]CrossChainCallback
+
 	// Monitoring and analytics
-	metrics          *CrossChainMetrics
-	auditLog         []CrossChainEvent
-	
+	metrics  *CrossChainMetrics
+	auditLog []CrossChainEvent
+
 	// Stop channel
-	stopCh           chan struct{}
-	running          bool
+	stopCh  chan struct{}
+	running bool
 }
 
 // ChainConfig represents configuration for a supported blockchain
 type ChainConfig struct {
-	ChainID          string            `json:"chain_id"`
-	Name             string            `json:"name"`
-	NetworkType      NetworkType       `json:"network_type"`
-	ConsensusType    ConsensusType     `json:"consensus_type"`
-	BlockTime        time.Duration     `json:"block_time"`
-	FinalizationTime time.Duration     `json:"finalization_time"`
-	NativeAsset      string            `json:"native_asset"`
-	
+	ChainID          string        `json:"chain_id"`
+	Name             string        `json:"name"`
+	NetworkType      NetworkType   `json:"network_type"`
+	ConsensusType    ConsensusType `json:"consensus_type"`
+	BlockTime        time.Duration `json:"block_time"`
+	FinalizationTime time.Duration `json:"finalization_time"`
+	NativeAsset      string        `json:"native_asset"`
+
 	// Connection parameters
-	RPCEndpoints     []string          `json:"rpc_endpoints"`
-	WebSocketEndpoints []string        `json:"websocket_endpoints"`
-	
+	RPCEndpoints       []string `json:"rpc_endpoints"`
+	WebSocketEndpoints []string `json:"websocket_endpoints"`
+
 	// Protocol-specific configuration
-	ProtocolConfig   map[string]interface{} `json:"protocol_config"`
-	
+	ProtocolConfig map[string]interface{} `json:"protocol_config"`
+
 	// Security parameters
-	SecurityDeposit  *big.Int          `json:"security_deposit"`
-	ChallengeWindow  time.Duration     `json:"challenge_window"`
-	ProofRequirement ProofRequirement  `json:"proof_requirement"`
-	
+	SecurityDeposit  *big.Int         `json:"security_deposit"`
+	ChallengeWindow  time.Duration    `json:"challenge_window"`
+	ProofRequirement ProofRequirement `json:"proof_requirement"`
+
 	// Enabled features
-	Features         []string          `json:"features"`
-	LastUpdated      time.Time         `json:"last_updated"`
+	Features    []string  `json:"features"`
+	LastUpdated time.Time `json:"last_updated"`
 }
 
 type NetworkType int
@@ -126,29 +126,29 @@ type BridgeContract struct {
 	ByteCode        []byte    `json:"bytecode"`
 	Version         string    `json:"version"`
 	DeployedAt      time.Time `json:"deployed_at"`
-	
+
 	// Bridge functionality
-	SupportedTokens []string           `json:"supported_tokens"`
-	LockingMethods  map[string]string  `json:"locking_methods"`
+	SupportedTokens  []string          `json:"supported_tokens"`
+	LockingMethods   map[string]string `json:"locking_methods"`
 	UnlockingMethods map[string]string `json:"unlocking_methods"`
-	
+
 	// Security
-	AdminKeys       []string    `json:"admin_keys"`
-	MultiSigThreshold int       `json:"multisig_threshold"`
-	PauseState      bool        `json:"pause_state"`
+	AdminKeys         []string `json:"admin_keys"`
+	MultiSigThreshold int      `json:"multisig_threshold"`
+	PauseState        bool     `json:"pause_state"`
 }
 
 // RelayNode represents a cross-chain message relay node
 type RelayNode struct {
-	NodeID          string            `json:"node_id"`
-	PublicKey       []byte            `json:"public_key"`
-	Endpoint        string            `json:"endpoint"`
-	SupportedChains []string          `json:"supported_chains"`
-	ReputationScore float64           `json:"reputation_score"`
-	Stake           *big.Int          `json:"stake"`
-	LastSeen        time.Time         `json:"last_seen"`
-	Status          RelayNodeStatus   `json:"status"`
-	Performance     *NodePerformance  `json:"performance"`
+	NodeID          string           `json:"node_id"`
+	PublicKey       []byte           `json:"public_key"`
+	Endpoint        string           `json:"endpoint"`
+	SupportedChains []string         `json:"supported_chains"`
+	ReputationScore float64          `json:"reputation_score"`
+	Stake           *big.Int         `json:"stake"`
+	LastSeen        time.Time        `json:"last_seen"`
+	Status          RelayNodeStatus  `json:"status"`
+	Performance     *NodePerformance `json:"performance"`
 }
 
 type RelayNodeStatus int
@@ -161,11 +161,11 @@ const (
 )
 
 type NodePerformance struct {
-	MessagesRelayed    int64         `json:"messages_relayed"`
-	AverageLatency     time.Duration `json:"average_latency"`
-	SuccessRate        float64       `json:"success_rate"`
-	UptimePercentage   float64       `json:"uptime_percentage"`
-	LastPerformanceUpdate time.Time  `json:"last_performance_update"`
+	MessagesRelayed       int64         `json:"messages_relayed"`
+	AverageLatency        time.Duration `json:"average_latency"`
+	SuccessRate           float64       `json:"success_rate"`
+	UptimePercentage      float64       `json:"uptime_percentage"`
+	LastPerformanceUpdate time.Time     `json:"last_performance_update"`
 }
 
 // RelaySelector chooses optimal relay nodes for cross-chain messages
@@ -186,54 +186,54 @@ const (
 )
 
 type SelectionEvent struct {
-	Timestamp     time.Time `json:"timestamp"`
-	SelectedNode  string    `json:"selected_node"`
-	Alternatives  []string  `json:"alternatives"`
+	Timestamp     time.Time     `json:"timestamp"`
+	SelectedNode  string        `json:"selected_node"`
+	Alternatives  []string      `json:"alternatives"`
 	SelectionTime time.Duration `json:"selection_time"`
-	Reason        string    `json:"reason"`
+	Reason        string        `json:"reason"`
 }
 
 // MessageQueue manages cross-chain message queuing and delivery
 type MessageQueue struct {
-	pendingMessages map[string]*CrossChainMessage
+	pendingMessages   map[string]*CrossChainMessage
 	processedMessages map[string]*MessageReceipt
-	messageCounter  int64
-	maxQueueSize    int
-	retryAttempts   int
-	retryDelay      time.Duration
+	messageCounter    int64
+	maxQueueSize      int
+	retryAttempts     int
+	retryDelay        time.Duration
 }
 
 // CrossChainMessage represents a message sent between chains
 type CrossChainMessage struct {
-	ID              string            `json:"id"`
-	SourceChainID   string            `json:"source_chain_id"`
-	DestChainID     string            `json:"dest_chain_id"`
-	MessageType     MessageType       `json:"message_type"`
-	Payload         []byte            `json:"payload"`
-	
+	ID            string      `json:"id"`
+	SourceChainID string      `json:"source_chain_id"`
+	DestChainID   string      `json:"dest_chain_id"`
+	MessageType   MessageType `json:"message_type"`
+	Payload       []byte      `json:"payload"`
+
 	// Routing information
-	Sender          string            `json:"sender"`
-	Recipient       string            `json:"recipient"`
-	RelayPath       []string          `json:"relay_path"`
-	
+	Sender    string   `json:"sender"`
+	Recipient string   `json:"recipient"`
+	RelayPath []string `json:"relay_path"`
+
 	// Execution parameters
-	GasLimit        *big.Int          `json:"gas_limit"`
-	GasPrice        *big.Int          `json:"gas_price"`
-	TimeoutHeight   int64             `json:"timeout_height"`
-	TimeoutTime     time.Time         `json:"timeout_time"`
-	
+	GasLimit      *big.Int  `json:"gas_limit"`
+	GasPrice      *big.Int  `json:"gas_price"`
+	TimeoutHeight int64     `json:"timeout_height"`
+	TimeoutTime   time.Time `json:"timeout_time"`
+
 	// Security
-	Proof           []byte            `json:"proof"`
-	ProofType       ProofRequirement  `json:"proof_type"`
-	Signature       []byte            `json:"signature"`
-	Nonce           int64             `json:"nonce"`
-	
+	Proof     []byte           `json:"proof"`
+	ProofType ProofRequirement `json:"proof_type"`
+	Signature []byte           `json:"signature"`
+	Nonce     int64            `json:"nonce"`
+
 	// Status tracking
-	Status          MessageStatus     `json:"status"`
-	CreatedAt       time.Time         `json:"created_at"`
-	ProcessedAt     *time.Time        `json:"processed_at,omitempty"`
-	Attempts        int               `json:"attempts"`
-	LastError       string            `json:"last_error,omitempty"`
+	Status      MessageStatus `json:"status"`
+	CreatedAt   time.Time     `json:"created_at"`
+	ProcessedAt *time.Time    `json:"processed_at,omitempty"`
+	Attempts    int           `json:"attempts"`
+	LastError   string        `json:"last_error,omitempty"`
 }
 
 type MessageType int
@@ -261,35 +261,35 @@ const (
 
 // MessageReceipt represents proof of message delivery
 type MessageReceipt struct {
-	MessageID       string      `json:"message_id"`
-	BlockHeight     int64       `json:"block_height"`
-	BlockHash       []byte      `json:"block_hash"`
-	TransactionHash []byte      `json:"transaction_hash"`
-	DeliveredAt     time.Time   `json:"delivered_at"`
-	GasUsed         *big.Int    `json:"gas_used"`
-	Success         bool        `json:"success"`
-	Result          []byte      `json:"result,omitempty"`
-	Error           string      `json:"error,omitempty"`
+	MessageID       string    `json:"message_id"`
+	BlockHeight     int64     `json:"block_height"`
+	BlockHash       []byte    `json:"block_hash"`
+	TransactionHash []byte    `json:"transaction_hash"`
+	DeliveredAt     time.Time `json:"delivered_at"`
+	GasUsed         *big.Int  `json:"gas_used"`
+	Success         bool      `json:"success"`
+	Result          []byte    `json:"result,omitempty"`
+	Error           string    `json:"error,omitempty"`
 }
 
 // IBCProtocol implements Inter-Blockchain Communication protocol
 type IBCProtocol struct {
-	connections     map[string]*IBCConnection
-	channels        map[string]*IBCChannel
-	clients         map[string]*IBCClient
+	connections       map[string]*IBCConnection
+	channels          map[string]*IBCChannel
+	clients           map[string]*IBCClient
 	packetCommitments map[string][]byte
-	acknowledgements map[string][]byte
+	acknowledgements  map[string][]byte
 }
 
 // IBCConnection represents an IBC connection between chains
 type IBCConnection struct {
-	ID              string    `json:"id"`
-	ClientID        string    `json:"client_id"`
-	CounterpartyClientID string `json:"counterparty_client_id"`
-	State           ConnectionState `json:"state"`
-	Versions        []string  `json:"versions"`
-	DelayPeriod     time.Duration `json:"delay_period"`
-	CreatedAt       time.Time `json:"created_at"`
+	ID                   string          `json:"id"`
+	ClientID             string          `json:"client_id"`
+	CounterpartyClientID string          `json:"counterparty_client_id"`
+	State                ConnectionState `json:"state"`
+	Versions             []string        `json:"versions"`
+	DelayPeriod          time.Duration   `json:"delay_period"`
+	CreatedAt            time.Time       `json:"created_at"`
 }
 
 type ConnectionState int
@@ -303,15 +303,15 @@ const (
 
 // IBCChannel represents an IBC channel for application-level communication
 type IBCChannel struct {
-	ID              string      `json:"id"`
-	PortID          string      `json:"port_id"`
-	ConnectionID    string      `json:"connection_id"`
-	CounterpartyPortID string   `json:"counterparty_port_id"`
-	CounterpartyChannelID string `json:"counterparty_channel_id"`
-	State           ChannelState `json:"state"`
-	Ordering        ChannelOrdering `json:"ordering"`
-	Version         string      `json:"version"`
-	CreatedAt       time.Time   `json:"created_at"`
+	ID                    string          `json:"id"`
+	PortID                string          `json:"port_id"`
+	ConnectionID          string          `json:"connection_id"`
+	CounterpartyPortID    string          `json:"counterparty_port_id"`
+	CounterpartyChannelID string          `json:"counterparty_channel_id"`
+	State                 ChannelState    `json:"state"`
+	Ordering              ChannelOrdering `json:"ordering"`
+	Version               string          `json:"version"`
+	CreatedAt             time.Time       `json:"created_at"`
 }
 
 type ChannelState int
@@ -332,60 +332,60 @@ const (
 
 // IBCClient represents a light client for another chain
 type IBCClient struct {
-	ID            string      `json:"id"`
-	ChainID       string      `json:"chain_id"`
-	ClientType    string      `json:"client_type"`
-	LatestHeight  int64       `json:"latest_height"`
-	FrozenHeight  int64       `json:"frozen_height"`
-	TrustLevel    float64     `json:"trust_level"`
-	TrustingPeriod time.Duration `json:"trusting_period"`
+	ID              string        `json:"id"`
+	ChainID         string        `json:"chain_id"`
+	ClientType      string        `json:"client_type"`
+	LatestHeight    int64         `json:"latest_height"`
+	FrozenHeight    int64         `json:"frozen_height"`
+	TrustLevel      float64       `json:"trust_level"`
+	TrustingPeriod  time.Duration `json:"trusting_period"`
 	UnbondingPeriod time.Duration `json:"unbonding_period"`
-	MaxClockDrift time.Duration `json:"max_clock_drift"`
-	ConsensusState []byte      `json:"consensus_state"`
-	LastUpdated   time.Time   `json:"last_updated"`
+	MaxClockDrift   time.Duration `json:"max_clock_drift"`
+	ConsensusState  []byte        `json:"consensus_state"`
+	LastUpdated     time.Time     `json:"last_updated"`
 }
 
 // AtomicSwapManager handles cross-chain atomic swaps
 type AtomicSwapManager struct {
-	activeSwaps     map[string]*AtomicSwap
-	completedSwaps  map[string]*AtomicSwap
-	swapTemplates   map[string]*SwapTemplate
-	hashTimelock    *HashTimelockContract
+	activeSwaps    map[string]*AtomicSwap
+	completedSwaps map[string]*AtomicSwap
+	swapTemplates  map[string]*SwapTemplate
+	hashTimelock   *HashTimelockContract
 }
 
 // AtomicSwap represents a cross-chain atomic swap
 type AtomicSwap struct {
-	ID              string        `json:"id"`
-	InitiatorChain  string        `json:"initiator_chain"`
-	ParticipantChain string       `json:"participant_chain"`
-	InitiatorAddress string       `json:"initiator_address"`
-	ParticipantAddress string     `json:"participant_address"`
-	
+	ID                 string `json:"id"`
+	InitiatorChain     string `json:"initiator_chain"`
+	ParticipantChain   string `json:"participant_chain"`
+	InitiatorAddress   string `json:"initiator_address"`
+	ParticipantAddress string `json:"participant_address"`
+
 	// Assets being swapped
-	InitiatorAsset  *Asset        `json:"initiator_asset"`
-	ParticipantAsset *Asset       `json:"participant_asset"`
-	
+	InitiatorAsset   *Asset `json:"initiator_asset"`
+	ParticipantAsset *Asset `json:"participant_asset"`
+
 	// Hash time lock parameters
-	Secret          []byte        `json:"secret,omitempty"`
-	SecretHash      []byte        `json:"secret_hash"`
-	TimeLock        time.Time     `json:"timelock"`
-	
+	Secret     []byte    `json:"secret,omitempty"`
+	SecretHash []byte    `json:"secret_hash"`
+	TimeLock   time.Time `json:"timelock"`
+
 	// Contract addresses
-	InitiatorContract string      `json:"initiator_contract"`
-	ParticipantContract string    `json:"participant_contract"`
-	
+	InitiatorContract   string `json:"initiator_contract"`
+	ParticipantContract string `json:"participant_contract"`
+
 	// Status and timing
-	State           SwapState     `json:"state"`
-	CreatedAt       time.Time     `json:"created_at"`
-	UpdatedAt       time.Time     `json:"updated_at"`
-	ExpiresAt       time.Time     `json:"expires_at"`
+	State     SwapState `json:"state"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	ExpiresAt time.Time `json:"expires_at"`
 }
 
 type Asset struct {
-	Symbol      string    `json:"symbol"`
-	Amount      *big.Int  `json:"amount"`
-	Decimals    int       `json:"decimals"`
-	ContractAddress string `json:"contract_address,omitempty"`
+	Symbol          string   `json:"symbol"`
+	Amount          *big.Int `json:"amount"`
+	Decimals        int      `json:"decimals"`
+	ContractAddress string   `json:"contract_address,omitempty"`
 }
 
 type SwapState int
@@ -400,14 +400,14 @@ const (
 
 // SwapTemplate defines parameters for atomic swap types
 type SwapTemplate struct {
-	ID              string        `json:"id"`
-	Name            string        `json:"name"`
-	SupportedChains []string      `json:"supported_chains"`
-	MinAmount       *big.Int      `json:"min_amount"`
-	MaxAmount       *big.Int      `json:"max_amount"`
+	ID               string        `json:"id"`
+	Name             string        `json:"name"`
+	SupportedChains  []string      `json:"supported_chains"`
+	MinAmount        *big.Int      `json:"min_amount"`
+	MaxAmount        *big.Int      `json:"max_amount"`
 	TimelockDuration time.Duration `json:"timelock_duration"`
-	Fee             *big.Int      `json:"fee"`
-	ContractCode    []byte        `json:"contract_code"`
+	Fee              *big.Int      `json:"fee"`
+	ContractCode     []byte        `json:"contract_code"`
 }
 
 // HashTimelockContract implements HTLC functionality
@@ -416,17 +416,17 @@ type HashTimelockContract struct {
 }
 
 type HTLCInstance struct {
-	ID          string      `json:"id"`
-	ChainID     string      `json:"chain_id"`
-	Address     string      `json:"address"`
-	Sender      string      `json:"sender"`
-	Receiver    string      `json:"receiver"`
-	Amount      *big.Int    `json:"amount"`
-	SecretHash  []byte      `json:"secret_hash"`
-	TimeLock    time.Time   `json:"timelock"`
-	Redeemed    bool        `json:"redeemed"`
-	Refunded    bool        `json:"refunded"`
-	CreatedAt   time.Time   `json:"created_at"`
+	ID         string    `json:"id"`
+	ChainID    string    `json:"chain_id"`
+	Address    string    `json:"address"`
+	Sender     string    `json:"sender"`
+	Receiver   string    `json:"receiver"`
+	Amount     *big.Int  `json:"amount"`
+	SecretHash []byte    `json:"secret_hash"`
+	TimeLock   time.Time `json:"timelock"`
+	Redeemed   bool      `json:"redeemed"`
+	Refunded   bool      `json:"refunded"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 // StateProofManager handles cross-chain state proofs
@@ -461,11 +461,11 @@ type CacheEntry struct {
 
 // CrossChainValidatorSet manages cross-chain validators
 type CrossChainValidatorSet struct {
-	validators      map[string]*CrossChainValidator
-	totalStake      *big.Int
-	threshold       float64 // Byzantine fault tolerance threshold
-	epochLength     int64
-	currentEpoch    int64
+	validators   map[string]*CrossChainValidator
+	totalStake   *big.Int
+	threshold    float64 // Byzantine fault tolerance threshold
+	epochLength  int64
+	currentEpoch int64
 }
 
 // CrossChainValidator represents a validator participating in cross-chain consensus
@@ -482,22 +482,22 @@ type CrossChainValidator struct {
 
 // LightClient maintains minimal state for other chains
 type LightClient struct {
-	chainConfig     *ChainConfig
-	trustedHeight   int64
-	trustedHash     []byte
+	chainConfig       *ChainConfig
+	trustedHeight     int64
+	trustedHash       []byte
 	trustedValidators []CrossChainValidator
-	headerCache     map[int64]*BlockHeader
-	lastUpdate      time.Time
+	headerCache       map[int64]*BlockHeader
+	lastUpdate        time.Time
 }
 
 type BlockHeader struct {
-	Height          int64     `json:"height"`
-	Hash            []byte    `json:"hash"`
-	PrevHash        []byte    `json:"prev_hash"`
-	StateRoot       []byte    `json:"state_root"`
-	Timestamp       time.Time `json:"timestamp"`
-	ValidatorSet    []byte    `json:"validator_set"`
-	Signatures      [][]byte  `json:"signatures"`
+	Height       int64     `json:"height"`
+	Hash         []byte    `json:"hash"`
+	PrevHash     []byte    `json:"prev_hash"`
+	StateRoot    []byte    `json:"state_root"`
+	Timestamp    time.Time `json:"timestamp"`
+	ValidatorSet []byte    `json:"validator_set"`
+	Signatures   [][]byte  `json:"signatures"`
 }
 
 // FraudProofSystem handles fraud detection and proof generation
@@ -509,11 +509,11 @@ type FraudProofSystem struct {
 }
 
 type ChainMonitor struct {
-	chainID         string
-	lightClient     *LightClient
+	chainID           string
+	lightClient       *LightClient
 	lastCheckedHeight int64
-	anomalyThreshold float64
-	alertCallback   func(anomaly *Anomaly)
+	anomalyThreshold  float64
+	alertCallback     func(anomaly *Anomaly)
 }
 
 type FraudDetector interface {
@@ -521,15 +521,15 @@ type FraudDetector interface {
 }
 
 type FraudEvidence struct {
-	Type            FraudType `json:"type"`
-	ChainID         string    `json:"chain_id"`
-	Height          int64     `json:"height"`
-	Evidence        []byte    `json:"evidence"`
-	Proof           []byte    `json:"proof"`
-	SubmittedBy     string    `json:"submitted_by"`
-	SubmittedAt     time.Time `json:"submitted_at"`
-	Verified        bool      `json:"verified"`
-	Reward          *big.Int  `json:"reward,omitempty"`
+	Type        FraudType `json:"type"`
+	ChainID     string    `json:"chain_id"`
+	Height      int64     `json:"height"`
+	Evidence    []byte    `json:"evidence"`
+	Proof       []byte    `json:"proof"`
+	SubmittedBy string    `json:"submitted_by"`
+	SubmittedAt time.Time `json:"submitted_at"`
+	Verified    bool      `json:"verified"`
+	Reward      *big.Int  `json:"reward,omitempty"`
 }
 
 type FraudType int
@@ -562,82 +562,82 @@ const (
 
 // TokenRegistry manages cross-chain token mappings
 type TokenRegistry struct {
-	tokens          map[string]*CrossChainToken
-	nativeTokens    map[string]string // chainID -> native token
-	wrappedTokens   map[string]map[string]string // sourceChain -> destChain -> wrapped address
-	burnMintPairs   map[string]*BurnMintPair
+	tokens        map[string]*CrossChainToken
+	nativeTokens  map[string]string            // chainID -> native token
+	wrappedTokens map[string]map[string]string // sourceChain -> destChain -> wrapped address
+	burnMintPairs map[string]*BurnMintPair
 }
 
 type CrossChainToken struct {
-	Symbol          string            `json:"symbol"`
-	Name            string            `json:"name"`
-	Decimals        int               `json:"decimals"`
-	TotalSupply     *big.Int          `json:"total_supply"`
-	NativeChain     string            `json:"native_chain"`
-	NativeAddress   string            `json:"native_address"`
-	Representations map[string]string `json:"representations"` // chainID -> address
+	Symbol          string                 `json:"symbol"`
+	Name            string                 `json:"name"`
+	Decimals        int                    `json:"decimals"`
+	TotalSupply     *big.Int               `json:"total_supply"`
+	NativeChain     string                 `json:"native_chain"`
+	NativeAddress   string                 `json:"native_address"`
+	Representations map[string]string      `json:"representations"` // chainID -> address
 	Metadata        map[string]interface{} `json:"metadata"`
-	Verified        bool              `json:"verified"`
-	CreatedAt       time.Time         `json:"created_at"`
+	Verified        bool                   `json:"verified"`
+	CreatedAt       time.Time              `json:"created_at"`
 }
 
 type BurnMintPair struct {
-	SourceChain  string `json:"source_chain"`
-	DestChain    string `json:"dest_chain"`
-	SourceToken  string `json:"source_token"`
-	DestToken    string `json:"dest_token"`
-	BurnFunction string `json:"burn_function"`
-	MintFunction string `json:"mint_function"`
+	SourceChain  string   `json:"source_chain"`
+	DestChain    string   `json:"dest_chain"`
+	SourceToken  string   `json:"source_token"`
+	DestToken    string   `json:"dest_token"`
+	BurnFunction string   `json:"burn_function"`
+	MintFunction string   `json:"mint_function"`
 	MaxAmount    *big.Int `json:"max_amount"`
 	Fee          *big.Int `json:"fee"`
 }
 
 // LiquidityPool manages cross-chain liquidity
 type LiquidityPool struct {
-	ID              string            `json:"id"`
-	ChainA          string            `json:"chain_a"`
-	ChainB          string            `json:"chain_b"`
-	TokenA          string            `json:"token_a"`
-	TokenB          string            `json:"token_b"`
-	ReserveA        *big.Int          `json:"reserve_a"`
-	ReserveB        *big.Int          `json:"reserve_b"`
-	TotalShares     *big.Int          `json:"total_shares"`
+	ID                 string              `json:"id"`
+	ChainA             string              `json:"chain_a"`
+	ChainB             string              `json:"chain_b"`
+	TokenA             string              `json:"token_a"`
+	TokenB             string              `json:"token_b"`
+	ReserveA           *big.Int            `json:"reserve_a"`
+	ReserveB           *big.Int            `json:"reserve_b"`
+	TotalShares        *big.Int            `json:"total_shares"`
 	LiquidityProviders map[string]*big.Int `json:"liquidity_providers"`
-	Fee             float64           `json:"fee"`
-	CreatedAt       time.Time         `json:"created_at"`
+	Fee                float64             `json:"fee"`
+	CreatedAt          time.Time           `json:"created_at"`
 }
 
 // WrappedToken represents a token wrapped on another chain
 type WrappedToken struct {
-	NativeChain     string    `json:"native_chain"`
-	NativeAddress   string    `json:"native_address"`
-	WrappedChain    string    `json:"wrapped_chain"`
-	WrappedAddress  string    `json:"wrapped_address"`
-	TotalWrapped    *big.Int  `json:"total_wrapped"`
-	CollateralLocked *big.Int `json:"collateral_locked"`
-	MintBurnRatio   float64   `json:"mint_burn_ratio"`
-	LastUpdate      time.Time `json:"last_update"`
+	NativeChain      string    `json:"native_chain"`
+	NativeAddress    string    `json:"native_address"`
+	WrappedChain     string    `json:"wrapped_chain"`
+	WrappedAddress   string    `json:"wrapped_address"`
+	TotalWrapped     *big.Int  `json:"total_wrapped"`
+	CollateralLocked *big.Int  `json:"collateral_locked"`
+	MintBurnRatio    float64   `json:"mint_burn_ratio"`
+	LastUpdate       time.Time `json:"last_update"`
 }
 
 // CrossChainEventProcessor handles cross-chain events
 type CrossChainEventProcessor struct {
-	eventListeners  map[string][]EventListener
-	eventQueue      chan *CrossChainEvent
-	processors      map[EventType]EventProcessor
-	eventHistory    []CrossChainEvent
-	maxHistorySize  int
+	eventListeners map[string][]EventListener
+	eventQueue     chan *CrossChainEvent
+	processors     map[EventType]EventProcessor
+	eventHistory   []CrossChainEvent
+	maxHistorySize int
 }
 
 type CrossChainEvent struct {
-	ID            string                 `json:"id"`
-	Type          EventType              `json:"type"`
-	SourceChain   string                 `json:"source_chain"`
-	DestChain     string                 `json:"dest_chain,omitempty"`
-	BlockHeight   int64                  `json:"block_height"`
-	TransactionHash []byte               `json:"transaction_hash"`
-	Data          map[string]interface{} `json:"data"`
-	Timestamp     time.Time              `json:"timestamp"`
-	Processed     bool                   `json:"processed"`
+	ID              string                 `json:"id"`
+	Type            EventType              `json:"type"`
+	SourceChain     string                 `json:"source_chain"`
+	DestChain       string                 `json:"dest_chain,omitempty"`
+	BlockHeight     int64                  `json:"block_height"`
+	TransactionHash []byte                 `json:"transaction_hash"`
+	Data            map[string]interface{} `json:"data"`
+	Timestamp       time.Time              `json:"timestamp"`
+	Processed       bool                   `json:"processed"`
 }
 
 type EventType int
@@ -664,41 +664,41 @@ type CrossChainCallback func(event *CrossChainEvent)
 
 // CrossChainMetrics tracks cross-chain performance
 type CrossChainMetrics struct {
-	MessagesPerSecond    float64           `json:"messages_per_second"`
-	AverageLatency       time.Duration     `json:"average_latency"`
-	SuccessRate          float64           `json:"success_rate"`
-	ActiveConnections    int               `json:"active_connections"`
+	MessagesPerSecond    float64             `json:"messages_per_second"`
+	AverageLatency       time.Duration       `json:"average_latency"`
+	SuccessRate          float64             `json:"success_rate"`
+	ActiveConnections    int                 `json:"active_connections"`
 	TotalValueLocked     map[string]*big.Int `json:"total_value_locked"`
-	ChainHealthScores    map[string]float64 `json:"chain_health_scores"`
-	RelayNodePerformance map[string]float64 `json:"relay_node_performance"`
-	LastUpdated          time.Time         `json:"last_updated"`
+	ChainHealthScores    map[string]float64  `json:"chain_health_scores"`
+	RelayNodePerformance map[string]float64  `json:"relay_node_performance"`
+	LastUpdated          time.Time           `json:"last_updated"`
 }
 
 // NewCrossChainManager creates a new cross-chain manager
 func NewCrossChainManager(localChainID string) *CrossChainManager {
 	return &CrossChainManager{
-		localChainID:     localChainID,
-		supportedChains:  make(map[string]*ChainConfig),
-		bridgeContracts:  make(map[string]*BridgeContract),
-		relayNodes:       make(map[string]*RelayNode),
-		lightClients:     make(map[string]*LightClient),
-		liquidityPools:   make(map[string]*LiquidityPool),
-		wrappedTokens:    make(map[string]*WrappedToken),
-		callbacks:        make(map[string][]CrossChainCallback),
-		auditLog:         make([]CrossChainEvent, 0),
+		localChainID:    localChainID,
+		supportedChains: make(map[string]*ChainConfig),
+		bridgeContracts: make(map[string]*BridgeContract),
+		relayNodes:      make(map[string]*RelayNode),
+		lightClients:    make(map[string]*LightClient),
+		liquidityPools:  make(map[string]*LiquidityPool),
+		wrappedTokens:   make(map[string]*WrappedToken),
+		callbacks:       make(map[string][]CrossChainCallback),
+		auditLog:        make([]CrossChainEvent, 0),
 		stopCh:          make(chan struct{}),
-		
+
 		// Initialize components
-		relaySelector:    NewRelaySelector(),
-		messageQueue:     NewMessageQueue(),
-		ibcProtocol:      NewIBCProtocol(),
-		atomicSwaps:      NewAtomicSwapManager(),
-		stateProofs:      NewStateProofManager(),
-		validatorSet:     NewCrossChainValidatorSet(),
-		fraudProofs:      NewFraudProofSystem(),
-		tokenRegistry:    NewTokenRegistry(),
-		eventProcessor:   NewCrossChainEventProcessor(),
-		metrics:          &CrossChainMetrics{},
+		relaySelector:  NewRelaySelector(),
+		messageQueue:   NewMessageQueue(),
+		ibcProtocol:    NewIBCProtocol(),
+		atomicSwaps:    NewAtomicSwapManager(),
+		stateProofs:    NewStateProofManager(),
+		validatorSet:   NewCrossChainValidatorSet(),
+		fraudProofs:    NewFraudProofSystem(),
+		tokenRegistry:  NewTokenRegistry(),
+		eventProcessor: NewCrossChainEventProcessor(),
+		metrics:        &CrossChainMetrics{},
 	}
 }
 
@@ -728,11 +728,11 @@ func (ccm *CrossChainManager) Start(ctx context.Context) error {
 func (ccm *CrossChainManager) Stop() {
 	ccm.mu.Lock()
 	defer ccm.mu.Unlock()
-	
+
 	if !ccm.running {
 		return
 	}
-	
+
 	close(ccm.stopCh)
 	ccm.running = false
 	log.Printf("Cross-chain manager stopped")
@@ -742,20 +742,20 @@ func (ccm *CrossChainManager) Stop() {
 func (ccm *CrossChainManager) RegisterChain(config *ChainConfig) error {
 	ccm.mu.Lock()
 	defer ccm.mu.Unlock()
-	
+
 	if _, exists := ccm.supportedChains[config.ChainID]; exists {
 		return fmt.Errorf("chain %s already registered", config.ChainID)
 	}
-	
+
 	ccm.supportedChains[config.ChainID] = config
-	
+
 	// Initialize light client for the new chain
 	lightClient, err := NewLightClient(config)
 	if err != nil {
 		return fmt.Errorf("failed to create light client for %s: %w", config.ChainID, err)
 	}
 	ccm.lightClients[config.ChainID] = lightClient
-	
+
 	log.Printf("Registered chain %s (%s)", config.Name, config.ChainID)
 	return nil
 }
@@ -764,12 +764,12 @@ func (ccm *CrossChainManager) RegisterChain(config *ChainConfig) error {
 func (ccm *CrossChainManager) SendCrossChainMessage(destChainID string, msgType MessageType, payload []byte, recipient string) (*CrossChainMessage, error) {
 	ccm.mu.Lock()
 	defer ccm.mu.Unlock()
-	
+
 	// Validate destination chain
 	if _, exists := ccm.supportedChains[destChainID]; !exists {
 		return nil, fmt.Errorf("unsupported destination chain: %s", destChainID)
 	}
-	
+
 	// Create message
 	message := &CrossChainMessage{
 		ID:            ccm.generateMessageID(),
@@ -782,14 +782,14 @@ func (ccm *CrossChainManager) SendCrossChainMessage(destChainID string, msgType 
 		CreatedAt:     time.Now(),
 		Nonce:         ccm.messageQueue.messageCounter,
 	}
-	
+
 	// Select relay path
 	relayPath, err := ccm.relaySelector.SelectRelayPath(ccm.localChainID, destChainID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to select relay path: %w", err)
 	}
 	message.RelayPath = relayPath
-	
+
 	// Generate proof if required
 	destChainConfig := ccm.supportedChains[destChainID]
 	if destChainConfig.ProofRequirement != ProofRequirementNone {
@@ -800,75 +800,75 @@ func (ccm *CrossChainManager) SendCrossChainMessage(destChainID string, msgType 
 		message.Proof = proof
 		message.ProofType = destChainConfig.ProofRequirement
 	}
-	
+
 	// Sign message
 	signature, err := ccm.signMessage(message)
 	if err != nil {
 		return nil, fmt.Errorf("failed to sign message: %w", err)
 	}
 	message.Signature = signature
-	
+
 	// Queue for processing
 	ccm.messageQueue.QueueMessage(message)
-	
+
 	// Emit event
 	event := &CrossChainEvent{
-		ID:            ccm.generateEventID(),
-		Type:          EventTypeTokenTransfer,
-		SourceChain:   ccm.localChainID,
-		DestChain:     destChainID,
-		Data:          map[string]interface{}{"message_id": message.ID},
-		Timestamp:     time.Now(),
+		ID:          ccm.generateEventID(),
+		Type:        EventTypeTokenTransfer,
+		SourceChain: ccm.localChainID,
+		DestChain:   destChainID,
+		Data:        map[string]interface{}{"message_id": message.ID},
+		Timestamp:   time.Now(),
 	}
 	ccm.eventProcessor.EmitEvent(event)
-	
+
 	return message, nil
 }
 
 // InitiateAtomicSwap starts a cross-chain atomic swap
-func (ccm *CrossChainManager) InitiateAtomicSwap(participantChain string, participantAddress string, 
+func (ccm *CrossChainManager) InitiateAtomicSwap(participantChain string, participantAddress string,
 	initiatorAsset *Asset, participantAsset *Asset, timelock time.Duration) (*AtomicSwap, error) {
-	
+
 	// Generate secret and hash
 	secret := make([]byte, 32)
 	if _, err := crypto.GenerateRandom(secret); err != nil {
 		return nil, fmt.Errorf("failed to generate secret: %w", err)
 	}
-	
+
 	secretHash := sha256.Sum256(secret)
-	
+
 	swap := &AtomicSwap{
-		ID:                ccm.generateSwapID(),
-		InitiatorChain:    ccm.localChainID,
-		ParticipantChain:  participantChain,
+		ID:                 ccm.generateSwapID(),
+		InitiatorChain:     ccm.localChainID,
+		ParticipantChain:   participantChain,
 		ParticipantAddress: participantAddress,
-		InitiatorAsset:    initiatorAsset,
-		ParticipantAsset:  participantAsset,
-		Secret:            secret,
-		SecretHash:        secretHash[:],
-		TimeLock:          time.Now().Add(timelock),
-		State:             SwapStateInitiated,
-		CreatedAt:         time.Now(),
-		ExpiresAt:         time.Now().Add(timelock),
+		InitiatorAsset:     initiatorAsset,
+		ParticipantAsset:   participantAsset,
+		Secret:             secret,
+		SecretHash:         secretHash[:],
+		TimeLock:           time.Now().Add(timelock),
+		State:              SwapStateInitiated,
+		CreatedAt:          time.Now(),
+		ExpiresAt:          time.Now().Add(timelock),
 	}
-	
+
 	// Deploy HTLC contract on initiator chain
 	htlcAddress, err := ccm.atomicSwaps.DeployHTLC(swap)
 	if err != nil {
 		return nil, fmt.Errorf("failed to deploy HTLC: %w", err)
 	}
 	swap.InitiatorContract = htlcAddress
-	
+
 	// Register swap
 	ccm.atomicSwaps.RegisterSwap(swap)
-	
+
 	return swap, nil
 }
 
 // CreateLiquidityPool creates a new cross-chain liquidity pool
-func (ccm *CrossChainManager) CreateLiquidityPool(chainA, chainB, tokenA, tokenB string, 
+func (ccm *CrossChainManager) CreateLiquidityPool(chainA, chainB, tokenA, tokenB string,
 	initialA, initialB *big.Int, fee float64) (*LiquidityPool, error) {
-	
+
 	pool := &LiquidityPool{
 		ID:                 ccm.generatePoolID(),
 		ChainA:             chainA,
@@ -882,11 +882,11 @@ func (ccm *CrossChainManager) CreateLiquidityPool(chainA, chainB, tokenA, tokenB
 		Fee:                fee,
 		CreatedAt:          time.Now(),
 	}
-	
+
 	ccm.mu.Lock()
 	ccm.liquidityPools[pool.ID] = pool
 	ccm.mu.Unlock()
-	
+
 	return pool, nil
 }
 
@@ -894,7 +894,7 @@ func (ccm *CrossChainManager) CreateLiquidityPool(chainA, chainB, tokenA, tokenB
 func (ccm *CrossChainManager) messageProcessingLoop(ctx context.Context) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -910,7 +910,7 @@ func (ccm *CrossChainManager) messageProcessingLoop(ctx context.Context) {
 func (ccm *CrossChainManager) processQueuedMessages() {
 	ccm.mu.Lock()
 	defer ccm.mu.Unlock()
-	
+
 	// Process pending messages
 	for _, message := range ccm.messageQueue.pendingMessages {
 		if message.Status == MessageStatusPending {
@@ -933,7 +933,7 @@ func (ccm *CrossChainManager) deliverMessage(message *CrossChainMessage) error {
 	if err != nil {
 		return fmt.Errorf("failed to select relay: %w", err)
 	}
-	
+
 	// Send message to relay
 	return ccm.sendToRelay(relayNode, message)
 }
@@ -944,25 +944,25 @@ func (ccm *CrossChainManager) sendToRelay(relay *RelayNode, message *CrossChainM
 	message.Status = MessageStatusDelivered
 	now := time.Now()
 	message.ProcessedAt = &now
-	
+
 	// Create receipt
 	receipt := &MessageReceipt{
-		MessageID:       message.ID,
-		BlockHeight:     1000, // Placeholder
-		DeliveredAt:     now,
-		Success:         true,
+		MessageID:   message.ID,
+		BlockHeight: 1000, // Placeholder
+		DeliveredAt: now,
+		Success:     true,
 	}
-	
+
 	ccm.messageQueue.processedMessages[message.ID] = receipt
 	delete(ccm.messageQueue.pendingMessages, message.ID)
-	
+
 	return nil
 }
 
 func (ccm *CrossChainManager) relayNodeMonitoringLoop(ctx context.Context) {
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -978,7 +978,7 @@ func (ccm *CrossChainManager) relayNodeMonitoringLoop(ctx context.Context) {
 func (ccm *CrossChainManager) updateRelayNodePerformance() {
 	ccm.mu.Lock()
 	defer ccm.mu.Unlock()
-	
+
 	for _, node := range ccm.relayNodes {
 		// Update node performance metrics (simplified)
 		if time.Since(node.LastSeen) > 60*time.Second {
@@ -993,7 +993,7 @@ func (ccm *CrossChainManager) updateRelayNodePerformance() {
 func (ccm *CrossChainManager) lightClientUpdateLoop(ctx context.Context) {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -1009,7 +1009,7 @@ func (ccm *CrossChainManager) lightClientUpdateLoop(ctx context.Context) {
 func (ccm *CrossChainManager) updateLightClients() {
 	ccm.mu.RLock()
 	defer ccm.mu.RUnlock()
-	
+
 	for chainID, client := range ccm.lightClients {
 		if err := client.Update(); err != nil {
 			log.Printf("Failed to update light client for %s: %v", chainID, err)
@@ -1020,7 +1020,7 @@ func (ccm *CrossChainManager) updateLightClients() {
 func (ccm *CrossChainManager) fraudDetectionLoop(ctx context.Context) {
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -1041,7 +1041,7 @@ func (ccm *CrossChainManager) runFraudDetection() {
 func (ccm *CrossChainManager) metricsUpdateLoop(ctx context.Context) {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -1057,11 +1057,11 @@ func (ccm *CrossChainManager) metricsUpdateLoop(ctx context.Context) {
 func (ccm *CrossChainManager) updateMetrics() {
 	ccm.mu.Lock()
 	defer ccm.mu.Unlock()
-	
+
 	// Update cross-chain metrics
 	ccm.metrics.ActiveConnections = len(ccm.supportedChains) - 1 // Exclude local chain
 	ccm.metrics.LastUpdated = time.Now()
-	
+
 	// Calculate success rate
 	totalMessages := len(ccm.messageQueue.pendingMessages) + len(ccm.messageQueue.processedMessages)
 	successfulMessages := len(ccm.messageQueue.processedMessages)
@@ -1104,12 +1104,12 @@ func (ccm *CrossChainManager) generatePoolID() string {
 func (ccm *CrossChainManager) signMessage(message *CrossChainMessage) ([]byte, error) {
 	// Create message hash
 	hash := sha256.Sum256(ccm.serializeMessage(message))
-	
+
 	// Sign with local chain's private key (placeholder implementation)
 	signature := make([]byte, 64)
 	copy(signature, hash[:32])
 	copy(signature[32:], hash[:32])
-	
+
 	return signature, nil
 }
 
@@ -1128,7 +1128,7 @@ func (ccm *CrossChainManager) serializeMessage(message *CrossChainMessage) []byt
 func (ccm *CrossChainManager) GetSupportedChains() []string {
 	ccm.mu.RLock()
 	defer ccm.mu.RUnlock()
-	
+
 	chains := make([]string, 0, len(ccm.supportedChains))
 	for chainID := range ccm.supportedChains {
 		chains = append(chains, chainID)
@@ -1139,18 +1139,18 @@ func (ccm *CrossChainManager) GetSupportedChains() []string {
 func (ccm *CrossChainManager) GetMetrics() *CrossChainMetrics {
 	ccm.mu.RLock()
 	defer ccm.mu.RUnlock()
-	
+
 	return ccm.metrics
 }
 
 func (ccm *CrossChainManager) GetMessageStatus(messageID string) (*CrossChainMessage, error) {
 	ccm.mu.RLock()
 	defer ccm.mu.RUnlock()
-	
+
 	if message, exists := ccm.messageQueue.pendingMessages[messageID]; exists {
 		return message, nil
 	}
-	
+
 	if _, exists := ccm.messageQueue.processedMessages[messageID]; exists {
 		// Reconstruct message status from receipt
 		return &CrossChainMessage{
@@ -1158,7 +1158,7 @@ func (ccm *CrossChainManager) GetMessageStatus(messageID string) (*CrossChainMes
 			Status: MessageStatusDelivered,
 		}, nil
 	}
-	
+
 	return nil, fmt.Errorf("message not found: %s", messageID)
 }
 
@@ -1179,9 +1179,9 @@ func (rs *RelaySelector) SelectRelayPath(sourceChain, destChain string) ([]strin
 func (rs *RelaySelector) SelectRelay(destChain string) (*RelayNode, error) {
 	// Placeholder: return first available relay
 	return &RelayNode{
-		NodeID:    "relay-node-1",
-		Endpoint:  "ws://relay1.example.com",
-		Status:    RelayNodeStatusActive,
+		NodeID:   "relay-node-1",
+		Endpoint: "ws://relay1.example.com",
+		Status:   RelayNodeStatusActive,
 	}, nil
 }
 
@@ -1211,10 +1211,10 @@ func NewIBCProtocol() *IBCProtocol {
 
 func NewAtomicSwapManager() *AtomicSwapManager {
 	return &AtomicSwapManager{
-		activeSwaps:     make(map[string]*AtomicSwap),
-		completedSwaps:  make(map[string]*AtomicSwap),
-		swapTemplates:   make(map[string]*SwapTemplate),
-		hashTimelock:    &HashTimelockContract{contracts: make(map[string]*HTLCInstance)},
+		activeSwaps:    make(map[string]*AtomicSwap),
+		completedSwaps: make(map[string]*AtomicSwap),
+		swapTemplates:  make(map[string]*SwapTemplate),
+		hashTimelock:   &HashTimelockContract{contracts: make(map[string]*HTLCInstance)},
 	}
 }
 
@@ -1253,10 +1253,10 @@ func NewCrossChainValidatorSet() *CrossChainValidatorSet {
 
 func NewLightClient(config *ChainConfig) (*LightClient, error) {
 	return &LightClient{
-		chainConfig:       config,
-		trustedHeight:     0,
-		headerCache:       make(map[int64]*BlockHeader),
-		lastUpdate:        time.Now(),
+		chainConfig:   config,
+		trustedHeight: 0,
+		headerCache:   make(map[int64]*BlockHeader),
+		lastUpdate:    time.Now(),
 	}, nil
 }
 
@@ -1311,7 +1311,7 @@ func (ccep *CrossChainEventProcessor) EmitEvent(event *CrossChainEvent) {
 func (ccep *CrossChainEventProcessor) ProcessEvent(event *CrossChainEvent) {
 	event.Processed = true
 	ccep.eventHistory = append(ccep.eventHistory, *event)
-	
+
 	// Limit history size
 	if len(ccep.eventHistory) > ccep.maxHistorySize {
 		ccep.eventHistory = ccep.eventHistory[1:]

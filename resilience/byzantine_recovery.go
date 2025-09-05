@@ -2,16 +2,10 @@ package resilience
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/json"
 	"fmt"
-	"math"
 	"math/big"
-	"sort"
 	"sync"
 	"time"
-
-	"github.com/davidcanhelp/sedition/crypto"
 )
 
 // ByzantineRecoveryManager handles Byzantine fault recovery and network partition tolerance
@@ -19,98 +13,98 @@ type ByzantineRecoveryManager struct {
 	mu sync.RWMutex
 
 	// Fault detection and diagnosis
-	faultDetector           *ByzantineFaultDetector
-	anomalyDetector         *AnomalyDetector
-	networkMonitor          *NetworkHealthMonitor
-	behaviorAnalyzer        *ValidatorBehaviorAnalyzer
-	
+	faultDetector    *ByzantineFaultDetector
+	anomalyDetector  *AnomalyDetector
+	networkMonitor   *NetworkHealthMonitor
+	behaviorAnalyzer *ValidatorBehaviorAnalyzer
+
 	// Recovery mechanisms
-	recoveryEngine          *RecoveryEngine
-	partitionResolver       *PartitionResolver
-	consensusHealer         *ConsensusHealer
-	stateReconciler         *StateReconciler
-	
+	recoveryEngine    *RecoveryEngine
+	partitionResolver *PartitionResolver
+	consensusHealer   *ConsensusHealer
+	stateReconciler   *StateReconciler
+
 	// Security and verification
 	evidenceCollector       *EvidenceCollector
 	fraudProofSystem        *FraudProofSystem
 	challengeResponseSystem *ChallengeResponseSystem
 	cryptographicProofs     *CryptographicProofManager
-	
+
 	// Economic incentives
-	slashingCoordinator     *SlashingCoordinator
-	reputationManager       *ReputationManager
-	incentiveAdjuster       *IncentiveAdjuster
-	
+	slashingCoordinator *SlashingCoordinator
+	reputationManager   *ReputationManager
+	incentiveAdjuster   *IncentiveAdjuster
+
 	// Network resilience
-	topologyOptimizer       *NetworkTopologyOptimizer
-	redundancyManager       *RedundancyManager
-	failoverCoordinator     *FailoverCoordinator
-	
+	topologyOptimizer   *NetworkTopologyOptimizer
+	redundancyManager   *RedundancyManager
+	failoverCoordinator *FailoverCoordinator
+
 	// Recovery state
-	activeRecoveries        map[string]*RecoveryOperation
-	recoveryHistory         []RecoveryEvent
-	networkState            *NetworkResilienceState
-	
+	activeRecoveries map[string]*RecoveryOperation
+	recoveryHistory  []RecoveryEvent
+	networkState     *NetworkResilienceState
+
 	// Configuration and metrics
-	config                  *ResilienceConfig
-	metrics                 *ResilienceMetrics
-	alertSystem            *AlertSystem
-	
+	config      *ResilienceConfig
+	metrics     *ResilienceMetrics
+	alertSystem *AlertSystem
+
 	// Control
-	running                 bool
-	stopCh                  chan struct{}
+	running bool
+	stopCh  chan struct{}
 }
 
 // ByzantineFaultDetector identifies Byzantine behaviors and failures
 type ByzantineFaultDetector struct {
-	detectionRules          []*FaultDetectionRule
-	validatorProfiles       map[string]*ValidatorProfile
-	networkBaseline         *NetworkBaseline
-	anomalyThresholds       map[string]float64
-	
+	detectionRules    []*FaultDetectionRule
+	validatorProfiles map[string]*ValidatorProfile
+	networkBaseline   *NetworkBaseline
+	anomalyThresholds map[string]float64
+
 	// Detection algorithms
-	statisticalDetector     *StatisticalAnomalyDetector
-	consensusDetector       *ConsensusAnomalyDetector
-	behavioralDetector      *BehavioralAnomalyDetector
-	cryptographicDetector   *CryptographicAnomalyDetector
-	
+	statisticalDetector   *StatisticalAnomalyDetector
+	consensusDetector     *ConsensusAnomalyDetector
+	behavioralDetector    *BehavioralAnomalyDetector
+	cryptographicDetector *CryptographicAnomalyDetector
+
 	// Machine learning
-	mlModels                map[string]*MLFaultModel
-	featureExtractor        *FaultFeatureExtractor
-	predictionEngine        *FaultPredictionEngine
-	
+	mlModels         map[string]*MLFaultModel
+	featureExtractor *FaultFeatureExtractor
+	predictionEngine *FaultPredictionEngine
+
 	// Real-time monitoring
-	monitoringChannels      map[string]chan *ValidatorEvent
-	eventAggregator         *EventAggregator
-	realtimeAnalyzer        *RealtimeAnalyzer
+	monitoringChannels map[string]chan *ValidatorEvent
+	eventAggregator    *EventAggregator
+	realtimeAnalyzer   *RealtimeAnalyzer
 }
 
 // ValidatorProfile tracks individual validator behavior patterns
 type ValidatorProfile struct {
-	ValidatorID             string                    `json:"validator_id"`
-	
+	ValidatorID string `json:"validator_id"`
+
 	// Behavioral metrics
-	MessageFrequency        *FrequencyProfile         `json:"message_frequency"`
-	ResponseTimes           *ResponseTimeProfile      `json:"response_times"`
-	VotingPatterns          *VotingPatternProfile     `json:"voting_patterns"`
-	NetworkBehavior         *NetworkBehaviorProfile   `json:"network_behavior"`
-	
+	MessageFrequency *FrequencyProfile       `json:"message_frequency"`
+	ResponseTimes    *ResponseTimeProfile    `json:"response_times"`
+	VotingPatterns   *VotingPatternProfile   `json:"voting_patterns"`
+	NetworkBehavior  *NetworkBehaviorProfile `json:"network_behavior"`
+
 	// Reputation and trust
-	ReputationScore         float64                   `json:"reputation_score"`
-	TrustLevel              TrustLevel                `json:"trust_level"`
-	HistoricalReliability   float64                   `json:"historical_reliability"`
-	
+	ReputationScore       float64    `json:"reputation_score"`
+	TrustLevel            TrustLevel `json:"trust_level"`
+	HistoricalReliability float64    `json:"historical_reliability"`
+
 	// Anomaly tracking
-	AnomalyScore            float64                   `json:"anomaly_score"`
-	RecentAnomalies         []Anomaly                 `json:"recent_anomalies"`
-	AnomalyTrend            AnomalyTrend              `json:"anomaly_trend"`
-	
+	AnomalyScore    float64      `json:"anomaly_score"`
+	RecentAnomalies []Anomaly    `json:"recent_anomalies"`
+	AnomalyTrend    AnomalyTrend `json:"anomaly_trend"`
+
 	// Performance metrics
-	PerformanceMetrics      *ValidatorPerformanceMetrics `json:"performance_metrics"`
-	
+	PerformanceMetrics *ValidatorPerformanceMetrics `json:"performance_metrics"`
+
 	// Update tracking
-	LastUpdated             time.Time                 `json:"last_updated"`
-	ProfileVersion          int                       `json:"profile_version"`
+	LastUpdated    time.Time `json:"last_updated"`
+	ProfileVersion int       `json:"profile_version"`
 }
 
 type TrustLevel int
@@ -134,45 +128,45 @@ const (
 
 // RecoveryEngine orchestrates recovery from Byzantine faults
 type RecoveryEngine struct {
-	recoveryStrategies      map[FaultType]*RecoveryStrategy
-	activeRecoveries        map[string]*RecoveryOperation
-	recoveryQueue           *PriorityQueue
-	resourceAllocator       *RecoveryResourceAllocator
-	
+	recoveryStrategies map[FaultType]*RecoveryStrategy
+	activeRecoveries   map[string]*RecoveryOperation
+	recoveryQueue      *PriorityQueue
+	resourceAllocator  *RecoveryResourceAllocator
+
 	// Recovery algorithms
-	consensusRecovery       *ConsensusRecoveryAlgorithm
-	stateRecovery          *StateRecoveryAlgorithm
-	networkRecovery        *NetworkRecoveryAlgorithm
-	validatorRecovery      *ValidatorRecoveryAlgorithm
-	
+	consensusRecovery *ConsensusRecoveryAlgorithm
+	stateRecovery     *StateRecoveryAlgorithm
+	networkRecovery   *NetworkRecoveryAlgorithm
+	validatorRecovery *ValidatorRecoveryAlgorithm
+
 	// Orchestration
-	recoveryOrchestrator    *RecoveryOrchestrator
-	dependencyManager      *RecoveryDependencyManager
-	rollbackManager        *RecoveryRollbackManager
+	recoveryOrchestrator *RecoveryOrchestrator
+	dependencyManager    *RecoveryDependencyManager
+	rollbackManager      *RecoveryRollbackManager
 }
 
 type RecoveryStrategy struct {
-	StrategyID              string                    `json:"strategy_id"`
-	FaultTypes              []FaultType               `json:"fault_types"`
-	RecoverySteps           []*RecoveryStep           `json:"recovery_steps"`
-	Prerequisites           []Prerequisite            `json:"prerequisites"`
-	ResourceRequirements    *ResourceRequirements     `json:"resource_requirements"`
-	EstimatedDuration       time.Duration             `json:"estimated_duration"`
-	SuccessRate             float64                   `json:"success_rate"`
-	Priority                int                       `json:"priority"`
-	Enabled                 bool                      `json:"enabled"`
+	StrategyID           string                `json:"strategy_id"`
+	FaultTypes           []FaultType           `json:"fault_types"`
+	RecoverySteps        []*RecoveryStep       `json:"recovery_steps"`
+	Prerequisites        []Prerequisite        `json:"prerequisites"`
+	ResourceRequirements *ResourceRequirements `json:"resource_requirements"`
+	EstimatedDuration    time.Duration         `json:"estimated_duration"`
+	SuccessRate          float64               `json:"success_rate"`
+	Priority             int                   `json:"priority"`
+	Enabled              bool                  `json:"enabled"`
 }
 
 type RecoveryStep struct {
-	StepID                  string                    `json:"step_id"`
-	StepType                RecoveryStepType          `json:"step_type"`
-	Description             string                    `json:"description"`
-	ExecutionFunction       func(*RecoveryContext) error
-	ValidationFunction      func(*RecoveryContext) bool
-	RollbackFunction        func(*RecoveryContext) error
-	Timeout                 time.Duration             `json:"timeout"`
-	Dependencies            []string                  `json:"dependencies"`
-	CriticalStep            bool                      `json:"critical_step"`
+	StepID             string           `json:"step_id"`
+	StepType           RecoveryStepType `json:"step_type"`
+	Description        string           `json:"description"`
+	ExecutionFunction  func(*RecoveryContext) error
+	ValidationFunction func(*RecoveryContext) bool
+	RollbackFunction   func(*RecoveryContext) error
+	Timeout            time.Duration `json:"timeout"`
+	Dependencies       []string      `json:"dependencies"`
+	CriticalStep       bool          `json:"critical_step"`
 }
 
 type RecoveryStepType int
@@ -207,29 +201,29 @@ const (
 
 // NetworkPartition represents a network partition event
 type NetworkPartition struct {
-	ID                      string                    `json:"id"`
-	DetectedAt              time.Time                 `json:"detected_at"`
-	ResolvedAt              *time.Time                `json:"resolved_at,omitempty"`
-	
+	ID         string     `json:"id"`
+	DetectedAt time.Time  `json:"detected_at"`
+	ResolvedAt *time.Time `json:"resolved_at,omitempty"`
+
 	// Partition topology
-	Partitions              []*PartitionGroup         `json:"partitions"`
-	IsolatedNodes           []string                  `json:"isolated_nodes"`
-	PartitionType           PartitionType             `json:"partition_type"`
-	
+	Partitions    []*PartitionGroup `json:"partitions"`
+	IsolatedNodes []string          `json:"isolated_nodes"`
+	PartitionType PartitionType     `json:"partition_type"`
+
 	// Impact assessment
-	AffectedValidators      []string                  `json:"affected_validators"`
-	ConsensusImpact         ConsensusImpactLevel      `json:"consensus_impact"`
-	SecurityRisk            SecurityRiskLevel         `json:"security_risk"`
-	
+	AffectedValidators []string             `json:"affected_validators"`
+	ConsensusImpact    ConsensusImpactLevel `json:"consensus_impact"`
+	SecurityRisk       SecurityRiskLevel    `json:"security_risk"`
+
 	// Recovery state
-	RecoveryStatus          RecoveryStatus            `json:"recovery_status"`
-	RecoveryStrategy        string                    `json:"recovery_strategy"`
-	RecoveryProgress        float64                   `json:"recovery_progress"`
-	
+	RecoveryStatus   RecoveryStatus `json:"recovery_status"`
+	RecoveryStrategy string         `json:"recovery_strategy"`
+	RecoveryProgress float64        `json:"recovery_progress"`
+
 	// Metadata
-	Severity                int                       `json:"severity"`
-	RootCause               string                    `json:"root_cause"`
-	ResolutionMethod        string                    `json:"resolution_method"`
+	Severity         int    `json:"severity"`
+	RootCause        string `json:"root_cause"`
+	ResolutionMethod string `json:"resolution_method"`
 }
 
 type PartitionType int
@@ -273,31 +267,31 @@ const (
 
 // PartitionGroup represents a connected component during partition
 type PartitionGroup struct {
-	ID                      string                    `json:"id"`
-	Validators              []string                  `json:"validators"`
-	TotalStake              *big.Int                  `json:"total_stake"`
-	CanProgress             bool                      `json:"can_progress"`
-	IsMainPartition         bool                      `json:"is_main_partition"`
-	LastBlockHeight         int64                     `json:"last_block_height"`
-	InternalConnectivity    float64                   `json:"internal_connectivity"`
+	ID                   string   `json:"id"`
+	Validators           []string `json:"validators"`
+	TotalStake           *big.Int `json:"total_stake"`
+	CanProgress          bool     `json:"can_progress"`
+	IsMainPartition      bool     `json:"is_main_partition"`
+	LastBlockHeight      int64    `json:"last_block_height"`
+	InternalConnectivity float64  `json:"internal_connectivity"`
 }
 
 // ConsensusHealer repairs consensus after Byzantine faults
 type ConsensusHealer struct {
-	healingStrategies       map[ConsensusFailureType]*HealingStrategy
-	checkpointManager       *CheckpointManager
-	stateReconciler         *StateReconciler
-	validatorCoordinator    *ValidatorCoordinator
-	
+	healingStrategies    map[ConsensusFailureType]*HealingStrategy
+	checkpointManager    *CheckpointManager
+	stateReconciler      *StateReconciler
+	validatorCoordinator *ValidatorCoordinator
+
 	// Healing algorithms
-	fastRecovery            *FastRecoveryAlgorithm
-	safeRecovery            *SafeRecoveryAlgorithm
-	consensusReset          *ConsensusResetAlgorithm
-	
+	fastRecovery   *FastRecoveryAlgorithm
+	safeRecovery   *SafeRecoveryAlgorithm
+	consensusReset *ConsensusResetAlgorithm
+
 	// Verification
-	healingVerifier         *HealingVerifier
-	integrityChecker        *IntegrityChecker
-	consistencyValidator    *ConsistencyValidator
+	healingVerifier      *HealingVerifier
+	integrityChecker     *IntegrityChecker
+	consistencyValidator *ConsistencyValidator
 }
 
 type ConsensusFailureType int
@@ -312,64 +306,64 @@ const (
 
 // StateReconciler handles state reconciliation after partitions
 type StateReconciler struct {
-	reconciliationEngine    *ReconciliationEngine
-	merkleTreeManager       *MerkleTreeManager
-	stateComparator         *StateComparator
-	conflictResolver        *ConflictResolver
-	
+	reconciliationEngine *ReconciliationEngine
+	merkleTreeManager    *MerkleTreeManager
+	stateComparator      *StateComparator
+	conflictResolver     *ConflictResolver
+
 	// Reconciliation strategies
-	optimisticReconciliation *OptimisticReconciliation
+	optimisticReconciliation  *OptimisticReconciliation
 	pessimisticReconciliation *PessimisticReconciliation
-	hybridReconciliation    *HybridReconciliation
-	
+	hybridReconciliation      *HybridReconciliation
+
 	// State verification
-	stateVerifier           *StateVerifier
-	proofValidator          *ProofValidator
-	witnessManager          *WitnessManager
+	stateVerifier  *StateVerifier
+	proofValidator *ProofValidator
+	witnessManager *WitnessManager
 }
 
 // EvidenceCollector gathers evidence of Byzantine behavior
 type EvidenceCollector struct {
-	evidenceTypes           map[FaultType]*EvidenceType
-	evidenceRepository      *EvidenceRepository
-	witnessNetwork          *WitnessNetwork
-	cryptographicProofs     *CryptographicProofManager
-	
+	evidenceTypes       map[FaultType]*EvidenceType
+	evidenceRepository  *EvidenceRepository
+	witnessNetwork      *WitnessNetwork
+	cryptographicProofs *CryptographicProofManager
+
 	// Collection strategies
-	passiveCollection       *PassiveEvidenceCollector
-	activeCollection        *ActiveEvidenceCollector
-	crowdsourcedCollection  *CrowdsourcedEvidenceCollector
-	
+	passiveCollection      *PassiveEvidenceCollector
+	activeCollection       *ActiveEvidenceCollector
+	crowdsourcedCollection *CrowdsourcedEvidenceCollector
+
 	// Evidence validation
-	evidenceValidator       *EvidenceValidator
-	authenticityVerifier    *AuthenticityVerifier
-	integrityChecker        *EvidenceIntegrityChecker
+	evidenceValidator    *EvidenceValidator
+	authenticityVerifier *AuthenticityVerifier
+	integrityChecker     *EvidenceIntegrityChecker
 }
 
 // Recovery metrics and monitoring
 type ResilienceMetrics struct {
 	// Fault detection metrics
-	DetectedFaults          map[FaultType]int         `json:"detected_faults"`
-	FalsePositiveRate       float64                   `json:"false_positive_rate"`
-	FalseNegativeRate       float64                   `json:"false_negative_rate"`
-	DetectionLatency        time.Duration             `json:"detection_latency"`
-	
+	DetectedFaults    map[FaultType]int `json:"detected_faults"`
+	FalsePositiveRate float64           `json:"false_positive_rate"`
+	FalseNegativeRate float64           `json:"false_negative_rate"`
+	DetectionLatency  time.Duration     `json:"detection_latency"`
+
 	// Recovery metrics
-	RecoverySuccessRate     float64                   `json:"recovery_success_rate"`
-	AverageRecoveryTime     time.Duration             `json:"average_recovery_time"`
-	RecoveryEfficiency      float64                   `json:"recovery_efficiency"`
-	
+	RecoverySuccessRate float64       `json:"recovery_success_rate"`
+	AverageRecoveryTime time.Duration `json:"average_recovery_time"`
+	RecoveryEfficiency  float64       `json:"recovery_efficiency"`
+
 	// Network resilience
-	NetworkUptime           float64                   `json:"network_uptime"`
-	PartitionTolerance      float64                   `json:"partition_tolerance"`
-	ByzantineTolerance      float64                   `json:"byzantine_tolerance"`
-	
+	NetworkUptime      float64 `json:"network_uptime"`
+	PartitionTolerance float64 `json:"partition_tolerance"`
+	ByzantineTolerance float64 `json:"byzantine_tolerance"`
+
 	// Security metrics
-	PreventedAttacks        int                       `json:"prevented_attacks"`
-	MitigatedThreats        int                       `json:"mitigated_threats"`
-	SecurityScore           float64                   `json:"security_score"`
-	
-	LastUpdated             time.Time                 `json:"last_updated"`
+	PreventedAttacks int     `json:"prevented_attacks"`
+	MitigatedThreats int     `json:"mitigated_threats"`
+	SecurityScore    float64 `json:"security_score"`
+
+	LastUpdated time.Time `json:"last_updated"`
 }
 
 // NewByzantineRecoveryManager creates a new Byzantine recovery manager
@@ -398,8 +392,8 @@ func NewByzantineRecoveryManager(config *ResilienceConfig) *ByzantineRecoveryMan
 		networkState:            NewNetworkResilienceState(),
 		config:                  config,
 		metrics:                 &ResilienceMetrics{DetectedFaults: make(map[FaultType]int)},
-		alertSystem:            NewAlertSystem(config),
-		stopCh:                 make(chan struct{}),
+		alertSystem:             NewAlertSystem(config),
+		stopCh:                  make(chan struct{}),
 	}
 }
 
@@ -418,18 +412,18 @@ func (brm *ByzantineRecoveryManager) Start(ctx context.Context) error {
 	go brm.networkMonitoringLoop(ctx)
 	go brm.behaviorAnalysisLoop(ctx)
 	go brm.anomalyDetectionLoop(ctx)
-	
+
 	// Start recovery processes
 	go brm.recoveryOrchestrationLoop(ctx)
 	go brm.partitionResolutionLoop(ctx)
 	go brm.consensusHealingLoop(ctx)
 	go brm.stateReconciliationLoop(ctx)
-	
+
 	// Start security processes
 	go brm.evidenceCollectionLoop(ctx)
 	go brm.challengeResponseLoop(ctx)
 	go brm.slashingCoordinationLoop(ctx)
-	
+
 	// Start optimization processes
 	go brm.topologyOptimizationLoop(ctx)
 	go brm.metricsUpdateLoop(ctx)
@@ -442,11 +436,11 @@ func (brm *ByzantineRecoveryManager) Start(ctx context.Context) error {
 func (brm *ByzantineRecoveryManager) Stop() {
 	brm.mu.Lock()
 	defer brm.mu.Unlock()
-	
+
 	if !brm.running {
 		return
 	}
-	
+
 	close(brm.stopCh)
 	brm.running = false
 }
@@ -456,11 +450,11 @@ func (brm *ByzantineRecoveryManager) DetectByzantineFault(validatorID string, ev
 	brm.mu.RLock()
 	profile := brm.faultDetector.validatorProfiles[validatorID]
 	brm.mu.RUnlock()
-	
+
 	if profile == nil {
 		return nil, fmt.Errorf("validator profile not found: %s", validatorID)
 	}
-	
+
 	// Run multi-layered detection
 	results := []*DetectionResult{
 		brm.faultDetector.statisticalDetector.Analyze(validatorID, evidence),
@@ -468,32 +462,32 @@ func (brm *ByzantineRecoveryManager) DetectByzantineFault(validatorID string, ev
 		brm.faultDetector.behavioralDetector.Analyze(validatorID, evidence),
 		brm.faultDetector.cryptographicDetector.Analyze(validatorID, evidence),
 	}
-	
+
 	// Aggregate detection results
 	aggregatedResult := brm.aggregateDetectionResults(results)
-	
+
 	// Update validator profile
 	brm.updateValidatorProfile(validatorID, aggregatedResult)
-	
+
 	// Create fault detection result
 	faultResult := &FaultDetectionResult{
-		ValidatorID:    validatorID,
-		FaultDetected:  aggregatedResult.IsFault,
-		FaultType:      aggregatedResult.FaultType,
-		Confidence:     aggregatedResult.Confidence,
-		Evidence:       evidence,
-		DetectedAt:     time.Now(),
-		Severity:       aggregatedResult.Severity,
+		ValidatorID:       validatorID,
+		FaultDetected:     aggregatedResult.IsFault,
+		FaultType:         aggregatedResult.FaultType,
+		Confidence:        aggregatedResult.Confidence,
+		Evidence:          evidence,
+		DetectedAt:        time.Now(),
+		Severity:          aggregatedResult.Severity,
 		RecommendedAction: aggregatedResult.RecommendedAction,
 	}
-	
+
 	// Update metrics
 	brm.mu.Lock()
 	if faultResult.FaultDetected {
 		brm.metrics.DetectedFaults[faultResult.FaultType]++
 	}
 	brm.mu.Unlock()
-	
+
 	return faultResult, nil
 }
 
@@ -509,42 +503,42 @@ func (brm *ByzantineRecoveryManager) InitiateRecovery(faultResult *FaultDetectio
 		Evidence:       faultResult.Evidence,
 		Priority:       brm.calculateRecoveryPriority(faultResult),
 	}
-	
+
 	// Select recovery strategy
 	strategy := brm.recoveryEngine.SelectStrategy(faultResult.FaultType, faultResult.Severity)
 	if strategy == nil {
 		return nil, fmt.Errorf("no recovery strategy found for fault type: %v", faultResult.FaultType)
 	}
 	recoveryOp.Strategy = strategy
-	
+
 	// Validate prerequisites
 	if !brm.validateRecoveryPrerequisites(recoveryOp) {
 		return nil, fmt.Errorf("recovery prerequisites not met")
 	}
-	
+
 	// Allocate resources
 	if err := brm.recoveryEngine.resourceAllocator.AllocateResources(recoveryOp); err != nil {
 		return nil, fmt.Errorf("failed to allocate recovery resources: %w", err)
 	}
-	
+
 	// Register active recovery
 	brm.mu.Lock()
 	brm.activeRecoveries[recoveryOp.ID] = recoveryOp
 	brm.mu.Unlock()
-	
+
 	// Start recovery execution
 	go brm.executeRecovery(recoveryOp)
-	
+
 	// Emit alert
 	brm.alertSystem.EmitAlert(&Alert{
-		Type:        AlertTypeRecoveryInitiated,
-		Severity:    AlertSeverityHigh,
-		Message:     fmt.Sprintf("Recovery initiated for %s fault", faultResult.FaultType.String()),
-		Source:      recoveryOp.ID,
-		Timestamp:   time.Now(),
-		Metadata:    map[string]interface{}{"fault_type": faultResult.FaultType, "validator": faultResult.ValidatorID},
+		Type:      AlertTypeRecoveryInitiated,
+		Severity:  AlertSeverityHigh,
+		Message:   fmt.Sprintf("Recovery initiated for %s fault", faultResult.FaultType.String()),
+		Source:    recoveryOp.ID,
+		Timestamp: time.Now(),
+		Metadata:  map[string]interface{}{"fault_type": faultResult.FaultType, "validator": faultResult.ValidatorID},
 	})
-	
+
 	return recoveryOp, nil
 }
 
@@ -552,10 +546,10 @@ func (brm *ByzantineRecoveryManager) InitiateRecovery(faultResult *FaultDetectio
 func (brm *ByzantineRecoveryManager) HandleNetworkPartition(partition *NetworkPartition) error {
 	// Analyze partition characteristics
 	analysis := brm.partitionResolver.AnalyzePartition(partition)
-	
+
 	// Determine if consensus can continue
 	canContinue := brm.assessConsensusViability(partition, analysis)
-	
+
 	if canContinue {
 		// Continue consensus in main partition
 		brm.handlePartialPartition(partition, analysis)
@@ -563,10 +557,10 @@ func (brm *ByzantineRecoveryManager) HandleNetworkPartition(partition *NetworkPa
 		// Full network partition - enter safety mode
 		brm.handleFullPartition(partition, analysis)
 	}
-	
+
 	// Start partition resolution
 	go brm.resolvePartition(partition)
-	
+
 	return nil
 }
 
@@ -581,26 +575,26 @@ func (brm *ByzantineRecoveryManager) ReconcileAfterPartition(partition *NetworkP
 		}
 		partitionStates[group.ID] = state
 	}
-	
+
 	// Identify conflicts
 	conflicts := brm.stateReconciler.IdentifyConflicts(partitionStates)
-	
+
 	// Resolve conflicts using configured strategy
 	resolutionPlan := brm.stateReconciler.CreateResolutionPlan(conflicts, brm.config.ReconciliationStrategy)
-	
+
 	// Execute reconciliation
 	if err := brm.stateReconciler.ExecuteReconciliation(resolutionPlan); err != nil {
 		return fmt.Errorf("state reconciliation failed: %w", err)
 	}
-	
+
 	// Verify reconciled state
 	if err := brm.stateReconciler.VerifyReconciledState(); err != nil {
 		return fmt.Errorf("reconciled state verification failed: %w", err)
 	}
-	
+
 	// Update network state
 	brm.updateNetworkStateAfterReconciliation(partition)
-	
+
 	return nil
 }
 
@@ -608,7 +602,7 @@ func (brm *ByzantineRecoveryManager) ReconcileAfterPartition(partition *NetworkP
 func (brm *ByzantineRecoveryManager) faultDetectionLoop(ctx context.Context) {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -625,12 +619,12 @@ func (brm *ByzantineRecoveryManager) runFaultDetection() {
 	// Collect validator events and analyze for anomalies
 	brm.faultDetector.eventAggregator.ProcessEvents()
 	brm.faultDetector.realtimeAnalyzer.AnalyzeCurrentState()
-	
+
 	// Update ML models with new data
 	for _, model := range brm.faultDetector.mlModels {
 		model.Update()
 	}
-	
+
 	// Run prediction engine
 	predictions := brm.faultDetector.predictionEngine.PredictFaults()
 	for _, prediction := range predictions {
@@ -643,7 +637,7 @@ func (brm *ByzantineRecoveryManager) runFaultDetection() {
 func (brm *ByzantineRecoveryManager) networkMonitoringLoop(ctx context.Context) {
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -664,11 +658,11 @@ func (brm *ByzantineRecoveryManager) monitorNetworkHealth() {
 			brm.HandleNetworkPartition(partition)
 		}
 	}
-	
+
 	// Monitor validator connectivity
 	connectivity := brm.networkMonitor.AssessValidatorConnectivity()
 	brm.updateValidatorConnectivity(connectivity)
-	
+
 	// Update network topology
 	brm.topologyOptimizer.UpdateTopology()
 }
@@ -676,7 +670,7 @@ func (brm *ByzantineRecoveryManager) monitorNetworkHealth() {
 func (brm *ByzantineRecoveryManager) recoveryOrchestrationLoop(ctx context.Context) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -692,10 +686,10 @@ func (brm *ByzantineRecoveryManager) recoveryOrchestrationLoop(ctx context.Conte
 func (brm *ByzantineRecoveryManager) orchestrateActiveRecoveries() {
 	brm.mu.RLock()
 	defer brm.mu.RUnlock()
-	
+
 	for _, recovery := range brm.activeRecoveries {
 		brm.updateRecoveryProgress(recovery)
-		
+
 		if recovery.Status == RecoveryStatusCompleted || recovery.Status == RecoveryStatusFailed {
 			brm.finalizeRecovery(recovery)
 		}
@@ -704,65 +698,65 @@ func (brm *ByzantineRecoveryManager) orchestrateActiveRecoveries() {
 
 func (brm *ByzantineRecoveryManager) executeRecovery(recoveryOp *RecoveryOperation) {
 	recoveryOp.Status = RecoveryStatusExecuting
-	
+
 	for i, step := range recoveryOp.Strategy.RecoverySteps {
 		// Create recovery context
 		ctx := &RecoveryContext{
-			Operation:     recoveryOp,
-			CurrentStep:   step,
-			StepIndex:     i,
-			SharedState:   make(map[string]interface{}),
-			StartTime:     time.Now(),
+			Operation:   recoveryOp,
+			CurrentStep: step,
+			StepIndex:   i,
+			SharedState: make(map[string]interface{}),
+			StartTime:   time.Now(),
 		}
-		
+
 		// Execute recovery step
 		if err := brm.executeRecoveryStep(ctx); err != nil {
 			recoveryOp.Status = RecoveryStatusFailed
 			recoveryOp.Error = err.Error()
 			recoveryOp.FailedStep = &i
-			
+
 			// Attempt rollback if critical step failed
 			if step.CriticalStep {
 				brm.rollbackRecovery(recoveryOp, i)
 			}
 			return
 		}
-		
+
 		// Update progress
 		recoveryOp.Progress = float64(i+1) / float64(len(recoveryOp.Strategy.RecoverySteps))
 		recoveryOp.CompletedSteps++
 	}
-	
+
 	recoveryOp.Status = RecoveryStatusCompleted
 	recoveryOp.EndTime = &[]time.Time{time.Now()}[0]
 }
 
 func (brm *ByzantineRecoveryManager) executeRecoveryStep(ctx *RecoveryContext) error {
 	step := ctx.CurrentStep
-	
+
 	// Set timeout
 	stepCtx, cancel := context.WithTimeout(context.Background(), step.Timeout)
 	defer cancel()
-	
+
 	// Execute step function
 	errCh := make(chan error, 1)
 	go func() {
 		errCh <- step.ExecutionFunction(ctx)
 	}()
-	
+
 	select {
 	case err := <-errCh:
 		if err != nil {
 			return fmt.Errorf("recovery step %s failed: %w", step.StepID, err)
 		}
-		
+
 		// Validate step completion
 		if step.ValidationFunction != nil && !step.ValidationFunction(ctx) {
 			return fmt.Errorf("recovery step %s validation failed", step.StepID)
 		}
-		
+
 		return nil
-		
+
 	case <-stepCtx.Done():
 		return fmt.Errorf("recovery step %s timed out", step.StepID)
 	}
@@ -775,7 +769,7 @@ func (brm *ByzantineRecoveryManager) generateRecoveryID() string {
 
 func (brm *ByzantineRecoveryManager) calculateRecoveryPriority(faultResult *FaultDetectionResult) int {
 	basePriority := int(faultResult.Severity) * 10
-	
+
 	// Adjust based on fault type
 	switch faultResult.FaultType {
 	case FaultTypeNetworkPartition:
@@ -787,7 +781,7 @@ func (brm *ByzantineRecoveryManager) calculateRecoveryPriority(faultResult *Faul
 	case FaultTypeStateCorruption:
 		basePriority += 35
 	}
-	
+
 	return basePriority
 }
 
@@ -819,19 +813,19 @@ func (brm *ByzantineRecoveryManager) aggregateDetectionResults(results []*Detect
 	totalWeight := 0.0
 	weightedConfidence := 0.0
 	faultTypes := make(map[FaultType]float64)
-	
+
 	for _, result := range results {
 		weight := result.Weight
 		totalWeight += weight
 		weightedConfidence += result.Confidence * weight
-		
+
 		if result.IsFault {
 			faultTypes[result.FaultType] += weight
 		}
 	}
-	
+
 	avgConfidence := weightedConfidence / totalWeight
-	
+
 	// Determine dominant fault type
 	var dominantFaultType FaultType
 	maxWeight := 0.0
@@ -841,7 +835,7 @@ func (brm *ByzantineRecoveryManager) aggregateDetectionResults(results []*Detect
 			dominantFaultType = faultType
 		}
 	}
-	
+
 	return &AggregatedDetectionResult{
 		IsFault:           avgConfidence > brm.config.FaultThreshold,
 		FaultType:         dominantFaultType,
@@ -854,20 +848,20 @@ func (brm *ByzantineRecoveryManager) aggregateDetectionResults(results []*Detect
 func (brm *ByzantineRecoveryManager) updateValidatorProfile(validatorID string, result *AggregatedDetectionResult) {
 	brm.mu.Lock()
 	defer brm.mu.Unlock()
-	
+
 	profile := brm.faultDetector.validatorProfiles[validatorID]
 	if profile == nil {
 		profile = &ValidatorProfile{
-			ValidatorID:         validatorID,
-			RecentAnomalies:     make([]Anomaly, 0),
-			PerformanceMetrics:  &ValidatorPerformanceMetrics{},
+			ValidatorID:        validatorID,
+			RecentAnomalies:    make([]Anomaly, 0),
+			PerformanceMetrics: &ValidatorPerformanceMetrics{},
 		}
 		brm.faultDetector.validatorProfiles[validatorID] = profile
 	}
-	
+
 	// Update anomaly score
 	profile.AnomalyScore = result.Confidence
-	
+
 	// Add to recent anomalies if fault detected
 	if result.IsFault {
 		anomaly := Anomaly{
@@ -877,16 +871,16 @@ func (brm *ByzantineRecoveryManager) updateValidatorProfile(validatorID string, 
 			Description: fmt.Sprintf("Fault detected: %v", result.FaultType),
 		}
 		profile.RecentAnomalies = append(profile.RecentAnomalies, anomaly)
-		
+
 		// Limit recent anomalies
 		if len(profile.RecentAnomalies) > 100 {
 			profile.RecentAnomalies = profile.RecentAnomalies[1:]
 		}
 	}
-	
+
 	// Update trust level based on recent behavior
 	brm.updateValidatorTrustLevel(profile)
-	
+
 	profile.LastUpdated = time.Now()
 	profile.ProfileVersion++
 }
@@ -898,7 +892,7 @@ func (brm *ByzantineRecoveryManager) updateValidatorTrustLevel(profile *Validato
 			recentAnomalyCount++
 		}
 	}
-	
+
 	// Adjust trust level based on recent anomalies
 	if recentAnomalyCount == 0 {
 		if profile.TrustLevel < TrustLevelMaximum {
@@ -911,7 +905,7 @@ func (brm *ByzantineRecoveryManager) updateValidatorTrustLevel(profile *Validato
 			profile.TrustLevel--
 		}
 	}
-	
+
 	// Update reputation score
 	trustMultiplier := float64(profile.TrustLevel) / float64(TrustLevelMaximum)
 	profile.ReputationScore = profile.HistoricalReliability * trustMultiplier
@@ -927,7 +921,7 @@ func (brm *ByzantineRecoveryManager) GetResilienceMetrics() *ResilienceMetrics {
 func (brm *ByzantineRecoveryManager) GetActiveRecoveries() []*RecoveryOperation {
 	brm.mu.RLock()
 	defer brm.mu.RUnlock()
-	
+
 	recoveries := make([]*RecoveryOperation, 0, len(brm.activeRecoveries))
 	for _, recovery := range brm.activeRecoveries {
 		recoveries = append(recoveries, recovery)
@@ -938,22 +932,22 @@ func (brm *ByzantineRecoveryManager) GetActiveRecoveries() []*RecoveryOperation 
 func (brm *ByzantineRecoveryManager) GetValidatorProfile(validatorID string) (*ValidatorProfile, error) {
 	brm.mu.RLock()
 	defer brm.mu.RUnlock()
-	
+
 	profile := brm.faultDetector.validatorProfiles[validatorID]
 	if profile == nil {
 		return nil, fmt.Errorf("validator profile not found: %s", validatorID)
 	}
-	
+
 	return profile, nil
 }
 
 // Placeholder implementations for referenced types and functions
 
 type ResilienceConfig struct {
-	FaultThreshold        float64       `json:"fault_threshold"`
-	PredictionThreshold   float64       `json:"prediction_threshold"`
-	ReconciliationStrategy string       `json:"reconciliation_strategy"`
-	MaxRecoveryTime       time.Duration `json:"max_recovery_time"`
+	FaultThreshold         float64       `json:"fault_threshold"`
+	PredictionThreshold    float64       `json:"prediction_threshold"`
+	ReconciliationStrategy string        `json:"reconciliation_strategy"`
+	MaxRecoveryTime        time.Duration `json:"max_recovery_time"`
 }
 
 type AnomalyDetector struct{}
@@ -1011,8 +1005,8 @@ type RecoveryOperation struct {
 }
 
 type RecoveryEvent struct {
-	Type      string    `json:"type"`
-	Timestamp time.Time `json:"timestamp"`
+	Type      string                 `json:"type"`
+	Timestamp time.Time              `json:"timestamp"`
 	Details   map[string]interface{} `json:"details"`
 }
 
@@ -1030,9 +1024,9 @@ const (
 )
 
 type ResourceRequirements struct {
-	CPU    float64 `json:"cpu"`
-	Memory int64   `json:"memory"`
-	Network int64  `json:"network"`
+	CPU     float64 `json:"cpu"`
+	Memory  int64   `json:"memory"`
+	Network int64   `json:"network"`
 }
 
 type RecoveryContext struct {
@@ -1059,11 +1053,11 @@ type AggregatedDetectionResult struct {
 }
 
 type Alert struct {
-	Type      AlertType `json:"type"`
-	Severity  AlertSeverity `json:"severity"`
-	Message   string    `json:"message"`
-	Source    string    `json:"source"`
-	Timestamp time.Time `json:"timestamp"`
+	Type      AlertType              `json:"type"`
+	Severity  AlertSeverity          `json:"severity"`
+	Message   string                 `json:"message"`
+	Source    string                 `json:"source"`
+	Timestamp time.Time              `json:"timestamp"`
 	Metadata  map[string]interface{} `json:"metadata"`
 }
 
@@ -1165,32 +1159,48 @@ type PartitionState struct{}
 // Constructor functions (placeholder implementations)
 func NewByzantineFaultDetector(config *ResilienceConfig) *ByzantineFaultDetector {
 	return &ByzantineFaultDetector{
-		detectionRules:      make([]*FaultDetectionRule, 0),
-		validatorProfiles:   make(map[string]*ValidatorProfile),
-		anomalyThresholds:   make(map[string]float64),
+		detectionRules:     make([]*FaultDetectionRule, 0),
+		validatorProfiles:  make(map[string]*ValidatorProfile),
+		anomalyThresholds:  make(map[string]float64),
 		mlModels:           make(map[string]*MLFaultModel),
 		monitoringChannels: make(map[string]chan *ValidatorEvent),
 	}
 }
 
 func NewAnomalyDetector(config *ResilienceConfig) *AnomalyDetector { return &AnomalyDetector{} }
-func NewNetworkHealthMonitor(config *ResilienceConfig) *NetworkHealthMonitor { return &NetworkHealthMonitor{} }
-func NewValidatorBehaviorAnalyzer(config *ResilienceConfig) *ValidatorBehaviorAnalyzer { return &ValidatorBehaviorAnalyzer{} }
-func NewRecoveryEngine(config *ResilienceConfig) *RecoveryEngine { return &RecoveryEngine{activeRecoveries: make(map[string]*RecoveryOperation)} }
+func NewNetworkHealthMonitor(config *ResilienceConfig) *NetworkHealthMonitor {
+	return &NetworkHealthMonitor{}
+}
+func NewValidatorBehaviorAnalyzer(config *ResilienceConfig) *ValidatorBehaviorAnalyzer {
+	return &ValidatorBehaviorAnalyzer{}
+}
+func NewRecoveryEngine(config *ResilienceConfig) *RecoveryEngine {
+	return &RecoveryEngine{activeRecoveries: make(map[string]*RecoveryOperation)}
+}
 func NewPartitionResolver(config *ResilienceConfig) *PartitionResolver { return &PartitionResolver{} }
-func NewConsensusHealer(config *ResilienceConfig) *ConsensusHealer { return &ConsensusHealer{} }
-func NewStateReconciler(config *ResilienceConfig) *StateReconciler { return &StateReconciler{} }
+func NewConsensusHealer(config *ResilienceConfig) *ConsensusHealer     { return &ConsensusHealer{} }
+func NewStateReconciler(config *ResilienceConfig) *StateReconciler     { return &StateReconciler{} }
 func NewEvidenceCollector(config *ResilienceConfig) *EvidenceCollector { return &EvidenceCollector{} }
-func NewFraudProofSystem(config *ResilienceConfig) *FraudProofSystem { return &FraudProofSystem{} }
-func NewChallengeResponseSystem(config *ResilienceConfig) *ChallengeResponseSystem { return &ChallengeResponseSystem{} }
-func NewCryptographicProofManager(config *ResilienceConfig) *CryptographicProofManager { return &CryptographicProofManager{} }
-func NewSlashingCoordinator(config *ResilienceConfig) *SlashingCoordinator { return &SlashingCoordinator{} }
+func NewFraudProofSystem(config *ResilienceConfig) *FraudProofSystem   { return &FraudProofSystem{} }
+func NewChallengeResponseSystem(config *ResilienceConfig) *ChallengeResponseSystem {
+	return &ChallengeResponseSystem{}
+}
+func NewCryptographicProofManager(config *ResilienceConfig) *CryptographicProofManager {
+	return &CryptographicProofManager{}
+}
+func NewSlashingCoordinator(config *ResilienceConfig) *SlashingCoordinator {
+	return &SlashingCoordinator{}
+}
 func NewReputationManager(config *ResilienceConfig) *ReputationManager { return &ReputationManager{} }
 func NewIncentiveAdjuster(config *ResilienceConfig) *IncentiveAdjuster { return &IncentiveAdjuster{} }
-func NewNetworkTopologyOptimizer(config *ResilienceConfig) *NetworkTopologyOptimizer { return &NetworkTopologyOptimizer{} }
+func NewNetworkTopologyOptimizer(config *ResilienceConfig) *NetworkTopologyOptimizer {
+	return &NetworkTopologyOptimizer{}
+}
 func NewRedundancyManager(config *ResilienceConfig) *RedundancyManager { return &RedundancyManager{} }
-func NewFailoverCoordinator(config *ResilienceConfig) *FailoverCoordinator { return &FailoverCoordinator{} }
-func NewNetworkResilienceState() *NetworkResilienceState { return &NetworkResilienceState{} }
+func NewFailoverCoordinator(config *ResilienceConfig) *FailoverCoordinator {
+	return &FailoverCoordinator{}
+}
+func NewNetworkResilienceState() *NetworkResilienceState   { return &NetworkResilienceState{} }
 func NewAlertSystem(config *ResilienceConfig) *AlertSystem { return &AlertSystem{} }
 
 // Method placeholders
@@ -1213,13 +1223,13 @@ func (cd *CryptographicAnomalyDetector) Analyze(validatorID string, evidence []b
 func (re *RecoveryEngine) SelectStrategy(faultType FaultType, severity int) *RecoveryStrategy {
 	return &RecoveryStrategy{
 		StrategyID:        fmt.Sprintf("strategy-%v", faultType),
-		FaultTypes:       []FaultType{faultType},
-		RecoverySteps:    make([]*RecoveryStep, 0),
-		Prerequisites:    make([]Prerequisite, 0),
+		FaultTypes:        []FaultType{faultType},
+		RecoverySteps:     make([]*RecoveryStep, 0),
+		Prerequisites:     make([]Prerequisite, 0),
 		EstimatedDuration: 5 * time.Minute,
-		SuccessRate:      0.9,
-		Priority:         severity,
-		Enabled:          true,
+		SuccessRate:       0.9,
+		Priority:          severity,
+		Enabled:           true,
 	}
 }
 
@@ -1227,24 +1237,36 @@ func (rra *RecoveryResourceAllocator) AllocateResources(recovery *RecoveryOperat
 	return nil
 }
 
-func (ea *EventAggregator) ProcessEvents() {}
+func (ea *EventAggregator) ProcessEvents()        {}
 func (ra *RealtimeAnalyzer) AnalyzeCurrentState() {}
-func (model *MLFaultModel) Update() {}
-func (pe *FaultPredictionEngine) PredictFaults() []*FaultPrediction { return make([]*FaultPrediction, 0) }
+func (model *MLFaultModel) Update()               {}
+func (pe *FaultPredictionEngine) PredictFaults() []*FaultPrediction {
+	return make([]*FaultPrediction, 0)
+}
 
-func (nm *NetworkHealthMonitor) DetectPartitions() []*NetworkPartition { return make([]*NetworkPartition, 0) }
-func (nm *NetworkHealthMonitor) AssessValidatorConnectivity() map[string]float64 { return make(map[string]float64) }
+func (nm *NetworkHealthMonitor) DetectPartitions() []*NetworkPartition {
+	return make([]*NetworkPartition, 0)
+}
+func (nm *NetworkHealthMonitor) AssessValidatorConnectivity() map[string]float64 {
+	return make(map[string]float64)
+}
 func (nm *NetworkHealthMonitor) GetConnectivityRatio() float64 { return 0.9 }
 func (nm *NetworkHealthMonitor) GetParticipationRate() float64 { return 0.85 }
-func (nm *NetworkHealthMonitor) GetConsensusHealth() float64 { return 0.95 }
+func (nm *NetworkHealthMonitor) GetConsensusHealth() float64   { return 0.95 }
 
 func (nto *NetworkTopologyOptimizer) UpdateTopology() {}
 
-func (pr *PartitionResolver) AnalyzePartition(partition *NetworkPartition) *PartitionAnalysis { return &PartitionAnalysis{} }
-func (sr *StateReconciler) IdentifyConflicts(states map[string]*PartitionState) []*StateConflict { return make([]*StateConflict, 0) }
-func (sr *StateReconciler) CreateResolutionPlan(conflicts []*StateConflict, strategy string) *ResolutionPlan { return &ResolutionPlan{} }
+func (pr *PartitionResolver) AnalyzePartition(partition *NetworkPartition) *PartitionAnalysis {
+	return &PartitionAnalysis{}
+}
+func (sr *StateReconciler) IdentifyConflicts(states map[string]*PartitionState) []*StateConflict {
+	return make([]*StateConflict, 0)
+}
+func (sr *StateReconciler) CreateResolutionPlan(conflicts []*StateConflict, strategy string) *ResolutionPlan {
+	return &ResolutionPlan{}
+}
 func (sr *StateReconciler) ExecuteReconciliation(plan *ResolutionPlan) error { return nil }
-func (sr *StateReconciler) VerifyReconciledState() error { return nil }
+func (sr *StateReconciler) VerifyReconciledState() error                     { return nil }
 
 func (as *AlertSystem) EmitAlert(alert *Alert) {}
 
@@ -1272,31 +1294,41 @@ func (ft FaultType) String() string {
 }
 
 // Method implementations
-func (brm *ByzantineRecoveryManager) behaviorAnalysisLoop(ctx context.Context) {}
-func (brm *ByzantineRecoveryManager) anomalyDetectionLoop(ctx context.Context) {}
-func (brm *ByzantineRecoveryManager) partitionResolutionLoop(ctx context.Context) {}
-func (brm *ByzantineRecoveryManager) consensusHealingLoop(ctx context.Context) {}
-func (brm *ByzantineRecoveryManager) stateReconciliationLoop(ctx context.Context) {}
-func (brm *ByzantineRecoveryManager) evidenceCollectionLoop(ctx context.Context) {}
-func (brm *ByzantineRecoveryManager) challengeResponseLoop(ctx context.Context) {}
+func (brm *ByzantineRecoveryManager) behaviorAnalysisLoop(ctx context.Context)     {}
+func (brm *ByzantineRecoveryManager) anomalyDetectionLoop(ctx context.Context)     {}
+func (brm *ByzantineRecoveryManager) partitionResolutionLoop(ctx context.Context)  {}
+func (brm *ByzantineRecoveryManager) consensusHealingLoop(ctx context.Context)     {}
+func (brm *ByzantineRecoveryManager) stateReconciliationLoop(ctx context.Context)  {}
+func (brm *ByzantineRecoveryManager) evidenceCollectionLoop(ctx context.Context)   {}
+func (brm *ByzantineRecoveryManager) challengeResponseLoop(ctx context.Context)    {}
 func (brm *ByzantineRecoveryManager) slashingCoordinationLoop(ctx context.Context) {}
 func (brm *ByzantineRecoveryManager) topologyOptimizationLoop(ctx context.Context) {}
-func (brm *ByzantineRecoveryManager) metricsUpdateLoop(ctx context.Context) {}
-func (brm *ByzantineRecoveryManager) alertProcessingLoop(ctx context.Context) {}
+func (brm *ByzantineRecoveryManager) metricsUpdateLoop(ctx context.Context)        {}
+func (brm *ByzantineRecoveryManager) alertProcessingLoop(ctx context.Context)      {}
 
-func (brm *ByzantineRecoveryManager) handleFaultPrediction(prediction *FaultPrediction) {}
-func (brm *ByzantineRecoveryManager) isPartitionKnown(partition *NetworkPartition) bool { return false }
+func (brm *ByzantineRecoveryManager) handleFaultPrediction(prediction *FaultPrediction)           {}
+func (brm *ByzantineRecoveryManager) isPartitionKnown(partition *NetworkPartition) bool           { return false }
 func (brm *ByzantineRecoveryManager) updateValidatorConnectivity(connectivity map[string]float64) {}
-func (brm *ByzantineRecoveryManager) updateRecoveryProgress(recovery *RecoveryOperation) {}
-func (brm *ByzantineRecoveryManager) finalizeRecovery(recovery *RecoveryOperation) {}
-func (brm *ByzantineRecoveryManager) rollbackRecovery(recovery *RecoveryOperation, failedStepIndex int) {}
-func (brm *ByzantineRecoveryManager) assessConsensusViability(partition *NetworkPartition, analysis *PartitionAnalysis) bool { return true }
-func (brm *ByzantineRecoveryManager) handlePartialPartition(partition *NetworkPartition, analysis *PartitionAnalysis) {}
-func (brm *ByzantineRecoveryManager) handleFullPartition(partition *NetworkPartition, analysis *PartitionAnalysis) {}
+func (brm *ByzantineRecoveryManager) updateRecoveryProgress(recovery *RecoveryOperation)          {}
+func (brm *ByzantineRecoveryManager) finalizeRecovery(recovery *RecoveryOperation)                {}
+func (brm *ByzantineRecoveryManager) rollbackRecovery(recovery *RecoveryOperation, failedStepIndex int) {
+}
+func (brm *ByzantineRecoveryManager) assessConsensusViability(partition *NetworkPartition, analysis *PartitionAnalysis) bool {
+	return true
+}
+func (brm *ByzantineRecoveryManager) handlePartialPartition(partition *NetworkPartition, analysis *PartitionAnalysis) {
+}
+func (brm *ByzantineRecoveryManager) handleFullPartition(partition *NetworkPartition, analysis *PartitionAnalysis) {
+}
 func (brm *ByzantineRecoveryManager) resolvePartition(partition *NetworkPartition) {}
-func (brm *ByzantineRecoveryManager) collectPartitionState(group *PartitionGroup) (*PartitionState, error) { return &PartitionState{}, nil }
-func (brm *ByzantineRecoveryManager) updateNetworkStateAfterReconciliation(partition *NetworkPartition) {}
-func (brm *ByzantineRecoveryManager) calculateSeverity(faultType FaultType, confidence float64) int { return int(confidence * 10) }
+func (brm *ByzantineRecoveryManager) collectPartitionState(group *PartitionGroup) (*PartitionState, error) {
+	return &PartitionState{}, nil
+}
+func (brm *ByzantineRecoveryManager) updateNetworkStateAfterReconciliation(partition *NetworkPartition) {
+}
+func (brm *ByzantineRecoveryManager) calculateSeverity(faultType FaultType, confidence float64) int {
+	return int(confidence * 10)
+}
 func (brm *ByzantineRecoveryManager) determineRecommendedAction(faultType FaultType, confidence float64) RecommendedAction {
 	if confidence > 0.9 {
 		return RecommendedActionSlash

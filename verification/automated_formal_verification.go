@@ -2,14 +2,8 @@ package verification
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/json"
 	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
-	"regexp"
-	"strings"
 	"sync"
 	"time"
 )
@@ -19,93 +13,93 @@ type AutomatedFormalVerificationPipeline struct {
 	mu sync.RWMutex
 
 	// Core verification engines
-	tlaVerifier         *TLAVerifier
-	coqVerifier         *CoqVerifier
-	isabelleVerifier    *IsabelleVerifier
-	dafnyVerifier       *DafnyVerifier
-	
+	tlaVerifier      *TLAVerifier
+	coqVerifier      *CoqVerifier
+	isabelleVerifier *IsabelleVerifier
+	dafnyVerifier    *DafnyVerifier
+
 	// Specialized verifiers
 	modelChecker        *ModelChecker
 	theoremProver       *TheoremProver
 	symbolicExecutor    *SymbolicExecutor
 	abstractInterpreter *AbstractInterpreter
-	
+
 	// Specification management
 	specificationManager *SpecificationManager
-	propertyDatabase    *PropertyDatabase
-	invariantTracker    *InvariantTracker
-	
+	propertyDatabase     *PropertyDatabase
+	invariantTracker     *InvariantTracker
+
 	// Verification workflow
-	verificationQueue   *VerificationQueue
-	jobScheduler        *JobScheduler
-	resultAggregator    *ResultAggregator
-	
+	verificationQueue *VerificationQueue
+	jobScheduler      *JobScheduler
+	resultAggregator  *ResultAggregator
+
 	// Code analysis
-	codeAnalyzer        *CodeAnalyzer
-	dependencyTracker   *DependencyTracker
-	changeDetector      *ChangeDetector
-	
+	codeAnalyzer      *CodeAnalyzer
+	dependencyTracker *DependencyTracker
+	changeDetector    *ChangeDetector
+
 	// Reporting and metrics
-	reportGenerator     *ReportGenerator
-	metricsCollector    *VerificationMetrics
-	alertSystem         *VerificationAlertSystem
-	
+	reportGenerator  *ReportGenerator
+	metricsCollector *VerificationMetrics
+	alertSystem      *VerificationAlertSystem
+
 	// Configuration
-	config              *VerificationConfig
-	toolchainConfig     *ToolchainConfig
-	
+	config          *VerificationConfig
+	toolchainConfig *ToolchainConfig
+
 	// State management
-	verificationJobs    map[string]*VerificationJob
-	completedJobs       []*CompletedJob
-	activeWorkers       int
-	
+	verificationJobs map[string]*VerificationJob
+	completedJobs    []*CompletedJob
+	activeWorkers    int
+
 	// Control
-	running             bool
-	stopCh              chan struct{}
+	running bool
+	stopCh  chan struct{}
 }
 
 // TLAVerifier handles TLA+ specifications and model checking
 type TLAVerifier struct {
-	tlcPath             string
-	tlaToolsPath        string
-	specificationCache  map[string]*TLASpecification
-	modelConfig         *TLAModelConfig
-	
+	tlcPath            string
+	tlaToolsPath       string
+	specificationCache map[string]*TLASpecification
+	modelConfig        *TLAModelConfig
+
 	// TLA+ specific settings
-	maxStates           int64
-	maxTimeSeconds      int
-	checkDeadlock       bool
-	checkLiveness       bool
-	symmetryReduction   bool
-	
+	maxStates         int64
+	maxTimeSeconds    int
+	checkDeadlock     bool
+	checkLiveness     bool
+	symmetryReduction bool
+
 	// Advanced features
-	distributedMode     bool
-	workerNodes         []string
-	fingerprintMode     FingerprintMode
-	
+	distributedMode bool
+	workerNodes     []string
+	fingerprintMode FingerprintMode
+
 	// State space exploration
 	explorationStrategy ExplorationStrategy
 	stateGraphAnalyzer  *StateGraphAnalyzer
-	
+
 	// Performance optimization
-	cacheEnabled        bool
-	parallelWorkers     int
-	memoryLimit         string
+	cacheEnabled    bool
+	parallelWorkers int
+	memoryLimit     string
 }
 
 type TLASpecification struct {
-	Name                string                `json:"name"`
-	FilePath            string                `json:"file_path"`
-	ConfigPath          string                `json:"config_path"`
-	ModuleDependencies  []string              `json:"module_dependencies"`
-	Constants           map[string]interface{} `json:"constants"`
-	Variables           []string              `json:"variables"`
-	Invariants          []string              `json:"invariants"`
-	TemporalProperties  []string              `json:"temporal_properties"`
-	SafetyProperties    []string              `json:"safety_properties"`
-	LivenessProperties  []string              `json:"liveness_properties"`
-	LastModified        time.Time             `json:"last_modified"`
-	VerificationStatus  VerificationStatus    `json:"verification_status"`
+	Name               string                 `json:"name"`
+	FilePath           string                 `json:"file_path"`
+	ConfigPath         string                 `json:"config_path"`
+	ModuleDependencies []string               `json:"module_dependencies"`
+	Constants          map[string]interface{} `json:"constants"`
+	Variables          []string               `json:"variables"`
+	Invariants         []string               `json:"invariants"`
+	TemporalProperties []string               `json:"temporal_properties"`
+	SafetyProperties   []string               `json:"safety_properties"`
+	LivenessProperties []string               `json:"liveness_properties"`
+	LastModified       time.Time              `json:"last_modified"`
+	VerificationStatus VerificationStatus     `json:"verification_status"`
 }
 
 type FingerprintMode int
@@ -128,38 +122,38 @@ const (
 
 // CoqVerifier handles Coq theorem proving
 type CoqVerifier struct {
-	coqPath             string
-	libraryPaths        []string
-	proofCache          map[string]*CoqProof
-	tacticDatabase      *TacticDatabase
-	
+	coqPath        string
+	libraryPaths   []string
+	proofCache     map[string]*CoqProof
+	tacticDatabase *TacticDatabase
+
 	// Proof automation
-	autoTactics         []string
-	hintDatabases       []string
-	solverIntegration   map[string]string
-	
+	autoTactics       []string
+	hintDatabases     []string
+	solverIntegration map[string]string
+
 	// Proof development
-	proofSearch         *ProofSearchEngine
-	lemmaLibrary        *LemmaLibrary
-	definitionManager   *DefinitionManager
-	
+	proofSearch       *ProofSearchEngine
+	lemmaLibrary      *LemmaLibrary
+	definitionManager *DefinitionManager
+
 	// Verification strategies
-	inductiveProofs     bool
-	coinductiveProofs   bool
-	setoidRewrites      bool
-	typeClasses         bool
+	inductiveProofs   bool
+	coinductiveProofs bool
+	setoidRewrites    bool
+	typeClasses       bool
 }
 
 type CoqProof struct {
-	Name                string                `json:"name"`
-	Statement           string                `json:"statement"`
-	ProofScript         string                `json:"proof_script"`
-	Dependencies        []string              `json:"dependencies"`
-	VerificationTime    time.Duration         `json:"verification_time"`
-	Status              ProofStatus           `json:"status"`
-	ErrorMessages       []string              `json:"error_messages,omitempty"`
-	ProofSize           int                   `json:"proof_size"`
-	TacticsUsed         []string              `json:"tactics_used"`
+	Name             string        `json:"name"`
+	Statement        string        `json:"statement"`
+	ProofScript      string        `json:"proof_script"`
+	Dependencies     []string      `json:"dependencies"`
+	VerificationTime time.Duration `json:"verification_time"`
+	Status           ProofStatus   `json:"status"`
+	ErrorMessages    []string      `json:"error_messages,omitempty"`
+	ProofSize        int           `json:"proof_size"`
+	TacticsUsed      []string      `json:"tactics_used"`
 }
 
 type ProofStatus int
@@ -174,25 +168,25 @@ const (
 
 // DafnyVerifier handles Dafny specification and verification
 type DafnyVerifier struct {
-	dafnyPath           string
-	boogiePath          string
-	z3Path              string
-	
+	dafnyPath  string
+	boogiePath string
+	z3Path     string
+
 	// Verification settings
-	timeoutSeconds      int
-	resourceLimit       int
-	triggerGeneration   bool
-	induction           bool
-	
+	timeoutSeconds    int
+	resourceLimit     int
+	triggerGeneration bool
+	induction         bool
+
 	// Code generation
-	compileTarget       CompileTarget
-	optimizationLevel   int
-	runtimeChecks       bool
-	
+	compileTarget     CompileTarget
+	optimizationLevel int
+	runtimeChecks     bool
+
 	// Advanced features
 	quantifierInstantiation bool
-	nonlinearArithmetic bool
-	bitvectorTheory     bool
+	nonlinearArithmetic     bool
+	bitvectorTheory         bool
 }
 
 type CompileTarget int
@@ -207,37 +201,37 @@ const (
 
 // VerificationJob represents a verification task
 type VerificationJob struct {
-	ID                  string                `json:"id"`
-	Type                VerificationType      `json:"type"`
-	Priority            Priority              `json:"priority"`
-	Status              JobStatus             `json:"status"`
-	
+	ID       string           `json:"id"`
+	Type     VerificationType `json:"type"`
+	Priority Priority         `json:"priority"`
+	Status   JobStatus        `json:"status"`
+
 	// Input specifications
-	InputFiles          []string              `json:"input_files"`
-	Properties          []Property            `json:"properties"`
-	Assumptions         []Assumption          `json:"assumptions"`
-	
+	InputFiles  []string     `json:"input_files"`
+	Properties  []Property   `json:"properties"`
+	Assumptions []Assumption `json:"assumptions"`
+
 	// Verification configuration
-	VerifierConfig      *VerifierConfig       `json:"verifier_config"`
-	TimeoutDuration     time.Duration         `json:"timeout_duration"`
-	ResourceLimits      *ResourceLimits       `json:"resource_limits"`
-	
+	VerifierConfig  *VerifierConfig `json:"verifier_config"`
+	TimeoutDuration time.Duration   `json:"timeout_duration"`
+	ResourceLimits  *ResourceLimits `json:"resource_limits"`
+
 	// Execution details
-	StartTime           time.Time             `json:"start_time"`
-	EndTime             *time.Time            `json:"end_time,omitempty"`
-	ExecutionTime       time.Duration         `json:"execution_time"`
-	WorkerID            string                `json:"worker_id,omitempty"`
-	
+	StartTime     time.Time     `json:"start_time"`
+	EndTime       *time.Time    `json:"end_time,omitempty"`
+	ExecutionTime time.Duration `json:"execution_time"`
+	WorkerID      string        `json:"worker_id,omitempty"`
+
 	// Results
-	Result              *VerificationResult   `json:"result,omitempty"`
-	Artifacts           []string              `json:"artifacts"`
-	LogOutput           string                `json:"log_output,omitempty"`
-	
+	Result    *VerificationResult `json:"result,omitempty"`
+	Artifacts []string            `json:"artifacts"`
+	LogOutput string              `json:"log_output,omitempty"`
+
 	// Dependencies and scheduling
-	Dependencies        []string              `json:"dependencies"`
-	Dependents          []string              `json:"dependents"`
-	RetryCount          int                   `json:"retry_count"`
-	MaxRetries          int                   `json:"max_retries"`
+	Dependencies []string `json:"dependencies"`
+	Dependents   []string `json:"dependents"`
+	RetryCount   int      `json:"retry_count"`
+	MaxRetries   int      `json:"max_retries"`
 }
 
 type VerificationType int
@@ -275,15 +269,15 @@ const (
 
 // Property represents a formal property to verify
 type Property struct {
-	ID                  string                `json:"id"`
-	Name                string                `json:"name"`
-	Type                PropertyType          `json:"type"`
-	Description         string                `json:"description"`
-	Specification       string                `json:"specification"`
-	Language            SpecificationLanguage `json:"language"`
-	Category            PropertyCategory      `json:"category"`
-	Importance          Importance            `json:"importance"`
-	
+	ID            string                `json:"id"`
+	Name          string                `json:"name"`
+	Type          PropertyType          `json:"type"`
+	Description   string                `json:"description"`
+	Specification string                `json:"specification"`
+	Language      SpecificationLanguage `json:"language"`
+	Category      PropertyCategory      `json:"category"`
+	Importance    Importance            `json:"importance"`
+
 	// Verification metadata
 	VerificationMethod  VerificationMethod    `json:"verification_method"`
 	ExpectedResult      ExpectedResult        `json:"expected_result"`
@@ -355,29 +349,29 @@ const (
 
 // VerificationResult contains the outcome of verification
 type VerificationResult struct {
-	JobID               string                `json:"job_id"`
-	OverallStatus       VerificationStatus    `json:"overall_status"`
-	PropertyResults     []*PropertyResult     `json:"property_results"`
-	
+	JobID           string             `json:"job_id"`
+	OverallStatus   VerificationStatus `json:"overall_status"`
+	PropertyResults []*PropertyResult  `json:"property_results"`
+
 	// Performance metrics
-	TotalTime           time.Duration         `json:"total_time"`
-	StateSpaceSize      int64                 `json:"state_space_size,omitempty"`
-	MemoryUsage         int64                 `json:"memory_usage"`
-	CPUTime             time.Duration         `json:"cpu_time"`
-	
+	TotalTime      time.Duration `json:"total_time"`
+	StateSpaceSize int64         `json:"state_space_size,omitempty"`
+	MemoryUsage    int64         `json:"memory_usage"`
+	CPUTime        time.Duration `json:"cpu_time"`
+
 	// Detailed results
-	CounterExamples     []*CounterExample     `json:"counter_examples,omitempty"`
-	Witnesses           []*Witness            `json:"witnesses,omitempty"`
-	Statistics          *VerificationStats    `json:"statistics"`
-	
+	CounterExamples []*CounterExample  `json:"counter_examples,omitempty"`
+	Witnesses       []*Witness         `json:"witnesses,omitempty"`
+	Statistics      *VerificationStats `json:"statistics"`
+
 	// Error handling
-	Errors              []VerificationError   `json:"errors,omitempty"`
-	Warnings            []VerificationWarning `json:"warnings,omitempty"`
-	
+	Errors   []VerificationError   `json:"errors,omitempty"`
+	Warnings []VerificationWarning `json:"warnings,omitempty"`
+
 	// Output artifacts
-	GeneratedFiles      []string              `json:"generated_files"`
-	LogFile             string                `json:"log_file"`
-	ReportFile          string                `json:"report_file"`
+	GeneratedFiles []string `json:"generated_files"`
+	LogFile        string   `json:"log_file"`
+	ReportFile     string   `json:"report_file"`
 }
 
 type VerificationStatus int
@@ -392,55 +386,55 @@ const (
 )
 
 type PropertyResult struct {
-	PropertyID          string                `json:"property_id"`
-	Status              VerificationStatus    `json:"status"`
-	VerificationTime    time.Duration         `json:"verification_time"`
-	CounterExample      *CounterExample       `json:"counter_example,omitempty"`
-	Witness             *Witness              `json:"witness,omitempty"`
-	ErrorMessage        string                `json:"error_message,omitempty"`
+	PropertyID       string             `json:"property_id"`
+	Status           VerificationStatus `json:"status"`
+	VerificationTime time.Duration      `json:"verification_time"`
+	CounterExample   *CounterExample    `json:"counter_example,omitempty"`
+	Witness          *Witness           `json:"witness,omitempty"`
+	ErrorMessage     string             `json:"error_message,omitempty"`
 }
 
 type CounterExample struct {
-	PropertyID          string                `json:"property_id"`
-	TraceLength         int                   `json:"trace_length"`
-	States              []State               `json:"states"`
-	Actions             []Action              `json:"actions"`
-	VariableAssignments []VariableAssignment  `json:"variable_assignments"`
-	Description         string                `json:"description"`
+	PropertyID          string               `json:"property_id"`
+	TraceLength         int                  `json:"trace_length"`
+	States              []State              `json:"states"`
+	Actions             []Action             `json:"actions"`
+	VariableAssignments []VariableAssignment `json:"variable_assignments"`
+	Description         string               `json:"description"`
 }
 
 type State struct {
-	ID                  string                `json:"id"`
-	Variables           map[string]interface{} `json:"variables"`
-	Timestamp           time.Time             `json:"timestamp"`
-	Description         string                `json:"description"`
+	ID          string                 `json:"id"`
+	Variables   map[string]interface{} `json:"variables"`
+	Timestamp   time.Time              `json:"timestamp"`
+	Description string                 `json:"description"`
 }
 
 type Action struct {
-	Name                string                `json:"name"`
-	Parameters          map[string]interface{} `json:"parameters"`
-	Precondition        string                `json:"precondition"`
-	Effect              string                `json:"effect"`
+	Name         string                 `json:"name"`
+	Parameters   map[string]interface{} `json:"parameters"`
+	Precondition string                 `json:"precondition"`
+	Effect       string                 `json:"effect"`
 }
 
 type VariableAssignment struct {
-	Variable            string                `json:"variable"`
-	Value               interface{}           `json:"value"`
-	Type                string                `json:"type"`
+	Variable string      `json:"variable"`
+	Value    interface{} `json:"value"`
+	Type     string      `json:"type"`
 }
 
 // SpecificationManager handles formal specifications
 type SpecificationManager struct {
-	specifications      map[string]*FormalSpecification
-	dependencies        *DependencyGraph
-	versionControl      *SpecVersionControl
-	validator           *SpecificationValidator
-	
+	specifications map[string]*FormalSpecification
+	dependencies   *DependencyGraph
+	versionControl *SpecVersionControl
+	validator      *SpecificationValidator
+
 	// Specification generation
-	codeExtractor       *SpecificationExtractor
-	templateEngine      *SpecificationTemplateEngine
-	synthesizer         *SpecificationSynthesizer
-	
+	codeExtractor  *SpecificationExtractor
+	templateEngine *SpecificationTemplateEngine
+	synthesizer    *SpecificationSynthesizer
+
 	// Quality assurance
 	completenessChecker *CompletenessChecker
 	consistencyChecker  *ConsistencyChecker
@@ -448,28 +442,28 @@ type SpecificationManager struct {
 }
 
 type FormalSpecification struct {
-	ID                  string                `json:"id"`
-	Name                string                `json:"name"`
-	Version             string                `json:"version"`
-	Language            SpecificationLanguage `json:"language"`
-	Content             string                `json:"content"`
-	
+	ID       string                `json:"id"`
+	Name     string                `json:"name"`
+	Version  string                `json:"version"`
+	Language SpecificationLanguage `json:"language"`
+	Content  string                `json:"content"`
+
 	// Metadata
-	Author              string                `json:"author"`
-	CreatedAt           time.Time             `json:"created_at"`
-	LastModified        time.Time             `json:"last_modified"`
-	Description         string                `json:"description"`
-	
+	Author       string    `json:"author"`
+	CreatedAt    time.Time `json:"created_at"`
+	LastModified time.Time `json:"last_modified"`
+	Description  string    `json:"description"`
+
 	// Structure
-	Modules             []SpecificationModule `json:"modules"`
-	Dependencies        []string              `json:"dependencies"`
-	Properties          []string              `json:"properties"`
-	
+	Modules      []SpecificationModule `json:"modules"`
+	Dependencies []string              `json:"dependencies"`
+	Properties   []string              `json:"properties"`
+
 	// Quality metrics
-	ComplexityScore     float64               `json:"complexity_score"`
-	CompletenessScore   float64               `json:"completeness_score"`
-	ConsistencyScore    float64               `json:"consistency_score"`
-	
+	ComplexityScore   float64 `json:"complexity_score"`
+	CompletenessScore float64 `json:"completeness_score"`
+	ConsistencyScore  float64 `json:"consistency_score"`
+
 	// Verification history
 	VerificationHistory []VerificationAttempt `json:"verification_history"`
 	LastVerified        *time.Time            `json:"last_verified,omitempty"`
@@ -477,11 +471,11 @@ type FormalSpecification struct {
 }
 
 type SpecificationModule struct {
-	Name                string                `json:"name"`
-	Type                ModuleType            `json:"type"`
-	Content             string                `json:"content"`
-	Dependencies        []string              `json:"dependencies"`
-	ExportedDefinitions []string              `json:"exported_definitions"`
+	Name                string     `json:"name"`
+	Type                ModuleType `json:"type"`
+	Content             string     `json:"content"`
+	Dependencies        []string   `json:"dependencies"`
+	ExportedDefinitions []string   `json:"exported_definitions"`
 }
 
 type ModuleType int
@@ -496,16 +490,16 @@ const (
 
 // JobScheduler manages verification job execution
 type JobScheduler struct {
-	jobQueue            *PriorityJobQueue
-	workers             []*VerificationWorker
-	loadBalancer        *LoadBalancer
-	resourceManager     *ResourceManager
-	
+	jobQueue        *PriorityJobQueue
+	workers         []*VerificationWorker
+	loadBalancer    *LoadBalancer
+	resourceManager *ResourceManager
+
 	// Scheduling policies
-	schedulingPolicy    SchedulingPolicy
-	priorityWeights     map[Priority]float64
-	affinityRules       []AffinityRule
-	
+	schedulingPolicy SchedulingPolicy
+	priorityWeights  map[Priority]float64
+	affinityRules    []AffinityRule
+
 	// Performance optimization
 	cacheManager        *VerificationCacheManager
 	resultCache         map[string]*CachedResult
@@ -526,62 +520,62 @@ const (
 // VerificationMetrics tracks verification performance
 type VerificationMetrics struct {
 	// Job statistics
-	TotalJobs           int64                 `json:"total_jobs"`
-	CompletedJobs       int64                 `json:"completed_jobs"`
-	FailedJobs          int64                 `json:"failed_jobs"`
-	TimeoutJobs         int64                 `json:"timeout_jobs"`
-	
+	TotalJobs     int64 `json:"total_jobs"`
+	CompletedJobs int64 `json:"completed_jobs"`
+	FailedJobs    int64 `json:"failed_jobs"`
+	TimeoutJobs   int64 `json:"timeout_jobs"`
+
 	// Performance metrics
-	AverageJobTime      time.Duration         `json:"average_job_time"`
-	TotalVerificationTime time.Duration       `json:"total_verification_time"`
-	CPUUtilization      float64               `json:"cpu_utilization"`
-	MemoryUtilization   float64               `json:"memory_utilization"`
-	
+	AverageJobTime        time.Duration `json:"average_job_time"`
+	TotalVerificationTime time.Duration `json:"total_verification_time"`
+	CPUUtilization        float64       `json:"cpu_utilization"`
+	MemoryUtilization     float64       `json:"memory_utilization"`
+
 	// Success rates
-	OverallSuccessRate  float64               `json:"overall_success_rate"`
+	OverallSuccessRate   float64                  `json:"overall_success_rate"`
 	PropertySuccessRates map[PropertyType]float64 `json:"property_success_rates"`
-	
+
 	// Tool-specific metrics
-	TLASuccessRate      float64               `json:"tla_success_rate"`
-	CoqSuccessRate      float64               `json:"coq_success_rate"`
-	DafnySuccessRate    float64               `json:"dafny_success_rate"`
-	
+	TLASuccessRate   float64 `json:"tla_success_rate"`
+	CoqSuccessRate   float64 `json:"coq_success_rate"`
+	DafnySuccessRate float64 `json:"dafny_success_rate"`
+
 	// Quality metrics
-	BugDetectionRate    float64               `json:"bug_detection_rate"`
-	FalsePositiveRate   float64               `json:"false_positive_rate"`
-	CoverageMetrics     map[string]float64    `json:"coverage_metrics"`
-	
-	LastUpdated         time.Time             `json:"last_updated"`
+	BugDetectionRate  float64            `json:"bug_detection_rate"`
+	FalsePositiveRate float64            `json:"false_positive_rate"`
+	CoverageMetrics   map[string]float64 `json:"coverage_metrics"`
+
+	LastUpdated time.Time `json:"last_updated"`
 }
 
 // NewAutomatedFormalVerificationPipeline creates a new verification pipeline
 func NewAutomatedFormalVerificationPipeline(config *VerificationConfig) *AutomatedFormalVerificationPipeline {
 	return &AutomatedFormalVerificationPipeline{
-		tlaVerifier:         NewTLAVerifier(config.TLAConfig),
-		coqVerifier:         NewCoqVerifier(config.CoqConfig),
-		isabelleVerifier:    NewIsabelleVerifier(config.IsabelleConfig),
-		dafnyVerifier:       NewDafnyVerifier(config.DafnyConfig),
-		modelChecker:        NewModelChecker(config.ModelCheckingConfig),
-		theoremProver:       NewTheoremProver(config.TheoremProvingConfig),
-		symbolicExecutor:    NewSymbolicExecutor(config.SymbolicExecutionConfig),
-		abstractInterpreter: NewAbstractInterpreter(config.AbstractInterpretationConfig),
+		tlaVerifier:          NewTLAVerifier(config.TLAConfig),
+		coqVerifier:          NewCoqVerifier(config.CoqConfig),
+		isabelleVerifier:     NewIsabelleVerifier(config.IsabelleConfig),
+		dafnyVerifier:        NewDafnyVerifier(config.DafnyConfig),
+		modelChecker:         NewModelChecker(config.ModelCheckingConfig),
+		theoremProver:        NewTheoremProver(config.TheoremProvingConfig),
+		symbolicExecutor:     NewSymbolicExecutor(config.SymbolicExecutionConfig),
+		abstractInterpreter:  NewAbstractInterpreter(config.AbstractInterpretationConfig),
 		specificationManager: NewSpecificationManager(config.SpecificationConfig),
-		propertyDatabase:    NewPropertyDatabase(config.PropertyDatabaseConfig),
-		invariantTracker:    NewInvariantTracker(),
-		verificationQueue:   NewVerificationQueue(),
-		jobScheduler:        NewJobScheduler(config.SchedulingConfig),
-		resultAggregator:    NewResultAggregator(),
-		codeAnalyzer:        NewCodeAnalyzer(config.CodeAnalysisConfig),
-		dependencyTracker:   NewDependencyTracker(),
-		changeDetector:      NewChangeDetector(config.ChangeDetectionConfig),
-		reportGenerator:     NewReportGenerator(config.ReportingConfig),
-		metricsCollector:    &VerificationMetrics{PropertySuccessRates: make(map[PropertyType]float64), CoverageMetrics: make(map[string]float64)},
-		alertSystem:         NewVerificationAlertSystem(config.AlertConfig),
-		config:              config,
-		toolchainConfig:     config.ToolchainConfig,
-		verificationJobs:    make(map[string]*VerificationJob),
-		completedJobs:       make([]*CompletedJob, 0),
-		stopCh:              make(chan struct{}),
+		propertyDatabase:     NewPropertyDatabase(config.PropertyDatabaseConfig),
+		invariantTracker:     NewInvariantTracker(),
+		verificationQueue:    NewVerificationQueue(),
+		jobScheduler:         NewJobScheduler(config.SchedulingConfig),
+		resultAggregator:     NewResultAggregator(),
+		codeAnalyzer:         NewCodeAnalyzer(config.CodeAnalysisConfig),
+		dependencyTracker:    NewDependencyTracker(),
+		changeDetector:       NewChangeDetector(config.ChangeDetectionConfig),
+		reportGenerator:      NewReportGenerator(config.ReportingConfig),
+		metricsCollector:     &VerificationMetrics{PropertySuccessRates: make(map[PropertyType]float64), CoverageMetrics: make(map[string]float64)},
+		alertSystem:          NewVerificationAlertSystem(config.AlertConfig),
+		config:               config,
+		toolchainConfig:      config.ToolchainConfig,
+		verificationJobs:     make(map[string]*VerificationJob),
+		completedJobs:        make([]*CompletedJob, 0),
+		stopCh:               make(chan struct{}),
 	}
 }
 
@@ -616,11 +610,11 @@ func (afvp *AutomatedFormalVerificationPipeline) Start(ctx context.Context) erro
 func (afvp *AutomatedFormalVerificationPipeline) Stop() {
 	afvp.mu.Lock()
 	defer afvp.mu.Unlock()
-	
+
 	if !afvp.running {
 		return
 	}
-	
+
 	close(afvp.stopCh)
 	afvp.running = false
 }
@@ -670,7 +664,7 @@ func (afvp *AutomatedFormalVerificationPipeline) VerifySpecification(spec *Forma
 func (afvp *AutomatedFormalVerificationPipeline) VerifyConsensusProperties(consensusSpec string) (*VerificationResult, error) {
 	// Extract consensus properties
 	properties := afvp.extractConsensusProperties(consensusSpec)
-	
+
 	// Create comprehensive verification job
 	spec := &FormalSpecification{
 		ID:       "consensus-verification",
@@ -678,12 +672,12 @@ func (afvp *AutomatedFormalVerificationPipeline) VerifyConsensusProperties(conse
 		Language: SpecificationLanguageTLA,
 		Content:  consensusSpec,
 	}
-	
+
 	job, err := afvp.VerifySpecification(spec, properties)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create consensus verification job: %w", err)
 	}
-	
+
 	// Wait for completion with timeout
 	return afvp.waitForJobCompletion(job.ID, afvp.config.MaxWaitTime)
 }
@@ -795,7 +789,7 @@ func (afvp *AutomatedFormalVerificationPipeline) executeTLAVerification(job *Ver
 
 	// Configure TLC model checker
 	config := afvp.createTLCConfig(job, spec)
-	
+
 	// Run TLC model checking
 	cmd := afvp.buildTLCCommand(spec, config)
 	output, err := afvp.runCommand(cmd, job.TimeoutDuration)
@@ -811,7 +805,7 @@ func (afvp *AutomatedFormalVerificationPipeline) executeTLAVerification(job *Ver
 func (afvp *AutomatedFormalVerificationPipeline) executeCoqVerification(job *VerificationJob) (*VerificationResult, error) {
 	// Load Coq proof files
 	proofFiles := job.InputFiles
-	
+
 	// Compile and check proofs
 	for _, file := range proofFiles {
 		cmd := exec.Command(afvp.coqVerifier.coqPath, "-compile", file)
@@ -862,7 +856,7 @@ func (afvp *AutomatedFormalVerificationPipeline) initializeVerificationTools() e
 		}
 	}
 
-	// Check Coq installation  
+	// Check Coq installation
 	if afvp.config.CoqConfig.Enabled {
 		if err := afvp.checkCoqInstallation(); err != nil {
 			return fmt.Errorf("Coq installation check failed: %w", err)
@@ -903,7 +897,7 @@ func (afvp *AutomatedFormalVerificationPipeline) calculateJobPriority(properties
 			maxImportance = prop.Importance
 		}
 	}
-	
+
 	switch maxImportance {
 	case ImportanceCritical:
 		return PriorityCritical
@@ -932,7 +926,7 @@ func (afvp *AutomatedFormalVerificationPipeline) extractConsensusProperties(cons
 		},
 		{
 			ID:                 "liveness",
-			Name:               "Liveness Property", 
+			Name:               "Liveness Property",
 			Type:               PropertyTypeLiveness,
 			Description:        "Eventually some value is decided",
 			Specification:      "<>decided",
@@ -955,14 +949,15 @@ func (afvp *AutomatedFormalVerificationPipeline) extractConsensusProperties(cons
 			ExpectedResult:     ExpectedResultTrue,
 		},
 	}
-	
+
 	return properties
 }
 
 func (afvp *AutomatedFormalVerificationPipeline) runCommand(cmd *exec.Cmd, timeout time.Duration) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	
+
+	cmd = exec.CommandContext(ctx, cmd.Path, cmd.Args[1:]...)
 	cmd.Stderr = cmd.Stdout // Combine stderr and stdout
 	return cmd.Output()
 }
@@ -995,60 +990,60 @@ func (afvp *AutomatedFormalVerificationPipeline) GetVerificationMetrics() *Verif
 func (afvp *AutomatedFormalVerificationPipeline) GetJobStatus(jobID string) (*VerificationJob, error) {
 	afvp.mu.RLock()
 	defer afvp.mu.RUnlock()
-	
+
 	job, exists := afvp.verificationJobs[jobID]
 	if !exists {
 		return nil, fmt.Errorf("job not found: %s", jobID)
 	}
-	
+
 	return job, nil
 }
 
 func (afvp *AutomatedFormalVerificationPipeline) GetActiveJobs() []*VerificationJob {
 	afvp.mu.RLock()
 	defer afvp.mu.RUnlock()
-	
+
 	jobs := make([]*VerificationJob, 0)
 	for _, job := range afvp.verificationJobs {
 		if job.Status == JobStatusRunning || job.Status == JobStatusQueued {
 			jobs = append(jobs, job)
 		}
 	}
-	
+
 	return jobs
 }
 
 // Placeholder implementations for referenced types and methods
 
 type VerificationConfig struct {
-	TLAConfig                   *TLAConfig
-	CoqConfig                   *CoqConfig
-	IsabelleConfig              *IsabelleConfig
-	DafnyConfig                 *DafnyConfig
-	ModelCheckingConfig         *ModelCheckingConfig
-	TheoremProvingConfig        *TheoremProvingConfig
-	SymbolicExecutionConfig     *SymbolicExecutionConfig
+	TLAConfig                    *TLAConfig
+	CoqConfig                    *CoqConfig
+	IsabelleConfig               *IsabelleConfig
+	DafnyConfig                  *DafnyConfig
+	ModelCheckingConfig          *ModelCheckingConfig
+	TheoremProvingConfig         *TheoremProvingConfig
+	SymbolicExecutionConfig      *SymbolicExecutionConfig
 	AbstractInterpretationConfig *AbstractInterpretationConfig
-	SpecificationConfig         *SpecificationConfig
-	PropertyDatabaseConfig      *PropertyDatabaseConfig
-	SchedulingConfig            *SchedulingConfig
-	CodeAnalysisConfig          *CodeAnalysisConfig
-	ChangeDetectionConfig       *ChangeDetectionConfig
-	ReportingConfig             *ReportingConfig
-	AlertConfig                 *AlertConfig
-	ToolchainConfig             *ToolchainConfig
-	DefaultTimeout              time.Duration
-	MaxRetries                  int
-	MaxWaitTime                 time.Duration
+	SpecificationConfig          *SpecificationConfig
+	PropertyDatabaseConfig       *PropertyDatabaseConfig
+	SchedulingConfig             *SchedulingConfig
+	CodeAnalysisConfig           *CodeAnalysisConfig
+	ChangeDetectionConfig        *ChangeDetectionConfig
+	ReportingConfig              *ReportingConfig
+	AlertConfig                  *AlertConfig
+	ToolchainConfig              *ToolchainConfig
+	DefaultTimeout               time.Duration
+	MaxRetries                   int
+	MaxWaitTime                  time.Duration
 }
 
 type TLAConfig struct {
-	Enabled         bool
-	TLCPath         string
-	TLAToolsPath    string
-	MaxStates       int64
-	MaxTimeSeconds  int
-	WorkerNodes     []string
+	Enabled        bool
+	TLCPath        string
+	TLAToolsPath   string
+	MaxStates      int64
+	MaxTimeSeconds int
+	WorkerNodes    []string
 }
 
 type CoqConfig struct {
@@ -1133,78 +1128,97 @@ type AlertConfig struct{}
 type ToolchainConfig struct{}
 
 // Constructor functions
-func NewTLAVerifier(config *TLAConfig) *TLAVerifier { 
+func NewTLAVerifier(config *TLAConfig) *TLAVerifier {
 	return &TLAVerifier{
-		tlcPath: config.TLCPath,
-		tlaToolsPath: config.TLAToolsPath,
+		tlcPath:            config.TLCPath,
+		tlaToolsPath:       config.TLAToolsPath,
 		specificationCache: make(map[string]*TLASpecification),
-		maxStates: config.MaxStates,
-		maxTimeSeconds: config.MaxTimeSeconds,
-		workerNodes: config.WorkerNodes,
+		maxStates:          config.MaxStates,
+		maxTimeSeconds:     config.MaxTimeSeconds,
+		workerNodes:        config.WorkerNodes,
 	}
 }
 
-func NewCoqVerifier(config *CoqConfig) *CoqVerifier { 
+func NewCoqVerifier(config *CoqConfig) *CoqVerifier {
 	return &CoqVerifier{
-		coqPath: config.CoqPath,
+		coqPath:      config.CoqPath,
 		libraryPaths: config.LibraryPaths,
-		proofCache: make(map[string]*CoqProof),
+		proofCache:   make(map[string]*CoqProof),
 	}
 }
 
 func NewIsabelleVerifier(config *IsabelleConfig) *IsabelleVerifier { return &IsabelleVerifier{} }
-func NewDafnyVerifier(config *DafnyConfig) *DafnyVerifier { 
+func NewDafnyVerifier(config *DafnyConfig) *DafnyVerifier {
 	return &DafnyVerifier{
-		dafnyPath: config.DafnyPath,
-		boogiePath: config.BoogiePath,
-		z3Path: config.Z3Path,
+		dafnyPath:      config.DafnyPath,
+		boogiePath:     config.BoogiePath,
+		z3Path:         config.Z3Path,
 		timeoutSeconds: config.TimeoutSeconds,
 	}
 }
-func NewModelChecker(config *ModelCheckingConfig) *ModelChecker { return &ModelChecker{} }
+func NewModelChecker(config *ModelCheckingConfig) *ModelChecker    { return &ModelChecker{} }
 func NewTheoremProver(config *TheoremProvingConfig) *TheoremProver { return &TheoremProver{} }
-func NewSymbolicExecutor(config *SymbolicExecutionConfig) *SymbolicExecutor { return &SymbolicExecutor{} }
-func NewAbstractInterpreter(config *AbstractInterpretationConfig) *AbstractInterpreter { return &AbstractInterpreter{} }
-func NewSpecificationManager(config *SpecificationConfig) *SpecificationManager { 
+func NewSymbolicExecutor(config *SymbolicExecutionConfig) *SymbolicExecutor {
+	return &SymbolicExecutor{}
+}
+func NewAbstractInterpreter(config *AbstractInterpretationConfig) *AbstractInterpreter {
+	return &AbstractInterpreter{}
+}
+func NewSpecificationManager(config *SpecificationConfig) *SpecificationManager {
 	return &SpecificationManager{
 		specifications: make(map[string]*FormalSpecification),
 	}
 }
-func NewPropertyDatabase(config *PropertyDatabaseConfig) *PropertyDatabase { return &PropertyDatabase{} }
-func NewInvariantTracker() *InvariantTracker { return &InvariantTracker{} }
+func NewPropertyDatabase(config *PropertyDatabaseConfig) *PropertyDatabase {
+	return &PropertyDatabase{}
+}
+func NewInvariantTracker() *InvariantTracker   { return &InvariantTracker{} }
 func NewVerificationQueue() *VerificationQueue { return &VerificationQueue{} }
-func NewJobScheduler(config *SchedulingConfig) *JobScheduler { 
+func NewJobScheduler(config *SchedulingConfig) *JobScheduler {
 	return &JobScheduler{
-		workers: make([]*VerificationWorker, 0),
+		workers:     make([]*VerificationWorker, 0),
 		resultCache: make(map[string]*CachedResult),
 	}
 }
-func NewResultAggregator() *ResultAggregator { return &ResultAggregator{} }
-func NewCodeAnalyzer(config *CodeAnalysisConfig) *CodeAnalyzer { return &CodeAnalyzer{} }
-func NewDependencyTracker() *DependencyTracker { return &DependencyTracker{} }
+func NewResultAggregator() *ResultAggregator                          { return &ResultAggregator{} }
+func NewCodeAnalyzer(config *CodeAnalysisConfig) *CodeAnalyzer        { return &CodeAnalyzer{} }
+func NewDependencyTracker() *DependencyTracker                        { return &DependencyTracker{} }
 func NewChangeDetector(config *ChangeDetectionConfig) *ChangeDetector { return &ChangeDetector{} }
-func NewReportGenerator(config *ReportingConfig) *ReportGenerator { return &ReportGenerator{} }
-func NewVerificationAlertSystem(config *AlertConfig) *VerificationAlertSystem { return &VerificationAlertSystem{} }
+func NewReportGenerator(config *ReportingConfig) *ReportGenerator     { return &ReportGenerator{} }
+func NewVerificationAlertSystem(config *AlertConfig) *VerificationAlertSystem {
+	return &VerificationAlertSystem{}
+}
 
 // Method placeholders
 func (sv *SpecificationValidator) Validate(spec *FormalSpecification) error { return nil }
-func (dt *DependencyTracker) AnalyzeDependencies(spec *FormalSpecification) ([]string, error) { return []string{}, nil }
+func (dt *DependencyTracker) AnalyzeDependencies(spec *FormalSpecification) ([]string, error) {
+	return []string{}, nil
+}
 func (vq *VerificationQueue) Enqueue(job *VerificationJob) {}
-func (vq *VerificationQueue) GetNextJobs(count int) []*VerificationJob { return make([]*VerificationJob, 0) }
-func (js *JobScheduler) GetAvailableWorkers() []*VerificationWorker { return make([]*VerificationWorker, 0) }
+func (vq *VerificationQueue) GetNextJobs(count int) []*VerificationJob {
+	return make([]*VerificationJob, 0)
+}
+func (js *JobScheduler) GetAvailableWorkers() []*VerificationWorker {
+	return make([]*VerificationWorker, 0)
+}
 
-func (afvp *AutomatedFormalVerificationPipeline) createVerifierConfig(lang SpecificationLanguage) *VerifierConfig { return &VerifierConfig{} }
-func (afvp *AutomatedFormalVerificationPipeline) calculateResourceLimits(properties []Property) *ResourceLimits { return &ResourceLimits{} }
+func (afvp *AutomatedFormalVerificationPipeline) createVerifierConfig(lang SpecificationLanguage) *VerifierConfig {
+	return &VerifierConfig{}
+}
+func (afvp *AutomatedFormalVerificationPipeline) calculateResourceLimits(properties []Property) *ResourceLimits {
+	return &ResourceLimits{}
+}
 func (afvp *AutomatedFormalVerificationPipeline) waitForJobCompletion(jobID string, timeout time.Duration) (*VerificationResult, error) {
 	return &VerificationResult{JobID: jobID, OverallStatus: VerificationStatusPassed}, nil
 }
-func (afvp *AutomatedFormalVerificationPipeline) assignJobToWorker(job *VerificationJob, worker *VerificationWorker) {}
-func (afvp *AutomatedFormalVerificationPipeline) updateJobStatus(job *VerificationJob) {}
-func (afvp *AutomatedFormalVerificationPipeline) loadTLASpecification(filename string) (*TLASpecification, error) { 
-	return &TLASpecification{Name: filename}, nil 
+func (afvp *AutomatedFormalVerificationPipeline) assignJobToWorker(job *VerificationJob, worker *VerificationWorker) {
 }
-func (afvp *AutomatedFormalVerificationPipeline) createTLCConfig(job *VerificationJob, spec *TLASpecification) map[string]string { 
-	return make(map[string]string) 
+func (afvp *AutomatedFormalVerificationPipeline) updateJobStatus(job *VerificationJob) {}
+func (afvp *AutomatedFormalVerificationPipeline) loadTLASpecification(filename string) (*TLASpecification, error) {
+	return &TLASpecification{Name: filename}, nil
+}
+func (afvp *AutomatedFormalVerificationPipeline) createTLCConfig(job *VerificationJob, spec *TLASpecification) map[string]string {
+	return make(map[string]string)
 }
 func (afvp *AutomatedFormalVerificationPipeline) buildTLCCommand(spec *TLASpecification, config map[string]string) *exec.Cmd {
 	return exec.Command("java", "-cp", afvp.tlaVerifier.tlaToolsPath, "tlc2.TLC", spec.Name)
@@ -1214,8 +1228,8 @@ func (afvp *AutomatedFormalVerificationPipeline) parseTLCOutput(jobID string, ou
 }
 
 // Background loop placeholders
-func (afvp *AutomatedFormalVerificationPipeline) resultProcessingLoop(ctx context.Context) {}
+func (afvp *AutomatedFormalVerificationPipeline) resultProcessingLoop(ctx context.Context)  {}
 func (afvp *AutomatedFormalVerificationPipeline) metricsCollectionLoop(ctx context.Context) {}
-func (afvp *AutomatedFormalVerificationPipeline) changeMonitoringLoop(ctx context.Context) {}
-func (afvp *AutomatedFormalVerificationPipeline) reportGenerationLoop(ctx context.Context) {}
-func (afvp *AutomatedFormalVerificationPipeline) alertProcessingLoop(ctx context.Context) {}
+func (afvp *AutomatedFormalVerificationPipeline) changeMonitoringLoop(ctx context.Context)  {}
+func (afvp *AutomatedFormalVerificationPipeline) reportGenerationLoop(ctx context.Context)  {}
+func (afvp *AutomatedFormalVerificationPipeline) alertProcessingLoop(ctx context.Context)   {}

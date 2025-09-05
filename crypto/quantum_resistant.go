@@ -12,12 +12,12 @@ import (
 // SPHINCS+ signature scheme implementation
 // Based on SPHINCS+ specification (NIST PQC standardization)
 type SPHINCSConfig struct {
-	n        int // Security parameter (hash output length)
-	h        int // Height of hypertree
-	d        int // Number of layers
-	logT     int // Logarithm of Winternitz parameter
-	k        int // Number of trees in FORS
-	a        int // Height of each FORS tree
+	n    int // Security parameter (hash output length)
+	h    int // Height of hypertree
+	d    int // Number of layers
+	logT int // Logarithm of Winternitz parameter
+	k    int // Number of trees in FORS
+	a    int // Height of each FORS tree
 }
 
 // Standard SPHINCS+ parameter sets
@@ -132,7 +132,7 @@ func (sig *SPHINCSSignature) Verify(publicKey []byte) bool {
 
 	// Extract randomizer
 	randomizer := sig.signature[:sig.config.n]
-	
+
 	// Reconstruct message hash
 	msgHash := hashMessage(sig.config, sig.message, randomizer)
 
@@ -149,9 +149,9 @@ func (sig *SPHINCSSignature) Verify(publicKey []byte) bool {
 
 // CRYSTALS-Kyber key encapsulation mechanism
 type KyberConfig struct {
-	n int // Polynomial degree
-	q int // Modulus
-	k int // Dimension of module
+	n    int // Polynomial degree
+	q    int // Modulus
+	k    int // Dimension of module
 	eta1 int // Noise parameter for secret
 	eta2 int // Noise parameter for error
 	du   int // Compression parameter for u
@@ -333,11 +333,11 @@ type QuantumResistantConsensus struct {
 
 // QuantumValidator represents a validator with quantum-resistant keys
 type QuantumValidator struct {
-	Address     string
-	SPHINCSKey  *SPHINCSKeyPair
-	KyberKey    *KyberKeyPair
-	Reputation  float64
-	TokenStake  *big.Int
+	Address    string
+	SPHINCSKey *SPHINCSKeyPair
+	KyberKey   *KyberKeyPair
+	Reputation float64
+	TokenStake *big.Int
 }
 
 // NewQuantumResistantConsensus creates a new quantum-resistant consensus engine
@@ -407,7 +407,7 @@ func (qrc *QuantumResistantConsensus) VerifyBlockSignature(validatorAddr string,
 func (qrc *QuantumResistantConsensus) EstablishSecureChannel(validator1, validator2 string) ([]byte, error) {
 	v1, exists1 := qrc.validators[validator1]
 	_, exists2 := qrc.validators[validator2]
-	
+
 	if !exists1 || !exists2 {
 		return nil, errors.New("one or both validators not found")
 	}
@@ -495,9 +495,9 @@ func sampleNoiseFromSeed(seed []byte, n, eta int) []int16 {
 	h := sha256.New()
 	h.Write(seed)
 	hash := h.Sum(nil)
-	
+
 	for i := 0; i < n; i++ {
-		noise[i] = int16(int(hash[i%len(hash)]) % (2*eta+1) - eta)
+		noise[i] = int16(int(hash[i%len(hash)])%(2*eta+1) - eta)
 	}
 	return noise
 }
@@ -518,7 +518,7 @@ func encodeSecretKey(s [][]int16, config *KyberConfig) []byte {
 func encodePublicKey(A [][]int16, t []int16, config *KyberConfig) []byte {
 	keySize := config.k*config.k*config.n*2 + len(t)*2
 	key := make([]byte, keySize)
-	
+
 	// Encode A matrix
 	idx := 0
 	for i := 0; i < config.k; i++ {
@@ -529,7 +529,7 @@ func encodePublicKey(A [][]int16, t []int16, config *KyberConfig) []byte {
 			idx += 2
 		}
 	}
-	
+
 	// Encode t vector
 	for i := 0; i < len(t); i++ {
 		val := uint16(t[i])
@@ -537,27 +537,27 @@ func encodePublicKey(A [][]int16, t []int16, config *KyberConfig) []byte {
 		key[idx+1] = byte((val >> 8) & 0xFF)
 		idx += 2
 	}
-	
+
 	return key
 }
 
 func encodeCiphertext(u []int16, v int16, config *KyberConfig) []byte {
 	ctSize := len(u)*2 + 2
 	ct := make([]byte, ctSize)
-	
+
 	// Encode u
 	for i := 0; i < len(u); i++ {
 		val := uint16(u[i])
 		ct[i*2] = byte(val & 0xFF)
 		ct[i*2+1] = byte((val >> 8) & 0xFF)
 	}
-	
+
 	// Encode v
 	idx := len(u) * 2
 	val := uint16(v)
 	ct[idx] = byte(val & 0xFF)
 	ct[idx+1] = byte((val >> 8) & 0xFF)
-	
+
 	return ct
 }
 
@@ -566,19 +566,19 @@ func decodeCiphertext(ct []byte, config *KyberConfig) ([]int16, int16, error) {
 	if len(ct) != expectedSize {
 		return nil, 0, fmt.Errorf("invalid ciphertext size: expected %d, got %d", expectedSize, len(ct))
 	}
-	
+
 	// Decode u
 	u := make([]int16, config.k*config.n)
 	for i := 0; i < len(u); i++ {
 		val := uint16(ct[i*2]) | (uint16(ct[i*2+1]) << 8)
 		u[i] = int16(val)
 	}
-	
+
 	// Decode v
 	idx := len(u) * 2
 	val := uint16(ct[idx]) | (uint16(ct[idx+1]) << 8)
 	v := int16(val)
-	
+
 	return u, v, nil
 }
 

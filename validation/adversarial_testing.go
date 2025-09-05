@@ -11,103 +11,103 @@ import (
 // AdversarialTestingFramework implements tests that critics and attackers will try
 // This preemptively finds and fixes issues before public scrutiny
 type AdversarialTestingFramework struct {
-	mu                    sync.RWMutex
-	chaosEngineering      *ChaosEngineering
-	adversarialInputs     *AdversarialInputs
-	edgeCaseTesting       *EdgeCaseTesting
-	stressTestingSuite    *StressTestingSuite
-	byzantineSimulation   *ByzantineSimulation
-	quantumAttackSim      *QuantumAttackSimulation
-	biologicalAttackSim   *BiologicalAttackSimulation
-	criticalFailureTests  *CriticalFailureTests
+	mu                   sync.RWMutex
+	chaosEngineering     *ChaosEngineering
+	adversarialInputs    *AdversarialInputs
+	edgeCaseTesting      *EdgeCaseTesting
+	stressTestingSuite   *StressTestingSuite
+	byzantineSimulation  *ByzantineSimulation
+	quantumAttackSim     *QuantumAttackSimulation
+	biologicalAttackSim  *BiologicalAttackSimulation
+	criticalFailureTests *CriticalFailureTests
 }
 
 // ChaosEngineering randomly breaks things to find weaknesses
 type ChaosEngineering struct {
-	nodeFailureRate       float64
-	networkPartitions     *NetworkPartitions
-	clockSkew             *ClockSkew
-	randomDelays          *RandomDelays
-	resourceExhaustion    *ResourceExhaustion
-	cascadingFailures     *CascadingFailures
-	chaosMonkey           *ChaosMonkey
+	nodeFailureRate    float64
+	networkPartitions  *NetworkPartitions
+	clockSkew          *ClockSkew
+	randomDelays       *RandomDelays
+	resourceExhaustion *ResourceExhaustion
+	cascadingFailures  *CascadingFailures
+	chaosMonkey        *ChaosMonkey
 }
 
 // AdversarialInputs tests malicious/malformed inputs critics will try
 type AdversarialInputs struct {
-	malformedData         []*MalformedData
-	poisonedInputs        []*PoisonedInput
-	exploitPatterns       []*ExploitPattern
-	injectionAttempts     []*InjectionAttempt
-	overflowInputs        []*OverflowInput
-	denialOfService       *DoSAttempt
-	timingManipulation    *TimingManipulation
+	malformedData      []*MalformedData
+	poisonedInputs     []*PoisonedInput
+	exploitPatterns    []*ExploitPattern
+	injectionAttempts  []*InjectionAttempt
+	overflowInputs     []*OverflowInput
+	denialOfService    *DoSAttempt
+	timingManipulation *TimingManipulation
 }
 
 // EdgeCaseTesting covers the weird scenarios critics love to find
 type EdgeCaseTesting struct {
-	zeroNodeConsensus     *ZeroNodeTest
-	singleNodeConsensus   *SingleNodeTest
-	maxNodeConsensus      *MaxNodeTest
-	quantumSuperposition  *SuperpositionTest
-	biologicalMutation    *MutationTest
-	simultaneousFailures  *SimultaneousFailureTest
-	impossibleStates      *ImpossibleStateTest
+	zeroNodeConsensus    *ZeroNodeTest
+	singleNodeConsensus  *SingleNodeTest
+	maxNodeConsensus     *MaxNodeTest
+	quantumSuperposition *SuperpositionTest
+	biologicalMutation   *MutationTest
+	simultaneousFailures *SimultaneousFailureTest
+	impossibleStates     *ImpossibleStateTest
 }
 
 // StressTestingSuite pushes the system to breaking point
 type StressTestingSuite struct {
-	maxLoadTest           *MaxLoadTest
-	sustainedLoadTest     *SustainedLoadTest
-	burstLoadTest         *BurstLoadTest
-	memoryLeakTest        *MemoryLeakTest
-	cpuExhaustionTest     *CPUExhaustionTest
-	diskIOTest            *DiskIOTest
-	networkSaturation     *NetworkSaturationTest
+	maxLoadTest       *MaxLoadTest
+	sustainedLoadTest *SustainedLoadTest
+	burstLoadTest     *BurstLoadTest
+	memoryLeakTest    *MemoryLeakTest
+	cpuExhaustionTest *CPUExhaustionTest
+	diskIOTest        *DiskIOTest
+	networkSaturation *NetworkSaturationTest
 }
 
 // ByzantineSimulation tests Byzantine fault scenarios
 type ByzantineSimulation struct {
-	byzantineNodes        map[string]*ByzantineNode
-	faultPercentage       float64
-	attackPatterns        []*AttackPattern
-	collusion\tScenarios   []*CollusionScenario
-	doublespendAttempts   []*DoubleSpendAttempt
-	messageCorruption     *MessageCorruption
-	votingManipulation    *VotingManipulation
+	byzantineNodes      map[string]*ByzantineNode
+	faultPercentage     float64
+	attackPatterns      []*AttackPattern
+	collusionScenarios  []*CollusionScenario
+	doublespendAttempts []*DoubleSpendAttempt
+	messageCorruption   *MessageCorruption
+	votingManipulation  *VotingManipulation
 }
 
 // QuantumAttackSimulation simulates quantum computing attacks
 type QuantumAttackSimulation struct {
-	shorAlgorithmAttack   *ShorAttack
-	groverSearchAttack    *GroverAttack
-	quantumMitMAttack     *QuantumMitMAttack
-	entanglementHijack    *EntanglementHijack
-	measurementAttack     *MeasurementAttack
-	decoherenceAttack     *DecoherenceAttack
-	quantumDoS            *QuantumDoSAttack
+	shorAlgorithmAttack *ShorAttack
+	groverSearchAttack  *GroverAttack
+	quantumMitMAttack   *QuantumMitMAttack
+	entanglementHijack  *EntanglementHijack
+	measurementAttack   *MeasurementAttack
+	decoherenceAttack   *DecoherenceAttack
+	quantumDoS          *QuantumDoSAttack
 }
 
 // BiologicalAttackSimulation tests biological system attacks
 type BiologicalAttackSimulation struct {
-	dnaPoisoning          *DNAPoisoning
-	proteinMisfolding     *ProteinMisfoldingAttack
-	enzymeInhibition      *EnzymeInhibitionAttack
-	cellularDisruption    *CellularDisruptionAttack
-	metabolicAttack       *MetabolicAttack
-	viralInfection        *ViralInfectionSimulation
-	geneticMutation       *GeneticMutationAttack
+	dnaPoisoning       *DNAPoisoning
+	proteinMisfolding  *ProteinMisfoldingAttack
+	enzymeInhibition   *EnzymeInhibitionAttack
+	cellularDisruption *CellularDisruptionAttack
+	metabolicAttack    *MetabolicAttack
+	viralInfection     *ViralInfectionSimulation
+	geneticMutation    *GeneticMutationAttack
 }
 
 // CriticalFailureTests tests catastrophic failure scenarios
 type CriticalFailureTests struct {
-	totalSystemFailure    *TotalSystemFailure
-	dataCorruption        *DataCorruption
-	consensusSplit        *ConsensusSplit
-	infiniteLoop          *InfiniteLoopTest
-	deadlockScenario      *DeadlockScenario
-	memoryCorruption      *MemoryCorruption
-	stackOverflow         *StackOverflowTest
+	totalSystemFailure *TotalSystemFailure
+	dataCorruption     *DataCorruption
+	consensusSplit     *ConsensusSplit
+	infiniteLoop       *InfiniteLoopTest
+	deadlockScenario   *DeadlockScenario
+	memoryCorruption   *MemoryCorruption
+	stackOverflow      *StackOverflowTest
 }
 
 // NewAdversarialTestingFramework creates a testing framework that thinks like a critic
@@ -120,7 +120,7 @@ func NewAdversarialTestingFramework() *AdversarialTestingFramework {
 				healingTime:          time.Second * 30,
 			},
 			clockSkew: &ClockSkew{
-				maxSkew:  time.Second * 5,
+				maxSkew:   time.Second * 5,
 				driftRate: 0.01, // 1% drift
 			},
 			randomDelays: &RandomDelays{
@@ -175,12 +175,12 @@ func (atf *AdversarialTestingFramework) RunAdversarialTests() (*AdversarialRepor
 	defer atf.mu.Unlock()
 
 	report := &AdversarialReport{
-		Timestamp:         time.Now(),
+		Timestamp:            time.Now(),
 		VulnerabilitiesFound: []*Vulnerability{},
-		AttackResults:     map[string]*AttackResult{},
-		ResilienceScore:   0.0,
-		CriticalFailures:  []string{},
-		Recommendations:   []string{},
+		AttackResults:        map[string]*AttackResult{},
+		ResilienceScore:      0.0,
+		CriticalFailures:     []string{},
+		Recommendations:      []string{},
 	}
 
 	fmt.Println("🔥 Running Adversarial Testing Framework")
@@ -403,11 +403,11 @@ func (atf *AdversarialTestingFramework) runByzantineAttacks() *AttackResult {
 	// Create Byzantine nodes (33% - at the threshold)
 	totalNodes := 100
 	byzantineCount := int(float64(totalNodes) * atf.byzantineSimulation.faultPercentage)
-	
+
 	for i := 0; i < byzantineCount; i++ {
 		byzantine := &ByzantineNode{
-			nodeID:       fmt.Sprintf("byzantine_%d", i),
-			attackType:   atf.randomByzantineAttack(),
+			nodeID:         fmt.Sprintf("byzantine_%d", i),
+			attackType:     atf.randomByzantineAttack(),
 			maliciousVotes: true,
 		}
 		atf.byzantineSimulation.byzantineNodes[byzantine.nodeID] = byzantine
@@ -469,7 +469,7 @@ func (atf *AdversarialTestingFramework) runQuantumAttacks() *AttackResult {
 	if shorAttack.qubits >= 2048 {
 		result.AttackVectors = append(result.AttackVectors,
 			"Shor's algorithm with 2048 qubits")
-		
+
 		if !atf.testPostQuantumCrypto() {
 			result.CryptographyBroken = true
 			result.Vulnerabilities = append(result.Vulnerabilities, &Vulnerability{
@@ -539,7 +539,7 @@ func (atf *AdversarialTestingFramework) testNullInputs() bool {
 		}
 		return true
 	}()
-	
+
 	// Try to process nil input
 	// processConsensus(nil) // Would test actual system
 	return true
@@ -560,19 +560,19 @@ func (atf *AdversarialTestingFramework) randomByzantineAttack() string {
 func (atf *AdversarialTestingFramework) calculateResilienceScore(results map[string]*AttackResult) float64 {
 	totalTests := len(results)
 	survivedTests := 0
-	
+
 	for _, result := range results {
 		if result.SystemSurvived {
 			survivedTests++
 		}
 	}
-	
+
 	return float64(survivedTests) / float64(totalTests)
 }
 
 func (atf *AdversarialTestingFramework) generateSecurityRecommendations(report *AdversarialReport) []string {
 	recommendations := []string{}
-	
+
 	// Analyze vulnerabilities and suggest fixes
 	criticalCount := 0
 	highCount := 0
@@ -583,7 +583,7 @@ func (atf *AdversarialTestingFramework) generateSecurityRecommendations(report *
 			highCount++
 		}
 	}
-	
+
 	if criticalCount > 0 {
 		recommendations = append(recommendations,
 			fmt.Sprintf("URGENT: Fix %d critical vulnerabilities immediately", criticalCount))
@@ -592,21 +592,21 @@ func (atf *AdversarialTestingFramework) generateSecurityRecommendations(report *
 		recommendations = append(recommendations,
 			"Add cryptographic signatures to all messages")
 	}
-	
+
 	if highCount > 0 {
 		recommendations = append(recommendations,
 			fmt.Sprintf("Address %d high-severity issues before production", highCount))
 		recommendations = append(recommendations,
 			"Implement rate limiting and resource quotas")
 	}
-	
+
 	if report.ResilienceScore < 0.8 {
 		recommendations = append(recommendations,
 			"System resilience too low for production use")
 		recommendations = append(recommendations,
 			"Add redundancy and fallback mechanisms")
 	}
-	
+
 	// Always recommend
 	recommendations = append(recommendations,
 		"Regular security audits and penetration testing")
@@ -614,7 +614,7 @@ func (atf *AdversarialTestingFramework) generateSecurityRecommendations(report *
 		"Implement comprehensive monitoring and alerting")
 	recommendations = append(recommendations,
 		"Create incident response playbooks")
-	
+
 	return recommendations
 }
 
@@ -622,16 +622,16 @@ func (atf *AdversarialTestingFramework) printAdversarialReport(report *Adversari
 	fmt.Println("\n" + strings.Repeat("=", 80))
 	fmt.Println("🔥 ADVERSARIAL TESTING REPORT")
 	fmt.Println(strings.Repeat("=", 80))
-	
+
 	fmt.Printf("Resilience Score: %.1f%%\n", report.ResilienceScore*100)
-	
+
 	if len(report.CriticalFailures) > 0 {
 		fmt.Println("\n❌ CRITICAL FAILURES:")
 		for _, failure := range report.CriticalFailures {
 			fmt.Printf("  • %s\n", failure)
 		}
 	}
-	
+
 	if len(report.VulnerabilitiesFound) > 0 {
 		fmt.Printf("\n⚠️  VULNERABILITIES FOUND: %d\n", len(report.VulnerabilitiesFound))
 		for _, vuln := range report.VulnerabilitiesFound {
@@ -639,7 +639,7 @@ func (atf *AdversarialTestingFramework) printAdversarialReport(report *Adversari
 			fmt.Printf("    → Mitigation: %s\n", vuln.Mitigation)
 		}
 	}
-	
+
 	fmt.Println("\n📊 ATTACK RESULTS:")
 	for name, result := range report.AttackResults {
 		status := "✅ SURVIVED"
@@ -648,12 +648,12 @@ func (atf *AdversarialTestingFramework) printAdversarialReport(report *Adversari
 		}
 		fmt.Printf("  %s: %s\n", name, status)
 	}
-	
+
 	fmt.Println("\n💡 SECURITY RECOMMENDATIONS:")
 	for _, rec := range report.Recommendations {
 		fmt.Printf("  • %s\n", rec)
 	}
-	
+
 	fmt.Println(strings.Repeat("=", 80))
 }
 
@@ -668,16 +668,16 @@ type AdversarialReport struct {
 }
 
 type AttackResult struct {
-	AttackType                    string
-	AttackVectors                 []string
-	SystemSurvived                bool
-	ConsensusCompromised          bool
-	CryptographyBroken            bool
-	BiologicalSystemsCompromised  bool
-	UnrecoverableFailure          bool
-	SystemCrashed                 bool
-	UnhandledCases                int
-	Vulnerabilities               []*Vulnerability
+	AttackType                   string
+	AttackVectors                []string
+	SystemSurvived               bool
+	ConsensusCompromised         bool
+	CryptographyBroken           bool
+	BiologicalSystemsCompromised bool
+	UnrecoverableFailure         bool
+	SystemCrashed                bool
+	UnhandledCases               int
+	Vulnerabilities              []*Vulnerability
 }
 
 type Vulnerability struct {
@@ -725,7 +725,7 @@ type DNAPoisoning struct {
 }
 
 type TotalSystemFailure struct {
-	failureType string
+	failureType  string
 	cascadeDepth int
 }
 

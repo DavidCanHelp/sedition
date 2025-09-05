@@ -37,36 +37,36 @@ type NoiseModels struct {
 
 // DecoherenceSimulator models the #1 criticism: "quantum states die too fast"
 type DecoherenceSimulator struct {
-	temperature           float64 // Kelvin
-	decoherenceRates      map[string]float64
-	coherenceTimes        map[string]time.Duration
-	environmentCoupling   float64
-	dephasingMechanisms   []*DephasingMechanism
-	relaxationProcesses   []*RelaxationProcess
-	markovianDynamics     *MarkovianDynamics
-	nonMarkovianEffects   *NonMarkovianEffects
+	temperature         float64 // Kelvin
+	decoherenceRates    map[string]float64
+	coherenceTimes      map[string]time.Duration
+	environmentCoupling float64
+	dephasingMechanisms []*DephasingMechanism
+	relaxationProcesses []*RelaxationProcess
+	markovianDynamics   *MarkovianDynamics
+	nonMarkovianEffects *NonMarkovianEffects
 }
 
 // FallbackMechanisms ensures we're never worse than classical (key defense)
 type FallbackMechanisms struct {
-	classicalConsensus    *ClassicalConsensus
-	hybridModes           map[string]*HybridMode
-	gracefulDegradation   *GracefulDegradation
-	failureDetection      *FailureDetection
-	automaticFallback     bool
-	fallbackThresholds    map[string]float64
-	recoveryProtocols     []*RecoveryProtocol
+	classicalConsensus  *ClassicalConsensus
+	hybridModes         map[string]*HybridMode
+	gracefulDegradation *GracefulDegradation
+	failureDetection    *FailureDetection
+	automaticFallback   bool
+	fallbackThresholds  map[string]float64
+	recoveryProtocols   []*RecoveryProtocol
 }
 
 // PerformanceBenchmarks proves we're not just slow (addresses performance critics)
 type PerformanceBenchmarks struct {
-	consensusLatency      map[string]time.Duration
-	throughputMetrics     map[string]float64
-	scalabilityResults    map[int]*ScalabilityResult
-	comparisonBaselines   map[string]*BaselineComparison
-	worstCaseAnalysis     *WorstCaseAnalysis
-	averageCaseAnalysis   *AverageCaseAnalysis
-	bestCaseScenarios     *BestCaseScenarios
+	consensusLatency    map[string]time.Duration
+	throughputMetrics   map[string]float64
+	scalabilityResults  map[int]*ScalabilityResult
+	comparisonBaselines map[string]*BaselineComparison
+	worstCaseAnalysis   *WorstCaseAnalysis
+	averageCaseAnalysis *AverageCaseAnalysis
+	bestCaseScenarios   *BestCaseScenarios
 }
 
 // SecurityValidation addresses "too many attack surfaces" criticism
@@ -93,26 +93,26 @@ type PracticalityTests struct {
 
 // Core validation structures
 type ThermalNoise struct {
-	temperature           float64 // Kelvin
-	boltzmannConstant     float64
-	noiseSpectralDensity  float64
-	johnsonNoise          float64
-	thermalFluctuations   map[string]float64
-	temperatureStability  float64
+	temperature          float64 // Kelvin
+	boltzmannConstant    float64
+	noiseSpectralDensity float64
+	johnsonNoise         float64
+	thermalFluctuations  map[string]float64
+	temperatureStability float64
 }
 
 type QuantumDecoherence struct {
-	t1Time                time.Duration // Energy relaxation
-	t2Time                time.Duration // Phase coherence
-	t2StarTime            time.Duration // Inhomogeneous dephasing
-	pureDephasingRate     float64
-	energyRelaxationRate  float64
-	decoherenceChannels   []*DecoherenceChannel
-	lindbladOperators     [][]complex128
+	t1Time               time.Duration // Energy relaxation
+	t2Time               time.Duration // Phase coherence
+	t2StarTime           time.Duration // Inhomogeneous dephasing
+	pureDephasingRate    float64
+	energyRelaxationRate float64
+	decoherenceChannels  []*DecoherenceChannel
+	lindbladOperators    [][]complex128
 }
 
 type BiologicalVariability struct {
-	cellToCell\tVariation  float64
+	cellToCellVariation   float64
 	temporalFluctuations  *TemporalFluctuations
 	phenotypicNoise       float64
 	geneExpressionNoise   float64
@@ -122,12 +122,12 @@ type BiologicalVariability struct {
 }
 
 type ClassicalConsensus struct {
-	raftImplementation    *RaftConsensus
-	pbftImplementation    *PBFTConsensus
-	tendermintBackup      *TendermintConsensus
-	simpleVoting          *SimpleVoting
-	performanceBaseline   map[string]float64
-	reliabilityMetrics    map[string]float64
+	raftImplementation  *RaftConsensus
+	pbftImplementation  *PBFTConsensus
+	tendermintBackup    *TendermintConsensus
+	simpleVoting        *SimpleVoting
+	performanceBaseline map[string]float64
+	reliabilityMetrics  map[string]float64
 }
 
 type HybridMode struct {
@@ -143,28 +143,28 @@ type HybridMode struct {
 // NewRealisticValidationFramework creates a framework that addresses all criticisms
 func NewRealisticValidationFramework() *RealisticValidationFramework {
 	ctx, cancel := context.WithCancel(context.Background())
-	
+
 	return &RealisticValidationFramework{
 		ctx:    ctx,
 		cancel: cancel,
 		noiseModels: &NoiseModels{
 			thermalNoise: &ThermalNoise{
-				temperature:       300.0, // Room temperature (realistic!)
-				boltzmannConstant: 1.380649e-23, // J/K
-				noiseSpectralDensity: 4.14e-21, // J at 300K
-				johnsonNoise:      1e-9, // nV/√Hz
+				temperature:          300.0,        // Room temperature (realistic!)
+				boltzmannConstant:    1.380649e-23, // J/K
+				noiseSpectralDensity: 4.14e-21,     // J at 300K
+				johnsonNoise:         1e-9,         // nV/√Hz
 			},
 			quantumDecoherence: &QuantumDecoherence{
-				t1Time:     time.Microsecond * 100, // Realistic for solid state
-				t2Time:     time.Microsecond * 10,  // Much shorter than T1
-				t2StarTime: time.Microsecond * 1,   // Even shorter with inhomogeneity
-				pureDephasingRate:    1e6, // MHz
-				energyRelaxationRate: 1e5, // 100 kHz
+				t1Time:               time.Microsecond * 100, // Realistic for solid state
+				t2Time:               time.Microsecond * 10,  // Much shorter than T1
+				t2StarTime:           time.Microsecond * 1,   // Even shorter with inhomogeneity
+				pureDephasingRate:    1e6,                    // MHz
+				energyRelaxationRate: 1e5,                    // 100 kHz
 			},
 			biologicalVariability: &BiologicalVariability{
-				cellToCellVariation:  0.3,  // 30% variation (realistic)
-				phenotypicNoise:      0.2,  // 20% phenotypic variation
-				geneExpressionNoise:  0.25, // 25% expression noise
+				cellToCellVariation: 0.3,  // 30% variation (realistic)
+				phenotypicNoise:     0.2,  // 20% phenotypic variation
+				geneExpressionNoise: 0.25, // 25% expression noise
 			},
 		},
 		decoherenceSimulator: &DecoherenceSimulator{
@@ -178,8 +178,8 @@ func NewRealisticValidationFramework() *RealisticValidationFramework {
 				raftImplementation: &RaftConsensus{},
 				pbftImplementation: &PBFTConsensus{},
 			},
-			hybridModes:        make(map[string]*HybridMode),
-			automaticFallback:  true, // Always have a backup plan
+			hybridModes:       make(map[string]*HybridMode),
+			automaticFallback: true, // Always have a backup plan
 			fallbackThresholds: map[string]float64{
 				"quantum_fidelity":     0.5,  // Fall back if below 50%
 				"biological_stability": 0.6,  // Fall back if below 60%
@@ -193,9 +193,9 @@ func NewRealisticValidationFramework() *RealisticValidationFramework {
 		},
 		securityValidation: &SecurityValidation{
 			quantumAttackResistance: &QuantumAttackResistance{
-				shorResistance:    true,
-				groverResistance:  true,
-				quantumSupremacy:  false, // We're not there yet
+				shorResistance:   true,
+				groverResistance: true,
+				quantumSupremacy: false, // We're not there yet
 			},
 			byzantineTolerance: &ByzantineTolerance{
 				faultThreshold: 0.33, // Standard Byzantine threshold
@@ -205,20 +205,20 @@ func NewRealisticValidationFramework() *RealisticValidationFramework {
 		practicalityTests: &PracticalityTests{
 			realWorldScenarios: []*RealWorldScenario{},
 			operationalCosts: &OperationalCosts{
-				hardwareCosts:     1000000, // $1M realistic for quantum hardware
-				maintenanceCosts:  100000,  // $100k/year maintenance
-				energyCosts:       50000,   // $50k/year energy
+				hardwareCosts:    1000000, // $1M realistic for quantum hardware
+				maintenanceCosts: 100000,  // $100k/year maintenance
+				energyCosts:      50000,   // $50k/year energy
 			},
 		},
 		scalabilityAnalysis: &ScalabilityAnalysis{
-			nodeCountTests:     []int{10, 100, 1000, 10000},
-			linearScalability:  false, // Be honest
-			scalabilityLimit:   1000,  // Realistic limit
+			nodeCountTests:    []int{10, 100, 1000, 10000},
+			linearScalability: false, // Be honest
+			scalabilityLimit:  1000,  // Realistic limit
 		},
 		energyMetrics: &EnergyMetrics{
-			powerConsumption:   10000, // 10kW (realistic for quantum)
-			energyPerOperation: 1e-15, // Joules (competitive with classical)
-			coolingRequirements: 5000, // 5kW cooling
+			powerConsumption:    10000, // 10kW (realistic for quantum)
+			energyPerOperation:  1e-15, // Joules (competitive with classical)
+			coolingRequirements: 5000,  // 5kW cooling
 		},
 	}
 }
@@ -243,7 +243,7 @@ func (rvf *RealisticValidationFramework) RunComprehensiveValidation() (*Validati
 	// Test 1: Noise and Decoherence (The #1 Criticism)
 	noiseResult, err := rvf.testNoiseAndDecoherence()
 	if err != nil {
-		report.CriticalIssues = append(report.CriticalIssues, 
+		report.CriticalIssues = append(report.CriticalIssues,
 			fmt.Sprintf("Noise testing failed: %v", err))
 	}
 	report.TestCategories["noise_decoherence"] = noiseResult
@@ -334,7 +334,7 @@ func (rvf *RealisticValidationFramework) testNoiseAndDecoherence() (*CategoryRes
 		thermalTest.Passed = true
 		thermalTest.Score = 0.7
 		thermalTest.Details = "System tolerates thermal noise with error correction"
-		result.Mitigations = append(result.Mitigations, 
+		result.Mitigations = append(result.Mitigations,
 			"Implemented thermal noise compensation algorithms")
 	} else {
 		result.Issues = append(result.Issues,
@@ -378,7 +378,7 @@ func (rvf *RealisticValidationFramework) testNoiseAndDecoherence() (*CategoryRes
 
 	// Add biological noise
 	biologicalConsensus := rvf.testBiologicalVariability(0.3) // 30% variation
-	if biologicalConsensus > 0.7 { // 70% consensus despite noise
+	if biologicalConsensus > 0.7 {                            // 70% consensus despite noise
 		biologicalTest.Passed = true
 		biologicalTest.Score = biologicalConsensus
 		biologicalTest.Details = "Biological redundancy overcomes variability"
@@ -554,7 +554,7 @@ func (rvf *RealisticValidationFramework) testFallbackMechanisms() (*CategoryResu
 func (rvf *RealisticValidationFramework) addThermalNoise(signal, temperature float64) float64 {
 	// Johnson-Nyquist noise
 	kT := rvf.noiseModels.thermalNoise.boltzmannConstant * temperature
-	noiseAmplitude := math.Sqrt(4 * kT * 1e6) // 1 MHz bandwidth
+	noiseAmplitude := math.Sqrt(4 * kT * 1e6)          // 1 MHz bandwidth
 	noise := rand.NormFloat64() * noiseAmplitude * 1e9 // Scale to reasonable units
 	return signal + noise
 }
@@ -570,7 +570,7 @@ func (rvf *RealisticValidationFramework) testBiologicalVariability(variation flo
 	// Monte Carlo simulation of biological consensus with noise
 	trials := 1000
 	successes := 0
-	
+
 	for i := 0; i < trials; i++ {
 		// Add random biological variation
 		consensus := 1.0 + rand.NormFloat64()*variation
@@ -578,7 +578,7 @@ func (rvf *RealisticValidationFramework) testBiologicalVariability(variation flo
 			successes++
 		}
 	}
-	
+
 	return float64(successes) / float64(trials)
 }
 
@@ -586,29 +586,29 @@ func (rvf *RealisticValidationFramework) printValidationSummary(report *Validati
 	fmt.Println("\n" + strings.Repeat("=", 80))
 	fmt.Println("📊 VALIDATION REPORT SUMMARY")
 	fmt.Println(strings.Repeat("=", 80))
-	
+
 	fmt.Printf("Overall Score: %.1f%%\n", report.OverallScore*100)
-	
+
 	fmt.Println("\n✅ Strengths:")
 	for _, strength := range report.Strengths {
 		fmt.Printf("  • %s\n", strength)
 	}
-	
+
 	fmt.Println("\n⚠️  Critical Issues:")
 	for _, issue := range report.CriticalIssues {
 		fmt.Printf("  • %s\n", issue)
 	}
-	
+
 	fmt.Println("\n💡 Recommendations:")
 	for _, rec := range report.Recommendations {
 		fmt.Printf("  • %s\n", rec)
 	}
-	
+
 	fmt.Println("\n📈 Category Results:")
 	for name, result := range report.TestCategories {
 		fmt.Printf("  %s: %.1f%% pass rate\n", name, result.PassRate*100)
 	}
-	
+
 	fmt.Println(strings.Repeat("=", 80))
 }
 

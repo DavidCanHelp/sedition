@@ -16,70 +16,70 @@ type EconomicMechanismEngine struct {
 	mu sync.RWMutex
 
 	// Game theory components
-	gameAnalyzer         *GameTheoreticAnalyzer
-	mechanismDesigner    *MechanismDesigner
-	equilibriumSolver    *EquilibriumSolver
-	auctionMechanisms    map[string]*AuctionMechanism
-	
+	gameAnalyzer      *GameTheoreticAnalyzer
+	mechanismDesigner *MechanismDesigner
+	equilibriumSolver *EquilibriumSolver
+	auctionMechanisms map[string]*AuctionMechanism
+
 	// Incentive structures
-	incentiveSchemes     map[string]*IncentiveScheme
-	rewardPools          map[string]*RewardPool
-	slashingRules        []*SlashingRule
-	feeStructure         *FeeStructure
-	
+	incentiveSchemes map[string]*IncentiveScheme
+	rewardPools      map[string]*RewardPool
+	slashingRules    []*SlashingRule
+	feeStructure     *FeeStructure
+
 	// Economic models
-	tokenEconomics       *TokenEconomics
-	governanceModel      *GovernanceModel
-	liquidityMining      *LiquidityMiningProgram
-	stakingMechanics     *StakingMechanics
-	
+	tokenEconomics   *TokenEconomics
+	governanceModel  *GovernanceModel
+	liquidityMining  *LiquidityMiningProgram
+	stakingMechanics *StakingMechanics
+
 	// Market dynamics
-	predictionMarkets    map[string]*PredictionMarket
-	reputationMarket     *ReputationMarket
-	codeQualityMarket    *CodeQualityMarket
-	
+	predictionMarkets map[string]*PredictionMarket
+	reputationMarket  *ReputationMarket
+	codeQualityMarket *CodeQualityMarket
+
 	// Economic analysis
 	economicSimulator    *EconomicSimulator
 	gameTreeAnalyzer     *GameTreeAnalyzer
 	socialChoiceAnalyzer *SocialChoiceAnalyzer
-	
+
 	// Security and fairness
-	byzantineModel       *ByzantineGameModel
-	fairnessMetrics      *FairnessMetrics
-	attackCostAnalyzer   *AttackCostAnalyzer
-	
+	byzantineModel     *ByzantineGameModel
+	fairnessMetrics    *FairnessMetrics
+	attackCostAnalyzer *AttackCostAnalyzer
+
 	// Performance tracking
-	economicMetrics      *EconomicMetrics
-	behaviorTracker      *BehaviorTracker
-	
+	economicMetrics *EconomicMetrics
+	behaviorTracker *BehaviorTracker
+
 	// Configuration
-	config               *EconomicConfig
-	running              bool
-	stopCh               chan struct{}
+	config  *EconomicConfig
+	running bool
+	stopCh  chan struct{}
 }
 
 // GameTheoreticAnalyzer analyzes strategic interactions in the consensus mechanism
 type GameTheoreticAnalyzer struct {
-	players              map[string]*Player
-	strategies           map[string][]*Strategy
-	payoffMatrices      map[string]*PayoffMatrix
-	gameTypes           map[string]GameType
-	equilibriumHistory  []EquilibriumState
-	dominanceAnalyzer   *DominanceAnalyzer
+	players            map[string]*Player
+	strategies         map[string][]*Strategy
+	payoffMatrices     map[string]*PayoffMatrix
+	gameTypes          map[string]GameType
+	equilibriumHistory []EquilibriumState
+	dominanceAnalyzer  *DominanceAnalyzer
 }
 
 // Player represents a strategic player in the consensus game
 type Player struct {
-	ID                  string            `json:"id"`
-	Type                PlayerType        `json:"type"`
-	Stake               *big.Int          `json:"stake"`
-	ReputationScore     float64           `json:"reputation_score"`
-	UtilityFunction     *UtilityFunction  `json:"utility_function"`
-	RiskPreference      RiskPreference    `json:"risk_preference"`
-	InformationSet      *InformationSet   `json:"information_set"`
-	HistoricalBehavior  []ActionHistory   `json:"historical_behavior"`
-	Rationality         float64           `json:"rationality"` // 0.0 = irrational, 1.0 = perfectly rational
-	Cooperativeness     float64           `json:"cooperativeness"`
+	ID                 string           `json:"id"`
+	Type               PlayerType       `json:"type"`
+	Stake              *big.Int         `json:"stake"`
+	ReputationScore    float64          `json:"reputation_score"`
+	UtilityFunction    *UtilityFunction `json:"utility_function"`
+	RiskPreference     RiskPreference   `json:"risk_preference"`
+	InformationSet     *InformationSet  `json:"information_set"`
+	HistoricalBehavior []ActionHistory  `json:"historical_behavior"`
+	Rationality        float64          `json:"rationality"` // 0.0 = irrational, 1.0 = perfectly rational
+	Cooperativeness    float64          `json:"cooperativeness"`
 }
 
 type PlayerType int
@@ -103,15 +103,15 @@ const (
 
 // Strategy represents a player's strategic choice
 type Strategy struct {
-	ID              string                 `json:"id"`
-	Name            string                 `json:"name"`
-	Description     string                 `json:"description"`
-	Actions         []ActionType           `json:"actions"`
-	Conditions      []StrategyCondition    `json:"conditions"`
-	ExpectedPayoff  float64                `json:"expected_payoff"`
-	RiskLevel       float64                `json:"risk_level"`
-	Complexity      int                    `json:"complexity"`
-	AdoptionRate    float64                `json:"adoption_rate"`
+	ID             string              `json:"id"`
+	Name           string              `json:"name"`
+	Description    string              `json:"description"`
+	Actions        []ActionType        `json:"actions"`
+	Conditions     []StrategyCondition `json:"conditions"`
+	ExpectedPayoff float64             `json:"expected_payoff"`
+	RiskLevel      float64             `json:"risk_level"`
+	Complexity     int                 `json:"complexity"`
+	AdoptionRate   float64             `json:"adoption_rate"`
 }
 
 type ActionType int
@@ -129,19 +129,19 @@ const (
 )
 
 type StrategyCondition struct {
-	Variable    string      `json:"variable"`
-	Operator    string      `json:"operator"`
-	Value       interface{} `json:"value"`
-	Weight      float64     `json:"weight"`
+	Variable string      `json:"variable"`
+	Operator string      `json:"operator"`
+	Value    interface{} `json:"value"`
+	Weight   float64     `json:"weight"`
 }
 
 // PayoffMatrix represents strategic payoffs
 type PayoffMatrix struct {
-	Players     []string            `json:"players"`
-	Strategies  [][]string          `json:"strategies"`
-	Payoffs     [][][]float64       `json:"payoffs"`
-	GameType    GameType            `json:"game_type"`
-	Information InformationType     `json:"information"`
+	Players     []string        `json:"players"`
+	Strategies  [][]string      `json:"strategies"`
+	Payoffs     [][][]float64   `json:"payoffs"`
+	GameType    GameType        `json:"game_type"`
+	Information InformationType `json:"information"`
 }
 
 type GameType int
@@ -167,14 +167,14 @@ const (
 
 // UtilityFunction defines a player's preferences
 type UtilityFunction struct {
-	BaseUtility         float64                    `json:"base_utility"`
-	RewardWeight        float64                    `json:"reward_weight"`
-	ReputationWeight    float64                    `json:"reputation_weight"`
-	RiskPenalty         float64                    `json:"risk_penalty"`
-	SocialWelfareWeight float64                    `json:"social_welfare_weight"`
-	CustomParameters    map[string]float64         `json:"custom_parameters"`
-	UtilityType         UtilityType                `json:"utility_type"`
-	TimePreference      float64                    `json:"time_preference"` // Discount factor
+	BaseUtility         float64            `json:"base_utility"`
+	RewardWeight        float64            `json:"reward_weight"`
+	ReputationWeight    float64            `json:"reputation_weight"`
+	RiskPenalty         float64            `json:"risk_penalty"`
+	SocialWelfareWeight float64            `json:"social_welfare_weight"`
+	CustomParameters    map[string]float64 `json:"custom_parameters"`
+	UtilityType         UtilityType        `json:"utility_type"`
+	TimePreference      float64            `json:"time_preference"` // Discount factor
 }
 
 type UtilityType int
@@ -190,11 +190,11 @@ const (
 
 // InformationSet represents what a player knows
 type InformationSet struct {
-	KnownPlayers        []string                   `json:"known_players"`
-	KnownStrategies     map[string][]string        `json:"known_strategies"`
-	ObservedActions     []ActionObservation        `json:"observed_actions"`
-	BeliefUpdates       []BeliefUpdate             `json:"belief_updates"`
-	UncertaintyLevel    float64                    `json:"uncertainty_level"`
+	KnownPlayers     []string            `json:"known_players"`
+	KnownStrategies  map[string][]string `json:"known_strategies"`
+	ObservedActions  []ActionObservation `json:"observed_actions"`
+	BeliefUpdates    []BeliefUpdate      `json:"belief_updates"`
+	UncertaintyLevel float64             `json:"uncertainty_level"`
 }
 
 type ActionObservation struct {
@@ -214,29 +214,29 @@ type BeliefUpdate struct {
 
 // ActionHistory tracks a player's past actions
 type ActionHistory struct {
-	Action        ActionType    `json:"action"`
-	Context       string        `json:"context"`
-	Payoff        float64       `json:"payoff"`
-	Timestamp     time.Time     `json:"timestamp"`
-	Cooperated    bool          `json:"cooperated"`
-	Defected      bool          `json:"defected"`
+	Action     ActionType `json:"action"`
+	Context    string     `json:"context"`
+	Payoff     float64    `json:"payoff"`
+	Timestamp  time.Time  `json:"timestamp"`
+	Cooperated bool       `json:"cooperated"`
+	Defected   bool       `json:"defected"`
 }
 
 // MechanismDesigner creates optimal economic mechanisms
 type MechanismDesigner struct {
 	objectives          []DesignObjective
-	constraints         []DesignConstraint  
+	constraints         []DesignConstraint
 	mechanismLibrary    map[string]*MechanismTemplate
 	optimizationEngine  *OptimizationEngine
 	implementationTests []MechanismTest
 }
 
 type DesignObjective struct {
-	Name        string  `json:"name"`
-	Type        ObjectiveType `json:"type"`
-	Weight      float64 `json:"weight"`
-	Target      float64 `json:"target"`
-	Priority    int     `json:"priority"`
+	Name     string        `json:"name"`
+	Type     ObjectiveType `json:"type"`
+	Weight   float64       `json:"weight"`
+	Target   float64       `json:"target"`
+	Priority int           `json:"priority"`
 }
 
 type ObjectiveType int
@@ -252,12 +252,12 @@ const (
 )
 
 type DesignConstraint struct {
-	Name            string      `json:"name"`
-	Type            ConstraintType `json:"type"`
-	Value           float64     `json:"value"`
-	Operator        string      `json:"operator"`
-	Binding         bool        `json:"binding"`
-	ShadowPrice     float64     `json:"shadow_price"`
+	Name        string         `json:"name"`
+	Type        ConstraintType `json:"type"`
+	Value       float64        `json:"value"`
+	Operator    string         `json:"operator"`
+	Binding     bool           `json:"binding"`
+	ShadowPrice float64        `json:"shadow_price"`
 }
 
 type ConstraintType int
@@ -273,11 +273,11 @@ const (
 
 // EquilibriumSolver finds game equilibria
 type EquilibriumSolver struct {
-	solverType          SolverType
-	nashSolver          *NashEquilibriumSolver
-	bayesianSolver      *BayesianNashSolver
-	evolutionarySolver  *EvolutionaryStableSolver
-	correlatedSolver    *CorrelatedEquilibriumSolver
+	solverType         SolverType
+	nashSolver         *NashEquilibriumSolver
+	bayesianSolver     *BayesianNashSolver
+	evolutionarySolver *EvolutionaryStableSolver
+	correlatedSolver   *CorrelatedEquilibriumSolver
 }
 
 type SolverType int
@@ -293,15 +293,15 @@ const (
 
 // EquilibriumState represents a solution concept
 type EquilibriumState struct {
-	Type            EquilibriumType        `json:"type"`
-	Strategies      map[string]string      `json:"strategies"`
-	Payoffs         map[string]float64     `json:"payoffs"`
-	Stability       float64                `json:"stability"`
-	Efficiency      float64                `json:"efficiency"`
-	Fairness        float64                `json:"fairness"`
-	SocialWelfare   float64                `json:"social_welfare"`
-	ComputedAt      time.Time              `json:"computed_at"`
-	Conditions      []EquilibriumCondition `json:"conditions"`
+	Type          EquilibriumType        `json:"type"`
+	Strategies    map[string]string      `json:"strategies"`
+	Payoffs       map[string]float64     `json:"payoffs"`
+	Stability     float64                `json:"stability"`
+	Efficiency    float64                `json:"efficiency"`
+	Fairness      float64                `json:"fairness"`
+	SocialWelfare float64                `json:"social_welfare"`
+	ComputedAt    time.Time              `json:"computed_at"`
+	Conditions    []EquilibriumCondition `json:"conditions"`
 }
 
 type EquilibriumType int
@@ -316,25 +316,25 @@ const (
 )
 
 type EquilibriumCondition struct {
-	Name        string  `json:"name"`
-	Satisfied   bool    `json:"satisfied"`
-	Deviation   float64 `json:"deviation"`
-	Tolerance   float64 `json:"tolerance"`
+	Name      string  `json:"name"`
+	Satisfied bool    `json:"satisfied"`
+	Deviation float64 `json:"deviation"`
+	Tolerance float64 `json:"tolerance"`
 }
 
 // AuctionMechanism implements auction-based resource allocation
 type AuctionMechanism struct {
-	ID              string            `json:"id"`
-	Type            AuctionType       `json:"type"`
-	Resource        string            `json:"resource"`
-	Bidders         map[string]*Bidder `json:"bidders"`
-	ReservePrice    *big.Int          `json:"reserve_price"`
-	StartTime       time.Time         `json:"start_time"`
-	EndTime         time.Time         `json:"end_time"`
-	Winner          string            `json:"winner,omitempty"`
-	WinningBid      *big.Int          `json:"winning_bid,omitempty"`
-	Revenue         *big.Int          `json:"revenue"`
-	Efficiency      float64           `json:"efficiency"`
+	ID           string             `json:"id"`
+	Type         AuctionType        `json:"type"`
+	Resource     string             `json:"resource"`
+	Bidders      map[string]*Bidder `json:"bidders"`
+	ReservePrice *big.Int           `json:"reserve_price"`
+	StartTime    time.Time          `json:"start_time"`
+	EndTime      time.Time          `json:"end_time"`
+	Winner       string             `json:"winner,omitempty"`
+	WinningBid   *big.Int           `json:"winning_bid,omitempty"`
+	Revenue      *big.Int           `json:"revenue"`
+	Efficiency   float64            `json:"efficiency"`
 }
 
 type AuctionType int
@@ -350,12 +350,12 @@ const (
 
 // Bidder represents an auction participant
 type Bidder struct {
-	ID          string    `json:"id"`
-	Valuation   *big.Int  `json:"valuation"`
-	Bid         *big.Int  `json:"bid"`
+	ID          string      `json:"id"`
+	Valuation   *big.Int    `json:"valuation"`
+	Bid         *big.Int    `json:"bid"`
 	Strategy    BidStrategy `json:"strategy"`
-	Submitted   bool      `json:"submitted"`
-	SubmittedAt time.Time `json:"submitted_at"`
+	Submitted   bool        `json:"submitted"`
+	SubmittedAt time.Time   `json:"submitted_at"`
 }
 
 type BidStrategy int
@@ -369,17 +369,17 @@ const (
 
 // IncentiveScheme defines reward and penalty structures
 type IncentiveScheme struct {
-	ID              string                 `json:"id"`
-	Name            string                 `json:"name"`
-	Type            IncentiveType          `json:"type"`
-	BaseReward      *big.Int               `json:"base_reward"`
-	PerformanceMultiplier float64          `json:"performance_multiplier"`
-	QualityBonus    map[string]*big.Int    `json:"quality_bonus"`
-	SlashingRates   map[string]float64     `json:"slashing_rates"`
-	VestingPeriod   time.Duration          `json:"vesting_period"`
-	CliffPeriod     time.Duration          `json:"cliff_period"`
-	DecayRate       float64                `json:"decay_rate"`
-	Conditions      []IncentiveCondition   `json:"conditions"`
+	ID                    string               `json:"id"`
+	Name                  string               `json:"name"`
+	Type                  IncentiveType        `json:"type"`
+	BaseReward            *big.Int             `json:"base_reward"`
+	PerformanceMultiplier float64              `json:"performance_multiplier"`
+	QualityBonus          map[string]*big.Int  `json:"quality_bonus"`
+	SlashingRates         map[string]float64   `json:"slashing_rates"`
+	VestingPeriod         time.Duration        `json:"vesting_period"`
+	CliffPeriod           time.Duration        `json:"cliff_period"`
+	DecayRate             float64              `json:"decay_rate"`
+	Conditions            []IncentiveCondition `json:"conditions"`
 }
 
 type IncentiveType int
@@ -402,23 +402,23 @@ type IncentiveCondition struct {
 
 // RewardPool manages token distribution
 type RewardPool struct {
-	ID                  string            `json:"id"`
-	TotalRewards        *big.Int          `json:"total_rewards"`
-	AllocatedRewards    *big.Int          `json:"allocated_rewards"`
-	DistributedRewards  *big.Int          `json:"distributed_rewards"`
-	AllocationRules     []AllocationRule  `json:"allocation_rules"`
-	DistributionCycle   time.Duration     `json:"distribution_cycle"`
-	LastDistribution    time.Time         `json:"last_distribution"`
-	ActivePeriod        TimePeriod        `json:"active_period"`
+	ID                 string           `json:"id"`
+	TotalRewards       *big.Int         `json:"total_rewards"`
+	AllocatedRewards   *big.Int         `json:"allocated_rewards"`
+	DistributedRewards *big.Int         `json:"distributed_rewards"`
+	AllocationRules    []AllocationRule `json:"allocation_rules"`
+	DistributionCycle  time.Duration    `json:"distribution_cycle"`
+	LastDistribution   time.Time        `json:"last_distribution"`
+	ActivePeriod       TimePeriod       `json:"active_period"`
 }
 
 type AllocationRule struct {
-	Name        string  `json:"name"`
-	Percentage  float64 `json:"percentage"`
-	MinAmount   *big.Int `json:"min_amount"`
-	MaxAmount   *big.Int `json:"max_amount"`
-	Condition   string  `json:"condition"`
-	Priority    int     `json:"priority"`
+	Name       string   `json:"name"`
+	Percentage float64  `json:"percentage"`
+	MinAmount  *big.Int `json:"min_amount"`
+	MaxAmount  *big.Int `json:"max_amount"`
+	Condition  string   `json:"condition"`
+	Priority   int      `json:"priority"`
 }
 
 type TimePeriod struct {
@@ -428,16 +428,16 @@ type TimePeriod struct {
 
 // SlashingRule defines penalties for misbehavior
 type SlashingRule struct {
-	ID              string        `json:"id"`
-	Offense         OffenseType   `json:"offense"`
-	Severity        SeverityLevel `json:"severity"`
-	SlashPercentage float64       `json:"slash_percentage"`
-	MinSlashAmount  *big.Int      `json:"min_slash_amount"`
-	MaxSlashAmount  *big.Int      `json:"max_slash_amount"`
-	JailDuration    time.Duration `json:"jail_duration"`
+	ID              string         `json:"id"`
+	Offense         OffenseType    `json:"offense"`
+	Severity        SeverityLevel  `json:"severity"`
+	SlashPercentage float64        `json:"slash_percentage"`
+	MinSlashAmount  *big.Int       `json:"min_slash_amount"`
+	MaxSlashAmount  *big.Int       `json:"max_slash_amount"`
+	JailDuration    time.Duration  `json:"jail_duration"`
 	Evidence        []EvidenceType `json:"evidence"`
-	AppealPeriod    time.Duration `json:"appeal_period"`
-	Enabled         bool          `json:"enabled"`
+	AppealPeriod    time.Duration  `json:"appeal_period"`
+	Enabled         bool           `json:"enabled"`
 }
 
 type OffenseType int
@@ -472,38 +472,38 @@ const (
 
 // TokenEconomics manages token supply and demand
 type TokenEconomics struct {
-	TokenSupply         *TokenSupplyModel
-	InflationModel      *InflationModel
-	BurnMechanisms      []*BurnMechanism
-	DemandDrivers       []*DemandDriver
-	VelocityModel       *VelocityModel
-	PriceStabilization  *PriceStabilizationMechanism
+	TokenSupply        *TokenSupplyModel
+	InflationModel     *InflationModel
+	BurnMechanisms     []*BurnMechanism
+	DemandDrivers      []*DemandDriver
+	VelocityModel      *VelocityModel
+	PriceStabilization *PriceStabilizationMechanism
 }
 
 type TokenSupplyModel struct {
-	InitialSupply   *big.Int      `json:"initial_supply"`
-	MaxSupply       *big.Int      `json:"max_supply"`
-	CurrentSupply   *big.Int      `json:"current_supply"`
-	EmissionRate    float64       `json:"emission_rate"`
+	InitialSupply    *big.Int        `json:"initial_supply"`
+	MaxSupply        *big.Int        `json:"max_supply"`
+	CurrentSupply    *big.Int        `json:"current_supply"`
+	EmissionRate     float64         `json:"emission_rate"`
 	EmissionSchedule []EmissionEvent `json:"emission_schedule"`
-	HalvingEvents   []time.Time   `json:"halving_events"`
+	HalvingEvents    []time.Time     `json:"halving_events"`
 }
 
 type EmissionEvent struct {
-	Height      int64     `json:"height"`
-	Amount      *big.Int  `json:"amount"`
-	Reason      string    `json:"reason"`
-	Timestamp   time.Time `json:"timestamp"`
+	Height    int64     `json:"height"`
+	Amount    *big.Int  `json:"amount"`
+	Reason    string    `json:"reason"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 type InflationModel struct {
-	Type            InflationType `json:"type"`
-	TargetRate      float64       `json:"target_rate"`
-	CurrentRate     float64       `json:"current_rate"`
-	AdjustmentRate  float64       `json:"adjustment_rate"`
-	BoundedRange    [2]float64    `json:"bounded_range"`
-	StakingImpact   float64       `json:"staking_impact"`
-	LastAdjustment  time.Time     `json:"last_adjustment"`
+	Type           InflationType `json:"type"`
+	TargetRate     float64       `json:"target_rate"`
+	CurrentRate    float64       `json:"current_rate"`
+	AdjustmentRate float64       `json:"adjustment_rate"`
+	BoundedRange   [2]float64    `json:"bounded_range"`
+	StakingImpact  float64       `json:"staking_impact"`
+	LastAdjustment time.Time     `json:"last_adjustment"`
 }
 
 type InflationType int
@@ -517,15 +517,15 @@ const (
 
 // PredictionMarket for forecasting mechanism outcomes
 type PredictionMarket struct {
-	ID              string                 `json:"id"`
-	Question        string                 `json:"question"`
-	Outcomes        []string               `json:"outcomes"`
-	Positions       map[string]*Position   `json:"positions"`
-	TotalVolume     *big.Int               `json:"total_volume"`
-	Resolution      *MarketResolution      `json:"resolution,omitempty"`
-	CreatedAt       time.Time              `json:"created_at"`
-	ExpiresAt       time.Time              `json:"expires_at"`
-	MarketMaker     *AutomatedMarketMaker  `json:"market_maker"`
+	ID          string                `json:"id"`
+	Question    string                `json:"question"`
+	Outcomes    []string              `json:"outcomes"`
+	Positions   map[string]*Position  `json:"positions"`
+	TotalVolume *big.Int              `json:"total_volume"`
+	Resolution  *MarketResolution     `json:"resolution,omitempty"`
+	CreatedAt   time.Time             `json:"created_at"`
+	ExpiresAt   time.Time             `json:"expires_at"`
+	MarketMaker *AutomatedMarketMaker `json:"market_maker"`
 }
 
 type Position struct {
@@ -537,19 +537,19 @@ type Position struct {
 }
 
 type MarketResolution struct {
-	WinningOutcome  string    `json:"winning_outcome"`
-	ResolvedAt      time.Time `json:"resolved_at"`
-	ResolverID      string    `json:"resolver_id"`
-	Evidence        []byte    `json:"evidence"`
-	Contested       bool      `json:"contested"`
+	WinningOutcome string    `json:"winning_outcome"`
+	ResolvedAt     time.Time `json:"resolved_at"`
+	ResolverID     string    `json:"resolver_id"`
+	Evidence       []byte    `json:"evidence"`
+	Contested      bool      `json:"contested"`
 }
 
 type AutomatedMarketMaker struct {
-	Type            AMMType             `json:"type"`
-	Parameters      map[string]float64  `json:"parameters"`
-	Liquidity       *big.Int            `json:"liquidity"`
-	Fee             float64             `json:"fee"`
-	LastUpdate      time.Time           `json:"last_update"`
+	Type       AMMType            `json:"type"`
+	Parameters map[string]float64 `json:"parameters"`
+	Liquidity  *big.Int           `json:"liquidity"`
+	Fee        float64            `json:"fee"`
+	LastUpdate time.Time          `json:"last_update"`
 }
 
 type AMMType int
@@ -572,28 +572,28 @@ type EconomicSimulator struct {
 }
 
 type SimulationScenario struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Players     []*Player              `json:"players"`
-	Environment *EnvironmentSettings   `json:"environment"`
-	Duration    time.Duration          `json:"duration"`
-	Events      []SimulationEvent      `json:"events"`
+	ID          string               `json:"id"`
+	Name        string               `json:"name"`
+	Players     []*Player            `json:"players"`
+	Environment *EnvironmentSettings `json:"environment"`
+	Duration    time.Duration        `json:"duration"`
+	Events      []SimulationEvent    `json:"events"`
 }
 
 type EnvironmentSettings struct {
-	NetworkSize     int                    `json:"network_size"`
-	ByzantineRatio  float64                `json:"byzantine_ratio"`
-	Latency         time.Duration          `json:"latency"`
-	PartitionRisk   float64                `json:"partition_risk"`
-	ExternalShocks  []ExternalShock        `json:"external_shocks"`
+	NetworkSize    int             `json:"network_size"`
+	ByzantineRatio float64         `json:"byzantine_ratio"`
+	Latency        time.Duration   `json:"latency"`
+	PartitionRisk  float64         `json:"partition_risk"`
+	ExternalShocks []ExternalShock `json:"external_shocks"`
 }
 
 type ExternalShock struct {
-	Type        ShockType `json:"type"`
-	Magnitude   float64   `json:"magnitude"`
-	Timing      time.Time `json:"timing"`
+	Type        ShockType     `json:"type"`
+	Magnitude   float64       `json:"magnitude"`
+	Timing      time.Time     `json:"timing"`
 	Duration    time.Duration `json:"duration"`
-	Probability float64   `json:"probability"`
+	Probability float64       `json:"probability"`
 }
 
 type ShockType int
@@ -607,10 +607,10 @@ const (
 )
 
 type SimulationEvent struct {
-	Time        time.Duration `json:"time"`
-	Type        EventType     `json:"type"`
+	Time        time.Duration          `json:"time"`
+	Type        EventType              `json:"type"`
 	Parameters  map[string]interface{} `json:"parameters"`
-	Probability float64       `json:"probability"`
+	Probability float64                `json:"probability"`
 }
 
 type EventType int
@@ -625,44 +625,44 @@ const (
 
 // EconomicMetrics tracks system economic health
 type EconomicMetrics struct {
-	DecentralizationIndex    float64            `json:"decentralization_index"`
-	StakingRatio            float64            `json:"staking_ratio"`
-	TokenVelocity           float64            `json:"token_velocity"`
-	RewardDistribution      *DistributionStats `json:"reward_distribution"`
-	ParticipationRate       float64            `json:"participation_rate"`
-	SecurityBudget          *big.Int           `json:"security_budget"`
-	AttackCost              *big.Int           `json:"attack_cost"`
-	NakamotoCoefficient     int                `json:"nakamoto_coefficient"`
-	HerfindalIndex          float64            `json:"herfindal_index"`
-	LastUpdated             time.Time          `json:"last_updated"`
+	DecentralizationIndex float64            `json:"decentralization_index"`
+	StakingRatio          float64            `json:"staking_ratio"`
+	TokenVelocity         float64            `json:"token_velocity"`
+	RewardDistribution    *DistributionStats `json:"reward_distribution"`
+	ParticipationRate     float64            `json:"participation_rate"`
+	SecurityBudget        *big.Int           `json:"security_budget"`
+	AttackCost            *big.Int           `json:"attack_cost"`
+	NakamotoCoefficient   int                `json:"nakamoto_coefficient"`
+	HerfindalIndex        float64            `json:"herfindal_index"`
+	LastUpdated           time.Time          `json:"last_updated"`
 }
 
 type DistributionStats struct {
-	Mean       float64 `json:"mean"`
-	Median     float64 `json:"median"`
-	StdDev     float64 `json:"std_dev"`
-	Gini       float64 `json:"gini_coefficient"`
+	Mean        float64         `json:"mean"`
+	Median      float64         `json:"median"`
+	StdDev      float64         `json:"std_dev"`
+	Gini        float64         `json:"gini_coefficient"`
 	Percentiles map[int]float64 `json:"percentiles"`
-	Entropy    float64 `json:"entropy"`
+	Entropy     float64         `json:"entropy"`
 }
 
 // NewEconomicMechanismEngine creates a new economic mechanism engine
 func NewEconomicMechanismEngine(config *EconomicConfig) *EconomicMechanismEngine {
 	return &EconomicMechanismEngine{
-		gameAnalyzer:         NewGameTheoreticAnalyzer(),
-		mechanismDesigner:    NewMechanismDesigner(),
-		equilibriumSolver:    NewEquilibriumSolver(),
-		auctionMechanisms:    make(map[string]*AuctionMechanism),
-		incentiveSchemes:     make(map[string]*IncentiveScheme),
-		rewardPools:          make(map[string]*RewardPool),
-		slashingRules:        make([]*SlashingRule, 0),
-		tokenEconomics:       NewTokenEconomics(),
-		predictionMarkets:    make(map[string]*PredictionMarket),
-		economicSimulator:    NewEconomicSimulator(),
-		economicMetrics:      &EconomicMetrics{},
-		behaviorTracker:      NewBehaviorTracker(),
-		config:              config,
-		stopCh:              make(chan struct{}),
+		gameAnalyzer:      NewGameTheoreticAnalyzer(),
+		mechanismDesigner: NewMechanismDesigner(),
+		equilibriumSolver: NewEquilibriumSolver(),
+		auctionMechanisms: make(map[string]*AuctionMechanism),
+		incentiveSchemes:  make(map[string]*IncentiveScheme),
+		rewardPools:       make(map[string]*RewardPool),
+		slashingRules:     make([]*SlashingRule, 0),
+		tokenEconomics:    NewTokenEconomics(),
+		predictionMarkets: make(map[string]*PredictionMarket),
+		economicSimulator: NewEconomicSimulator(),
+		economicMetrics:   &EconomicMetrics{},
+		behaviorTracker:   NewBehaviorTracker(),
+		config:            config,
+		stopCh:            make(chan struct{}),
 	}
 }
 
@@ -690,11 +690,11 @@ func (eme *EconomicMechanismEngine) Start(ctx context.Context) error {
 func (eme *EconomicMechanismEngine) Stop() {
 	eme.mu.Lock()
 	defer eme.mu.Unlock()
-	
+
 	if !eme.running {
 		return
 	}
-	
+
 	close(eme.stopCh)
 	eme.running = false
 }
@@ -706,7 +706,7 @@ func (eme *EconomicMechanismEngine) AnalyzeGameEquilibrium() (*EquilibriumState,
 
 	// Build current game representation
 	payoffMatrix := eme.gameAnalyzer.BuildPayoffMatrix()
-	
+
 	// Solve for Nash equilibrium
 	equilibrium, err := eme.equilibriumSolver.SolveNashEquilibrium(payoffMatrix)
 	if err != nil {
@@ -740,7 +740,7 @@ func (eme *EconomicMechanismEngine) OptimizeIncentiveScheme(objectives []DesignO
 // RunEconomicSimulation simulates economic outcomes under different scenarios
 func (eme *EconomicMechanismEngine) RunEconomicSimulation(scenarios []*SimulationScenario) ([]*SimulationResult, error) {
 	results := make([]*SimulationResult, 0)
-	
+
 	for _, scenario := range scenarios {
 		result, err := eme.economicSimulator.RunSimulation(scenario)
 		if err != nil {
@@ -748,7 +748,7 @@ func (eme *EconomicMechanismEngine) RunEconomicSimulation(scenarios []*Simulatio
 		}
 		results = append(results, result)
 	}
-	
+
 	return results, nil
 }
 
@@ -932,7 +932,7 @@ func (eme *EconomicMechanismEngine) calculateFairness(equilibrium *EquilibriumSt
 		payoffs = append(payoffs, payoff)
 	}
 	sort.Float64s(payoffs)
-	
+
 	// Return the minimum payoff as fairness measure
 	if len(payoffs) > 0 {
 		minPayoff := payoffs[0]
@@ -970,7 +970,7 @@ func (eme *EconomicMechanismEngine) validateIncentiveCompatibility(scheme *Incen
 func (eme *EconomicMechanismEngine) checkPlayerIncentiveCompatibility(player *Player, scheme *IncentiveScheme) bool {
 	// Verify that truthful strategy is optimal for the player
 	truthfulUtility := eme.calculateUtility(player, "truthful", scheme)
-	
+
 	// Check against other possible strategies
 	for _, strategy := range eme.gameAnalyzer.strategies[player.ID] {
 		strategyUtility := eme.calculateUtility(player, strategy.ID, scheme)
@@ -984,23 +984,23 @@ func (eme *EconomicMechanismEngine) checkPlayerIncentiveCompatibility(player *Pl
 func (eme *EconomicMechanismEngine) calculateUtility(player *Player, strategy string, scheme *IncentiveScheme) float64 {
 	// Calculate expected utility for player using given strategy
 	baseUtility := player.UtilityFunction.BaseUtility
-	
+
 	// Add reward component
 	rewardUtility := float64(scheme.BaseReward.Int64()) * player.UtilityFunction.RewardWeight
-	
+
 	// Add reputation component
 	reputationUtility := player.ReputationScore * player.UtilityFunction.ReputationWeight
-	
+
 	// Subtract risk penalty if applicable
 	riskPenalty := eme.calculateRiskPenalty(player, strategy)
-	
+
 	return baseUtility + rewardUtility + reputationUtility - riskPenalty
 }
 
 func (eme *EconomicMechanismEngine) calculateRiskPenalty(player *Player, strategy string) float64 {
 	// Calculate risk penalty based on strategy and player risk preference
 	baseRisk := 0.1 // Base risk level
-	
+
 	switch player.RiskPreference {
 	case RiskPreferenceAverse:
 		return baseRisk * 2.0 * player.UtilityFunction.RiskPenalty
@@ -1009,7 +1009,7 @@ func (eme *EconomicMechanismEngine) calculateRiskPenalty(player *Player, strateg
 	case RiskPreferenceSeeking:
 		return baseRisk * 0.5 * player.UtilityFunction.RiskPenalty
 	}
-	
+
 	return baseRisk * player.UtilityFunction.RiskPenalty
 }
 
@@ -1017,7 +1017,7 @@ func (eme *EconomicMechanismEngine) updatePlayerStrategy(player *Player) {
 	// Update player strategy based on learning from historical outcomes
 	recentActions := eme.getRecentActions(player, 10)
 	avgPayoff := eme.calculateAveragePayoff(recentActions)
-	
+
 	// Adjust strategy if performance is below expectations
 	if avgPayoff < player.UtilityFunction.BaseUtility {
 		eme.exploreNewStrategy(player)
@@ -1035,7 +1035,7 @@ func (eme *EconomicMechanismEngine) calculateAveragePayoff(actions []ActionHisto
 	if len(actions) == 0 {
 		return 0.0
 	}
-	
+
 	total := 0.0
 	for _, action := range actions {
 		total += action.Payoff
@@ -1059,16 +1059,16 @@ func (eme *EconomicMechanismEngine) calculateDecentralizationIndex() float64 {
 	// Calculate decentralization using entropy of stake distribution
 	totalStake := big.NewInt(0)
 	stakes := make([]*big.Int, 0)
-	
+
 	for _, player := range eme.gameAnalyzer.players {
 		stakes = append(stakes, player.Stake)
 		totalStake.Add(totalStake, player.Stake)
 	}
-	
+
 	if totalStake.Cmp(big.NewInt(0)) == 0 {
 		return 0.0
 	}
-	
+
 	entropy := 0.0
 	for _, stake := range stakes {
 		if stake.Cmp(big.NewInt(0)) > 0 {
@@ -1080,7 +1080,7 @@ func (eme *EconomicMechanismEngine) calculateDecentralizationIndex() float64 {
 			}
 		}
 	}
-	
+
 	maxEntropy := math.Log2(float64(len(stakes)))
 	if maxEntropy > 0 {
 		return entropy / maxEntropy
@@ -1094,27 +1094,27 @@ func (eme *EconomicMechanismEngine) calculateNakamotoCoefficient() int {
 	for _, player := range eme.gameAnalyzer.players {
 		stakes = append(stakes, player.Stake)
 	}
-	
+
 	// Sort stakes in descending order
 	sort.Slice(stakes, func(i, j int) bool {
 		return stakes[i].Cmp(stakes[j]) > 0
 	})
-	
+
 	totalStake := big.NewInt(0)
 	for _, stake := range stakes {
 		totalStake.Add(totalStake, stake)
 	}
-	
+
 	halfStake := new(big.Int).Div(totalStake, big.NewInt(2))
 	accumulatedStake := big.NewInt(0)
-	
+
 	for i, stake := range stakes {
 		accumulatedStake.Add(accumulatedStake, stake)
 		if accumulatedStake.Cmp(halfStake) > 0 {
 			return i + 1
 		}
 	}
-	
+
 	return len(stakes)
 }
 
@@ -1124,21 +1124,21 @@ func (eme *EconomicMechanismEngine) calculateHerfindalIndex() float64 {
 	for _, player := range eme.gameAnalyzer.players {
 		totalStake.Add(totalStake, player.Stake)
 	}
-	
+
 	if totalStake.Cmp(big.NewInt(0)) == 0 {
 		return 0.0
 	}
-	
+
 	hhi := 0.0
 	totalStakeFloat := new(big.Float).SetInt(totalStake)
-	
+
 	for _, player := range eme.gameAnalyzer.players {
 		ratio := new(big.Float).SetInt(player.Stake)
 		ratio.Quo(ratio, totalStakeFloat)
 		ratioFloat, _ := ratio.Float64()
 		hhi += ratioFloat * ratioFloat
 	}
-	
+
 	return hhi
 }
 
@@ -1153,12 +1153,12 @@ func (eme *EconomicMechanismEngine) calculateParticipationRate() float64 {
 			}
 		}
 	}
-	
+
 	totalPlayers := len(eme.gameAnalyzer.players)
 	if totalPlayers == 0 {
 		return 0.0
 	}
-	
+
 	return float64(activeCount) / float64(totalPlayers)
 }
 
@@ -1168,16 +1168,16 @@ func (eme *EconomicMechanismEngine) calculateStakingRatio() float64 {
 	for _, player := range eme.gameAnalyzer.players {
 		totalStaked.Add(totalStaked, player.Stake)
 	}
-	
+
 	totalSupply := eme.tokenEconomics.TokenSupply.CurrentSupply
 	if totalSupply.Cmp(big.NewInt(0)) == 0 {
 		return 0.0
 	}
-	
+
 	ratio := new(big.Float).SetInt(totalStaked)
 	ratio.Quo(ratio, new(big.Float).SetInt(totalSupply))
 	ratioFloat, _ := ratio.Float64()
-	
+
 	return ratioFloat
 }
 
@@ -1192,32 +1192,32 @@ func (eme *EconomicMechanismEngine) calculateAttackCost() *big.Int {
 	for _, player := range eme.gameAnalyzer.players {
 		stakes = append(stakes, player.Stake)
 	}
-	
+
 	// Sort stakes in descending order
 	sort.Slice(stakes, func(i, j int) bool {
 		return stakes[i].Cmp(stakes[j]) > 0
 	})
-	
+
 	totalStake := big.NewInt(0)
 	for _, stake := range stakes {
 		totalStake.Add(totalStake, stake)
 	}
-	
+
 	// Cost to acquire 51% of stake
 	targetStake := new(big.Int).Mul(totalStake, big.NewInt(51))
 	targetStake.Div(targetStake, big.NewInt(100))
-	
+
 	return targetStake
 }
 
 func (eme *EconomicMechanismEngine) calculateSecurityBudget() *big.Int {
 	// Calculate total security budget (rewards + fees)
 	totalBudget := big.NewInt(0)
-	
+
 	for _, pool := range eme.rewardPools {
 		totalBudget.Add(totalBudget, pool.TotalRewards)
 	}
-	
+
 	return totalBudget
 }
 
@@ -1229,14 +1229,14 @@ func (eme *EconomicMechanismEngine) generateMarketID() string {
 func (eme *EconomicMechanismEngine) GetEconomicMetrics() *EconomicMetrics {
 	eme.mu.RLock()
 	defer eme.mu.RUnlock()
-	
+
 	return eme.economicMetrics
 }
 
 func (eme *EconomicMechanismEngine) GetCurrentEquilibrium() *EquilibriumState {
 	eme.mu.RLock()
 	defer eme.mu.RUnlock()
-	
+
 	if len(eme.gameAnalyzer.equilibriumHistory) > 0 {
 		return &eme.gameAnalyzer.equilibriumHistory[len(eme.gameAnalyzer.equilibriumHistory)-1]
 	}
@@ -1246,14 +1246,14 @@ func (eme *EconomicMechanismEngine) GetCurrentEquilibrium() *EquilibriumState {
 func (eme *EconomicMechanismEngine) ExportEconomicData() ([]byte, error) {
 	eme.mu.RLock()
 	defer eme.mu.RUnlock()
-	
+
 	exportData := struct {
-		Metrics     *EconomicMetrics    `json:"metrics"`
-		Equilibrium *EquilibriumState   `json:"current_equilibrium"`
-		Players     []*Player           `json:"players"`
-		Schemes     map[string]*IncentiveScheme `json:"incentive_schemes"`
+		Metrics     *EconomicMetrics             `json:"metrics"`
+		Equilibrium *EquilibriumState            `json:"current_equilibrium"`
+		Players     []*Player                    `json:"players"`
+		Schemes     map[string]*IncentiveScheme  `json:"incentive_schemes"`
 		Markets     map[string]*PredictionMarket `json:"prediction_markets"`
-		Timestamp   time.Time           `json:"timestamp"`
+		Timestamp   time.Time                    `json:"timestamp"`
 	}{
 		Metrics:     eme.economicMetrics,
 		Equilibrium: eme.GetCurrentEquilibrium(),
@@ -1262,7 +1262,7 @@ func (eme *EconomicMechanismEngine) ExportEconomicData() ([]byte, error) {
 		Markets:     eme.predictionMarkets,
 		Timestamp:   time.Now(),
 	}
-	
+
 	return json.MarshalIndent(exportData, "", "  ")
 }
 
@@ -1287,18 +1287,18 @@ type BehaviorTracker struct {
 }
 
 type BehaviorPattern struct {
-	PlayerType    PlayerType `json:"player_type"`
+	PlayerType    PlayerType   `json:"player_type"`
 	CommonActions []ActionType `json:"common_actions"`
-	Frequency     float64    `json:"frequency"`
+	Frequency     float64      `json:"frequency"`
 }
 
 type SimulationResult struct {
-	ScenarioID     string              `json:"scenario_id"`
-	Outcome        map[string]float64  `json:"outcome"`
-	Efficiency     float64             `json:"efficiency"`
-	Stability      float64             `json:"stability"`
-	WelfareMetrics *DistributionStats  `json:"welfare_metrics"`
-	Duration       time.Duration       `json:"duration"`
+	ScenarioID     string             `json:"scenario_id"`
+	Outcome        map[string]float64 `json:"outcome"`
+	Efficiency     float64            `json:"efficiency"`
+	Stability      float64            `json:"stability"`
+	WelfareMetrics *DistributionStats `json:"welfare_metrics"`
+	Duration       time.Duration      `json:"duration"`
 }
 
 type SimulationParameters struct {
@@ -1309,9 +1309,9 @@ type SimulationParameters struct {
 }
 
 type OptimizationEngine struct {
-	algorithm    OptimizationAlgorithm
-	constraints  []OptimizationConstraint
-	variables    []OptimizationVariable
+	algorithm   OptimizationAlgorithm
+	constraints []OptimizationConstraint
+	variables   []OptimizationVariable
 }
 
 type OptimizationAlgorithm int
@@ -1324,7 +1324,7 @@ const (
 )
 
 type OptimizationConstraint struct {
-	Name     string  `json:"name"`
+	Name     string `json:"name"`
 	Function func([]float64) bool
 	Penalty  float64 `json:"penalty"`
 }
@@ -1339,19 +1339,19 @@ type OptimizationVariable struct {
 // Constructor functions (placeholder implementations)
 func NewGameTheoreticAnalyzer() *GameTheoreticAnalyzer {
 	return &GameTheoreticAnalyzer{
-		players:         make(map[string]*Player),
-		strategies:      make(map[string][]*Strategy),
-		payoffMatrices:  make(map[string]*PayoffMatrix),
-		gameTypes:       make(map[string]GameType),
+		players:            make(map[string]*Player),
+		strategies:         make(map[string][]*Strategy),
+		payoffMatrices:     make(map[string]*PayoffMatrix),
+		gameTypes:          make(map[string]GameType),
 		equilibriumHistory: make([]EquilibriumState, 0),
 	}
 }
 
 func NewMechanismDesigner() *MechanismDesigner {
 	return &MechanismDesigner{
-		objectives:       make([]DesignObjective, 0),
-		constraints:      make([]DesignConstraint, 0),
-		mechanismLibrary: make(map[string]*MechanismTemplate),
+		objectives:         make([]DesignObjective, 0),
+		constraints:        make([]DesignConstraint, 0),
+		mechanismLibrary:   make(map[string]*MechanismTemplate),
 		optimizationEngine: &OptimizationEngine{},
 	}
 }
@@ -1380,11 +1380,11 @@ func NewTokenEconomics() *TokenEconomics {
 
 func NewEconomicSimulator() *EconomicSimulator {
 	return &EconomicSimulator{
-		scenarios:      make([]*SimulationScenario, 0),
-		results:        make([]*SimulationResult, 0),
-		parameters:     &SimulationParameters{Iterations: 1000},
-		randomSeed:     time.Now().UnixNano(),
-		iterations:     1000,
+		scenarios:       make([]*SimulationScenario, 0),
+		results:         make([]*SimulationResult, 0),
+		parameters:      &SimulationParameters{Iterations: 1000},
+		randomSeed:      time.Now().UnixNano(),
+		iterations:      1000,
 		parallelization: true,
 	}
 }
@@ -1413,24 +1413,24 @@ func (gta *GameTheoreticAnalyzer) UpdatePayoffMatrices() {
 func (es *EquilibriumSolver) SolveNashEquilibrium(matrix *PayoffMatrix) (*EquilibriumState, error) {
 	// Simplified Nash equilibrium computation
 	return &EquilibriumState{
-		Type:          EquilibriumTypeNash,
-		Strategies:    map[string]string{"player1": "cooperate", "player2": "cooperate"},
-		Payoffs:       map[string]float64{"player1": 3.0, "player2": 3.0},
-		Stability:     0.8,
-		ComputedAt:    time.Now(),
+		Type:       EquilibriumTypeNash,
+		Strategies: map[string]string{"player1": "cooperate", "player2": "cooperate"},
+		Payoffs:    map[string]float64{"player1": 3.0, "player2": 3.0},
+		Stability:  0.8,
+		ComputedAt: time.Now(),
 	}, nil
 }
 
 func (md *MechanismDesigner) OptimizeIncentives(objectives []DesignObjective, players map[string]*Player) (*IncentiveScheme, error) {
 	// Simplified incentive optimization
 	return &IncentiveScheme{
-		ID:                 "optimized-scheme",
-		Name:               "Optimized Incentive Scheme",
-		Type:               IncentiveTypeProgressive,
-		BaseReward:         big.NewInt(100),
+		ID:                    "optimized-scheme",
+		Name:                  "Optimized Incentive Scheme",
+		Type:                  IncentiveTypeProgressive,
+		BaseReward:            big.NewInt(100),
 		PerformanceMultiplier: 1.5,
-		VestingPeriod:      30 * 24 * time.Hour,
-		DecayRate:          0.01,
+		VestingPeriod:         30 * 24 * time.Hour,
+		DecayRate:             0.01,
 	}, nil
 }
 
@@ -1457,16 +1457,16 @@ func (bt *BehaviorTracker) analyzePlayerBehavior(player *Player) {
 }
 
 type MechanismTemplate struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	Parameters  map[string]interface{} `json:"parameters"`
+	ID         string                 `json:"id"`
+	Name       string                 `json:"name"`
+	Type       string                 `json:"type"`
+	Parameters map[string]interface{} `json:"parameters"`
 }
 
 type MechanismTest struct {
-	Name        string `json:"name"`
+	Name         string `json:"name"`
 	TestFunction func(*IncentiveScheme) bool
-	Weight      float64 `json:"weight"`
+	Weight       float64 `json:"weight"`
 }
 
 type DominanceAnalyzer struct {
@@ -1475,9 +1475,9 @@ type DominanceAnalyzer struct {
 }
 
 type NashEquilibriumSolver struct {
-	tolerance   float64
-	maxIters    int
-	algorithm   string
+	tolerance float64
+	maxIters  int
+	algorithm string
 }
 
 type BayesianNashSolver struct {
@@ -1497,37 +1497,37 @@ type CorrelatedEquilibriumSolver struct {
 }
 
 type FeeStructure struct {
-	BaseFee         *big.Int               `json:"base_fee"`
-	PriorityFee     *big.Int               `json:"priority_fee"`
-	DynamicPricing  bool                   `json:"dynamic_pricing"`
-	FeeDistribution map[string]float64     `json:"fee_distribution"`
+	BaseFee         *big.Int           `json:"base_fee"`
+	PriorityFee     *big.Int           `json:"priority_fee"`
+	DynamicPricing  bool               `json:"dynamic_pricing"`
+	FeeDistribution map[string]float64 `json:"fee_distribution"`
 }
 
 type GovernanceModel struct {
-	ProposalThreshold   *big.Int    `json:"proposal_threshold"`
-	QuorumRequirement   float64     `json:"quorum_requirement"`
+	ProposalThreshold   *big.Int      `json:"proposal_threshold"`
+	QuorumRequirement   float64       `json:"quorum_requirement"`
 	VotingPeriod        time.Duration `json:"voting_period"`
 	ImplementationDelay time.Duration `json:"implementation_delay"`
 }
 
 type LiquidityMiningProgram struct {
-	TotalRewards    *big.Int      `json:"total_rewards"`
-	Duration        time.Duration `json:"duration"`
-	PoolWeights     map[string]float64 `json:"pool_weights"`
-	EmissionSchedule []EmissionEvent `json:"emission_schedule"`
+	TotalRewards     *big.Int           `json:"total_rewards"`
+	Duration         time.Duration      `json:"duration"`
+	PoolWeights      map[string]float64 `json:"pool_weights"`
+	EmissionSchedule []EmissionEvent    `json:"emission_schedule"`
 }
 
 type StakingMechanics struct {
-	MinStakeAmount   *big.Int      `json:"min_stake_amount"`
-	UnbondingPeriod  time.Duration `json:"unbonding_period"`
-	SlashingEnabled  bool          `json:"slashing_enabled"`
-	RewardRate       float64       `json:"reward_rate"`
+	MinStakeAmount  *big.Int      `json:"min_stake_amount"`
+	UnbondingPeriod time.Duration `json:"unbonding_period"`
+	SlashingEnabled bool          `json:"slashing_enabled"`
+	RewardRate      float64       `json:"reward_rate"`
 }
 
 type ReputationMarket struct {
-	TotalVolume     *big.Int                       `json:"total_volume"`
-	Participants    map[string]*ReputationTrader   `json:"participants"`
-	PriceOracle     *ReputationOracle              `json:"price_oracle"`
+	TotalVolume  *big.Int                     `json:"total_volume"`
+	Participants map[string]*ReputationTrader `json:"participants"`
+	PriceOracle  *ReputationOracle            `json:"price_oracle"`
 }
 
 type ReputationTrader struct {
@@ -1544,37 +1544,37 @@ type ReputationOracle struct {
 }
 
 type CodeQualityMarket struct {
-	QualityContracts map[string]*QualityContract `json:"quality_contracts"`
-	Assessors        []string                    `json:"assessors"`
+	QualityContracts  map[string]*QualityContract `json:"quality_contracts"`
+	Assessors         []string                    `json:"assessors"`
 	DisputeResolution *DisputeResolutionMechanism `json:"dispute_resolution"`
 }
 
 type QualityContract struct {
-	CodeHash        []byte    `json:"code_hash"`
-	QualityScore    float64   `json:"quality_score"`
-	Stakes          *big.Int  `json:"stakes"`
-	ExpirationTime  time.Time `json:"expiration_time"`
+	CodeHash       []byte    `json:"code_hash"`
+	QualityScore   float64   `json:"quality_score"`
+	Stakes         *big.Int  `json:"stakes"`
+	ExpirationTime time.Time `json:"expiration_time"`
 }
 
 type DisputeResolutionMechanism struct {
-	Arbitrators     []string      `json:"arbitrators"`
-	DisputeFee      *big.Int      `json:"dispute_fee"`
-	ResolutionTime  time.Duration `json:"resolution_time"`
+	Arbitrators    []string      `json:"arbitrators"`
+	DisputeFee     *big.Int      `json:"dispute_fee"`
+	ResolutionTime time.Duration `json:"resolution_time"`
 }
 
 type GameTreeAnalyzer struct {
-	gameTree        *GameTreeNode
-	solutionConcept SolutionConcept
+	gameTree          *GameTreeNode
+	solutionConcept   SolutionConcept
 	backwardInduction bool
 }
 
 type GameTreeNode struct {
-	ID          string            `json:"id"`
-	Player      string            `json:"player"`
-	Actions     []string          `json:"actions"`
-	Children    []*GameTreeNode   `json:"children"`
+	ID          string             `json:"id"`
+	Player      string             `json:"player"`
+	Actions     []string           `json:"actions"`
+	Children    []*GameTreeNode    `json:"children"`
 	Payoffs     map[string]float64 `json:"payoffs"`
-	Probability float64           `json:"probability"`
+	Probability float64            `json:"probability"`
 }
 
 type SolutionConcept int
@@ -1587,8 +1587,8 @@ const (
 )
 
 type SocialChoiceAnalyzer struct {
-	votingMethods   []VotingMethod
-	preferenceProfiles []PreferenceProfile
+	votingMethods         []VotingMethod
+	preferenceProfiles    []PreferenceProfile
 	socialWelfareFunction SocialWelfareFunction
 }
 
@@ -1603,8 +1603,8 @@ const (
 )
 
 type PreferenceProfile struct {
-	Voter       string   `json:"voter"`
-	Preferences []string `json:"preferences"`
+	Voter       string    `json:"voter"`
+	Preferences []string  `json:"preferences"`
 	Weights     []float64 `json:"weights"`
 }
 
@@ -1618,10 +1618,10 @@ const (
 )
 
 type ByzantineGameModel struct {
-	byzantineRatio      float64
-	adversaryTypes      []AdversaryType
-	attackStrategies    []AttackStrategy
-	defenseMechanisms   []DefenseMechanism
+	byzantineRatio    float64
+	adversaryTypes    []AdversaryType
+	attackStrategies  []AttackStrategy
+	defenseMechanisms []DefenseMechanism
 }
 
 type AdversaryType int
@@ -1634,12 +1634,12 @@ const (
 )
 
 type AttackStrategy struct {
-	Name            string    `json:"name"`
-	Type            AttackType `json:"type"`
-	Cost            *big.Int  `json:"cost"`
-	ExpectedGain    *big.Int  `json:"expected_gain"`
-	SuccessRate     float64   `json:"success_rate"`
-	DetectionRate   float64   `json:"detection_rate"`
+	Name          string     `json:"name"`
+	Type          AttackType `json:"type"`
+	Cost          *big.Int   `json:"cost"`
+	ExpectedGain  *big.Int   `json:"expected_gain"`
+	SuccessRate   float64    `json:"success_rate"`
+	DetectionRate float64    `json:"detection_rate"`
 }
 
 type AttackType int
@@ -1653,63 +1653,63 @@ const (
 )
 
 type DefenseMechanism struct {
-	Name            string    `json:"name"`
-	Effectiveness   float64   `json:"effectiveness"`
-	Cost            *big.Int  `json:"cost"`
-	ActivationTime  time.Duration `json:"activation_time"`
+	Name           string        `json:"name"`
+	Effectiveness  float64       `json:"effectiveness"`
+	Cost           *big.Int      `json:"cost"`
+	ActivationTime time.Duration `json:"activation_time"`
 }
 
 type FairnessMetrics struct {
-	GiniCoefficient     float64 `json:"gini_coefficient"`
-	TheilIndex          float64 `json:"theil_index"`
-	AtkinsonIndex       float64 `json:"atkinson_index"`
-	PalmaRatio          float64 `json:"palma_ratio"`
-	InterquartileRange  float64 `json:"interquartile_range"`
+	GiniCoefficient    float64 `json:"gini_coefficient"`
+	TheilIndex         float64 `json:"theil_index"`
+	AtkinsonIndex      float64 `json:"atkinson_index"`
+	PalmaRatio         float64 `json:"palma_ratio"`
+	InterquartileRange float64 `json:"interquartile_range"`
 }
 
 type AttackCostAnalyzer struct {
-	attackVectors       []AttackVector
-	costModels          map[string]*CostModel
-	riskAssessments     map[string]*RiskAssessment
+	attackVectors   []AttackVector
+	costModels      map[string]*CostModel
+	riskAssessments map[string]*RiskAssessment
 }
 
 type AttackVector struct {
-	Name            string        `json:"name"`
-	Type            AttackType    `json:"type"`
-	MinimumCost     *big.Int      `json:"minimum_cost"`
-	ExpectedReturn  *big.Int      `json:"expected_return"`
-	TimeHorizon     time.Duration `json:"time_horizon"`
-	Complexity      int           `json:"complexity"`
+	Name           string        `json:"name"`
+	Type           AttackType    `json:"type"`
+	MinimumCost    *big.Int      `json:"minimum_cost"`
+	ExpectedReturn *big.Int      `json:"expected_return"`
+	TimeHorizon    time.Duration `json:"time_horizon"`
+	Complexity     int           `json:"complexity"`
 }
 
 type CostModel struct {
-	Fixed           *big.Int  `json:"fixed_cost"`
-	Variable        *big.Int  `json:"variable_cost"`
-	Marginal        *big.Int  `json:"marginal_cost"`
-	OpportunityCost *big.Int  `json:"opportunity_cost"`
+	Fixed           *big.Int `json:"fixed_cost"`
+	Variable        *big.Int `json:"variable_cost"`
+	Marginal        *big.Int `json:"marginal_cost"`
+	OpportunityCost *big.Int `json:"opportunity_cost"`
 }
 
 type RiskAssessment struct {
-	Probability     float64   `json:"probability"`
-	Impact          float64   `json:"impact"`
-	Mitigation      float64   `json:"mitigation"`
-	ResidualRisk    float64   `json:"residual_risk"`
-	LastUpdated     time.Time `json:"last_updated"`
+	Probability  float64   `json:"probability"`
+	Impact       float64   `json:"impact"`
+	Mitigation   float64   `json:"mitigation"`
+	ResidualRisk float64   `json:"residual_risk"`
+	LastUpdated  time.Time `json:"last_updated"`
 }
 
 type BurnMechanism struct {
-	Trigger         string    `json:"trigger"`
-	Rate            float64   `json:"rate"`
-	MaxAmount       *big.Int  `json:"max_amount"`
-	Frequency       time.Duration `json:"frequency"`
-	LastBurn        time.Time `json:"last_burn"`
+	Trigger   string        `json:"trigger"`
+	Rate      float64       `json:"rate"`
+	MaxAmount *big.Int      `json:"max_amount"`
+	Frequency time.Duration `json:"frequency"`
+	LastBurn  time.Time     `json:"last_burn"`
 }
 
 type DemandDriver struct {
-	Name            string    `json:"name"`
+	Name            string     `json:"name"`
 	Type            DemandType `json:"type"`
-	ElasticityCoeff float64   `json:"elasticity_coefficient"`
-	Impact          float64   `json:"impact"`
+	ElasticityCoeff float64    `json:"elasticity_coefficient"`
+	Impact          float64    `json:"impact"`
 }
 
 type DemandType int
@@ -1722,10 +1722,10 @@ const (
 )
 
 type VelocityModel struct {
-	CurrentVelocity float64   `json:"current_velocity"`
-	TargetVelocity  float64   `json:"target_velocity"`
+	CurrentVelocity float64          `json:"current_velocity"`
+	TargetVelocity  float64          `json:"target_velocity"`
 	Factors         []VelocityFactor `json:"factors"`
-	LastCalculated  time.Time `json:"last_calculated"`
+	LastCalculated  time.Time        `json:"last_calculated"`
 }
 
 type VelocityFactor struct {
@@ -1736,10 +1736,10 @@ type VelocityFactor struct {
 
 type PriceStabilizationMechanism struct {
 	Type                StabilizationType `json:"type"`
-	TargetPrice         *big.Int         `json:"target_price"`
-	ToleranceBand       float64          `json:"tolerance_band"`
-	InterventionTrigger float64          `json:"intervention_trigger"`
-	ReservePool         *big.Int         `json:"reserve_pool"`
+	TargetPrice         *big.Int          `json:"target_price"`
+	ToleranceBand       float64           `json:"tolerance_band"`
+	InterventionTrigger float64           `json:"intervention_trigger"`
+	ReservePool         *big.Int          `json:"reserve_pool"`
 }
 
 type StabilizationType int

@@ -23,7 +23,7 @@ func NewSigner() (*Signer, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate keys: %w", err)
 	}
-	
+
 	return &Signer{
 		privateKey: priv,
 		publicKey:  pub,
@@ -36,10 +36,10 @@ func NewSignerFromSeed(seed []byte) (*Signer, error) {
 	if len(seed) < 32 {
 		return nil, errors.New("seed must be at least 32 bytes")
 	}
-	
+
 	priv := ed25519.NewKeyFromSeed(seed[:32])
 	pub := priv.Public().(ed25519.PublicKey)
-	
+
 	return &Signer{
 		privateKey: priv,
 		publicKey:  pub,
@@ -52,7 +52,7 @@ func (s *Signer) Sign(message []byte) ([]byte, error) {
 	if s.privateKey == nil {
 		return nil, errors.New("private key not set")
 	}
-	
+
 	signature := ed25519.Sign(s.privateKey, message)
 	return signature, nil
 }
@@ -101,7 +101,7 @@ func (m *MultiSignature) AddSignature(signer *Signer) error {
 	if err != nil {
 		return err
 	}
-	
+
 	m.Signatures[signer.GetAddress()] = sig
 	return nil
 }
@@ -109,18 +109,18 @@ func (m *MultiSignature) AddSignature(signer *Signer) error {
 // Verify checks if we have enough valid signatures
 func (m *MultiSignature) Verify(signers map[string]ed25519.PublicKey) bool {
 	validCount := 0
-	
+
 	for address, sig := range m.Signatures {
 		pubKey, exists := signers[address]
 		if !exists {
 			continue
 		}
-		
+
 		if ed25519.Verify(pubKey, m.Message, sig) {
 			validCount++
 		}
 	}
-	
+
 	return validCount >= m.Threshold
 }
 
@@ -148,7 +148,7 @@ func NewSignedMessage(signer *Signer, message []byte) (*SignedMessage, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &SignedMessage{
 		Message:   message,
 		Signature: sig,
@@ -184,7 +184,7 @@ func (a *AggregateSignature) AddSigner(signer *Signer) error {
 	if err != nil {
 		return err
 	}
-	
+
 	a.Signers = append(a.Signers, signer.GetPublicKey())
 	a.Signatures = append(a.Signatures, sig)
 	return nil
@@ -195,13 +195,13 @@ func (a *AggregateSignature) Verify() bool {
 	if len(a.Signers) != len(a.Signatures) {
 		return false
 	}
-	
+
 	for i, pubKey := range a.Signers {
 		if !ed25519.Verify(pubKey, a.Message, a.Signatures[i]) {
 			return false
 		}
 	}
-	
+
 	return true
 }
 
@@ -239,13 +239,13 @@ func (t *ThresholdSigner) AddShare(index int, signer *Signer) error {
 	if err != nil {
 		return err
 	}
-	
+
 	t.shares[index] = &SignatureShare{
 		Index:     index,
 		Share:     sig,
 		PublicKey: signer.GetPublicKey(),
 	}
-	
+
 	return nil
 }
 
@@ -260,7 +260,7 @@ func (t *ThresholdSigner) CombineShares() ([]byte, error) {
 	if !t.HasThreshold() {
 		return nil, errors.New("insufficient shares")
 	}
-	
+
 	// Simplified: just concatenate first threshold signatures
 	// Real implementation would use Shamir secret sharing or BLS
 	combined := make([]byte, 0)
@@ -272,7 +272,7 @@ func (t *ThresholdSigner) CombineShares() ([]byte, error) {
 		combined = append(combined, share.Share...)
 		count++
 	}
-	
+
 	return combined, nil
 }
 
@@ -334,7 +334,7 @@ func (r *RingSignature) Sign(signer *Signer) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Include ring position (simplified)
 	for i, pubKey := range r.ring {
 		if string(pubKey) == string(signer.GetPublicKey()) {
@@ -342,7 +342,7 @@ func (r *RingSignature) Sign(signer *Signer) ([]byte, error) {
 			break
 		}
 	}
-	
+
 	return sig, nil
 }
 
@@ -351,13 +351,13 @@ func (r *RingSignature) Verify(signature []byte) bool {
 	if len(signature) < 65 {
 		return false
 	}
-	
+
 	// Extract ring position
 	position := int(signature[0])
 	if position >= len(r.ring) {
 		return false
 	}
-	
+
 	// Verify with public key at position
 	actualSig := signature[1:]
 	return ed25519.Verify(r.ring[position], r.message, actualSig)

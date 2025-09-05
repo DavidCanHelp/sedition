@@ -42,11 +42,11 @@ type ValidatorState struct {
 
 // NetworkState represents the overall network state
 type NetworkState struct {
-	Height          uint64
-	TotalStake      uint64
+	Height           uint64
+	TotalStake       uint64
 	ActiveValidators int
 	QualityThreshold float64
-	SlashingRate    float64
+	SlashingRate     float64
 }
 
 // ProofOfContribution is the main consensus struct
@@ -58,7 +58,7 @@ type ProofOfContribution struct {
 func NewProofOfContribution() *ProofOfContribution {
 	minStake := new(big.Int)
 	minStake.SetString("1000000000000000000", 10) // 1 token minimum
-	
+
 	engine := &ConsensusEngine{
 		validators:        make(map[string]*Validator),
 		qualityAnalyzer:   NewQualityAnalyzer(),
@@ -71,14 +71,14 @@ func NewProofOfContribution() *ProofOfContribution {
 		lastBlockTime:     time.Now(),
 		proposerHistory:   make([]string, 0),
 	}
-	
+
 	return &ProofOfContribution{engine: engine}
 }
 
 // RegisterValidator adds a validator to the consensus
 func (poc *ProofOfContribution) RegisterValidator(state *ValidatorState) {
 	stake := new(big.Int).SetUint64(state.Stake)
-	
+
 	validator := &Validator{
 		Address:          state.Address,
 		TokenStake:       stake,
@@ -89,7 +89,7 @@ func (poc *ProofOfContribution) RegisterValidator(state *ValidatorState) {
 		SlashingHistory:  state.SlashingHistory,
 		IsActive:         true,
 	}
-	
+
 	poc.engine.validators[state.Address] = validator
 }
 
@@ -108,19 +108,19 @@ func (poc *ProofOfContribution) CalculateTotalStake(state *ValidatorState) uint6
 	if !exists {
 		return 0
 	}
-	
+
 	// Calculate stake manually
 	repMultiplier := validator.ReputationScore / 10.0
 	if repMultiplier < 0.1 {
 		repMultiplier = 0.1
 	}
-	
+
 	contribBonus := 1.0 + (state.RecentContributions / 200.0)
-	
+
 	baseStake := new(big.Float).SetInt(validator.TokenStake)
 	totalStake := new(big.Float).Mul(baseStake, big.NewFloat(repMultiplier))
 	totalStake = new(big.Float).Mul(totalStake, big.NewFloat(contribBonus))
-	
+
 	result, _ := totalStake.Uint64()
 	return result
 }
@@ -135,18 +135,18 @@ func (poc *ProofOfContribution) ProcessBlock(block *Block) error {
 		}
 		avgQuality /= float64(len(block.Commits))
 	}
-	
+
 	// Validate block quality
 	if avgQuality < 30 {
 		return errors.New("block quality too low")
 	}
-	
+
 	// Update validator metrics based on block
 	if proposer, exists := poc.engine.validators[block.Proposer]; exists {
 		// Reward good behavior
 		proposer.ReputationScore = math.Min(10, proposer.ReputationScore*1.01)
 	}
-	
+
 	return nil
 }
 
