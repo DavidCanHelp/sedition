@@ -21,27 +21,27 @@ import (
 	"github.com/davidcanhelp/sedition/crypto"
 )
 
-// MessageType defines the type of P2P message
-type MessageType uint8
+// LegacyMessageType defines the type of P2P message (deprecated)
+type LegacyMessageType uint8
 
 const (
-	MessageTypeHandshake MessageType = iota
-	MessageTypePing
-	MessageTypePong
-	MessageTypeBlockProposal
-	MessageTypeBlockVote
-	MessageTypeBlockRequest
-	MessageTypeBlockResponse
-	MessageTypeCommitAnnounce
-	MessageTypePeerRequest
-	MessageTypePeerResponse
-	MessageTypeStateSync
-	MessageTypeConsensusMessage
+	LegacyMessageTypeHandshake LegacyMessageType = iota
+	LegacyMessageTypePing
+	LegacyMessageTypePong
+	LegacyMessageTypeBlockProposal
+	LegacyMessageTypeBlockVote
+	LegacyMessageTypeBlockRequest
+	LegacyMessageTypeBlockResponse
+	LegacyMessageTypeCommitAnnounce
+	LegacyMessageTypePeerRequest
+	LegacyMessageTypePeerResponse
+	LegacyMessageTypeStateSync
+	LegacyMessageTypeConsensusMessage
 )
 
 // Message represents a P2P network message
 type Message struct {
-	Type      MessageType
+	Type      LegacyMessageType
 	Timestamp time.Time
 	Sender    string
 	Payload   []byte
@@ -82,7 +82,7 @@ type P2PNode struct {
 	listener    net.Listener
 
 	// Message handling
-	messageHandlers map[MessageType]MessageHandler
+	messageHandlers map[LegacyMessageType]LegacyMessageHandler
 	messageQueue    chan *MessageEnvelope
 
 	// Gossip protocol
@@ -103,8 +103,8 @@ type P2PNode struct {
 	cancel context.CancelFunc
 }
 
-// MessageHandler processes received messages
-type MessageHandler func(peer *Peer, msg *Message) error
+// LegacyMessageHandler processes received messages (deprecated)
+type LegacyMessageHandler func(peer *Peer, msg *Message) error
 
 // MessageEnvelope wraps a message with routing info
 type MessageEnvelope struct {
@@ -132,7 +132,7 @@ func NewP2PNode(listenAddr string, signer *crypto.Signer, bootstrapNodes []strin
 		peers:           make(map[string]*Peer),
 		bannedPeers:     make(map[string]time.Time),
 		maxPeers:        50,
-		messageHandlers: make(map[MessageType]MessageHandler),
+		messageHandlers: make(map[LegacyMessageType]LegacyMessageHandler),
 		messageQueue:    make(chan *MessageEnvelope, 1000),
 		gossipPool:      make(map[string]*GossipMessage),
 		gossipTTL:       6,
@@ -529,7 +529,7 @@ func (n *P2PNode) BroadcastBlock(block *Block) error {
 	}
 
 	msg := &Message{
-		Type:      MessageTypeBlockProposal,
+		Type:      LegacyMessageTypeBlockProposal,
 		Timestamp: time.Now(),
 		Sender:    n.id,
 		Payload:   data,
@@ -553,7 +553,7 @@ func (n *P2PNode) BroadcastVote(blockHash []byte, approve bool) error {
 	}
 
 	msg := &Message{
-		Type:      MessageTypeBlockVote,
+		Type:      LegacyMessageTypeBlockVote,
 		Timestamp: time.Now(),
 		Sender:    n.id,
 		Payload:   data,
@@ -736,17 +736,17 @@ func (n *P2PNode) handleMessage(envelope *MessageEnvelope) {
 
 // registerDefaultHandlers registers the default message handlers
 func (n *P2PNode) registerDefaultHandlers() {
-	n.messageHandlers[MessageTypePing] = n.handlePing
-	n.messageHandlers[MessageTypePong] = n.handlePong
-	n.messageHandlers[MessageTypePeerRequest] = n.handlePeerRequest
-	n.messageHandlers[MessageTypePeerResponse] = n.handlePeerResponse
+	n.messageHandlers[LegacyMessageTypePing] = n.handlePing
+	n.messageHandlers[LegacyMessageTypePong] = n.handlePong
+	n.messageHandlers[LegacyMessageTypePeerRequest] = n.handlePeerRequest
+	n.messageHandlers[LegacyMessageTypePeerResponse] = n.handlePeerResponse
 }
 
 // handlePing handles ping messages
 func (n *P2PNode) handlePing(peer *Peer, msg *Message) error {
 	// Send pong
 	pong := &Message{
-		Type:      MessageTypePong,
+		Type:      LegacyMessageTypePong,
 		Timestamp: time.Now(),
 		Sender:    n.id,
 		Payload:   msg.Payload,
@@ -790,7 +790,7 @@ func (n *P2PNode) handlePeerRequest(peer *Peer, msg *Message) error {
 	}
 
 	response := &Message{
-		Type:      MessageTypePeerResponse,
+		Type:      LegacyMessageTypePeerResponse,
 		Timestamp: time.Now(),
 		Sender:    n.id,
 		Payload:   data,
@@ -879,7 +879,7 @@ func (n *P2PNode) discoverPeers() {
 
 	for i := 0; i < numToAsk; i++ {
 		msg := &Message{
-			Type:      MessageTypePeerRequest,
+			Type:      LegacyMessageTypePeerRequest,
 			Timestamp: time.Now(),
 			Sender:    n.id,
 		}
@@ -988,7 +988,7 @@ type NetworkMetrics struct {
 }
 
 // RegisterHandler registers a message handler
-func (n *P2PNode) RegisterHandler(msgType MessageType, handler MessageHandler) {
+func (n *P2PNode) RegisterHandler(msgType LegacyMessageType, handler LegacyMessageHandler) {
 	n.messageHandlers[msgType] = handler
 }
 

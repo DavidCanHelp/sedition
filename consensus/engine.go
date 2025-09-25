@@ -3,6 +3,7 @@ package consensus
 
 import (
 	"crypto/rand"
+	"fmt"
 	"math"
 	"math/big"
 	"sync"
@@ -404,4 +405,54 @@ type NetworkStats struct {
 	TotalStaked      *big.Int
 	CurrentEpoch     int64
 	LastBlockTime    time.Time
+}
+
+// ValidateBlock validates a block according to consensus rules
+func (e *Engine) ValidateBlock(block interface{}) error {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	// For now, we'll use reflection to handle different block types
+	// In production, define a common interface
+
+	// Basic validation - accept any non-nil block
+	if block == nil {
+		return fmt.Errorf("block is nil")
+	}
+
+	// For genesis blocks, always accept
+	// This is a simplified validation - in production, check block structure properly
+
+	// Update last block time
+	e.lastBlockTime = time.Now()
+
+	return nil
+}
+
+// SetValidatorSet sets the validator set from an external source
+func (e *Engine) SetValidatorSet(validatorSet *validator.ValidatorSet) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	if validatorSet == nil {
+		return
+	}
+
+	// Clear existing validators
+	e.validators = make(map[string]*validator.Validator)
+
+	// Add validators from the set
+	for _, v := range validatorSet.GetValidators() {
+		e.validators[v.Address] = v
+		e.calculateValidatorStake(v)
+	}
+}
+
+// GetValidator returns a validator by address
+func (e *Engine) GetValidator(address string) (*validator.Validator, bool) {
+	e.mu.RLock()
+	defer e.mu.RUnlock()
+
+	v, exists := e.validators[address]
+	return v, exists
 }

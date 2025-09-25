@@ -15,8 +15,8 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/util"
 )
 
-// Block represents a blockchain block
-type Block struct {
+// LegacyBlock represents a blockchain block (deprecated - use Block or BlockData instead)
+type LegacyBlock struct {
 	Height       uint64
 	PreviousHash []byte
 	Hash         []byte
@@ -134,7 +134,7 @@ func (db *BlockchainDB) Close() error {
 }
 
 // StoreBlock stores a block in the database
-func (db *BlockchainDB) StoreBlock(block *Block) error {
+func (db *BlockchainDB) StoreBlock(block *LegacyBlock) error {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 
@@ -188,14 +188,14 @@ func (db *BlockchainDB) StoreBlock(block *Block) error {
 }
 
 // GetBlock retrieves a block by hash
-func (db *BlockchainDB) GetBlock(hash []byte) (*Block, error) {
+func (db *BlockchainDB) GetBlock(hash []byte) (*LegacyBlock, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 
 	// Check cache
 	if cached := db.blockCache.Get(string(hash)); cached != nil {
 		db.cacheHits++
-		return cached.(*Block), nil
+		return cached.(*LegacyBlock), nil
 	}
 	db.cacheMisses++
 
@@ -210,7 +210,7 @@ func (db *BlockchainDB) GetBlock(hash []byte) (*Block, error) {
 	}
 
 	// Deserialize block
-	var block Block
+	var block LegacyBlock
 	if err := json.Unmarshal(data, &block); err != nil {
 		return nil, fmt.Errorf("failed to deserialize block: %w", err)
 	}
@@ -223,7 +223,7 @@ func (db *BlockchainDB) GetBlock(hash []byte) (*Block, error) {
 }
 
 // GetBlockByHeight retrieves a block by height
-func (db *BlockchainDB) GetBlockByHeight(height int64) (*Block, error) {
+func (db *BlockchainDB) GetBlockByHeight(height int64) (*LegacyBlock, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 
@@ -242,7 +242,7 @@ func (db *BlockchainDB) GetBlockByHeight(height int64) (*Block, error) {
 }
 
 // GetLatestBlock returns the latest block
-func (db *BlockchainDB) GetLatestBlock() (*Block, error) {
+func (db *BlockchainDB) GetLatestBlock() (*LegacyBlock, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 
@@ -447,11 +447,11 @@ func (db *BlockchainDB) GetCommit(hash []byte) (*Commit, error) {
 }
 
 // GetBlocksByTimeRange retrieves blocks within a time range
-func (db *BlockchainDB) GetBlocksByTimeRange(start, end time.Time) ([]*Block, error) {
+func (db *BlockchainDB) GetBlocksByTimeRange(start, end time.Time) ([]*LegacyBlock, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 
-	blocks := make([]*Block, 0)
+	blocks := make([]*LegacyBlock, 0)
 
 	startKey := makeTimeKey(start, nil)
 	endKey := makeTimeKey(end, []byte{0xff})
@@ -477,11 +477,11 @@ func (db *BlockchainDB) GetBlocksByTimeRange(start, end time.Time) ([]*Block, er
 }
 
 // GetBlocksByProposer retrieves blocks by proposer
-func (db *BlockchainDB) GetBlocksByProposer(proposer string) ([]*Block, error) {
+func (db *BlockchainDB) GetBlocksByProposer(proposer string) ([]*LegacyBlock, error) {
 	db.mu.RLock()
 	defer db.mu.RUnlock()
 
-	blocks := make([]*Block, 0)
+	blocks := make([]*LegacyBlock, 0)
 
 	prefix := append(proposerIndexPrefix, []byte(proposer)...)
 	iter := db.db.NewIterator(util.BytesPrefix(prefix), nil)

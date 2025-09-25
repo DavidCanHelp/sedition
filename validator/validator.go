@@ -11,6 +11,7 @@ import (
 // Validator represents a network validator/contributor
 type Validator struct {
 	Address          string
+	PublicKey        string                      // Public key for verification
 	TokenStake       *big.Int                    // Raw token amount staked
 	ReputationScore  float64                     // Reputation score (0.0 to 10.0)
 	RecentContribs   []contribution.Contribution // Recent contributions for this epoch

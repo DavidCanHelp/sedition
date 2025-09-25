@@ -247,19 +247,19 @@ func (n *Node) processMessages() {
 // handleMessage processes a specific message type
 func (n *Node) handleMessage(msg *Message) {
 	switch msg.Type {
-	case MessageTypePing:
+	case LegacyMessageTypePing:
 		n.handlePing(msg)
-	case MessageTypePong:
+	case LegacyMessageTypePong:
 		n.handlePong(msg)
-	case MessageTypeBlockProposal:
+	case LegacyMessageTypeBlockProposal:
 		n.handleBlockProposal(msg)
-	case MessageTypeBlockVote:
+	case LegacyMessageTypeBlockVote:
 		n.handleBlockVote(msg)
-	case MessageTypeConsensusMessage:
+	case LegacyMessageTypeConsensusMessage:
 		n.handleConsensusMessage(msg)
-	case MessageTypePeerRequest:
+	case LegacyMessageTypePeerRequest:
 		n.handlePeerRequest(msg)
-	case MessageTypePeerResponse:
+	case LegacyMessageTypePeerResponse:
 		n.handlePeerResponse(msg)
 	default:
 		// Unknown message type
@@ -305,7 +305,7 @@ func (n *Node) discoverNewPeers() {
 	if currentPeerCount < n.config.MinPeers {
 		// Request peers from existing connections
 		msg := &Message{
-			Type: MessageTypePeerRequest,
+			Type: LegacyMessageTypePeerRequest,
 		}
 		n.BroadcastMessage(msg)
 	}
@@ -329,7 +329,7 @@ func (n *Node) gossipLoop() {
 // sendPing sends a ping to all peers
 func (n *Node) sendPing() {
 	msg := &Message{
-		Type:    MessageTypePing,
+		Type:    LegacyMessageTypePing,
 		Payload: []byte(fmt.Sprintf("%d", time.Now().Unix())),
 	}
 	n.BroadcastMessage(msg)
@@ -473,7 +473,7 @@ func (n *Node) handlePing(msg *Message) {
 
 	// Send pong response
 	pong := &Message{
-		Type:    MessageTypePong,
+		Type:    LegacyMessageTypePong,
 		Payload: msg.Payload,
 	}
 	n.SendMessage(msg.Sender, pong)
@@ -514,7 +514,7 @@ func (n *Node) handlePeerRequest(msg *Message) {
 
 	response, _ := json.Marshal(peerList)
 	reply := &Message{
-		Type:    MessageTypePeerResponse,
+		Type:    LegacyMessageTypePeerResponse,
 		Payload: response,
 	}
 	n.SendMessage(msg.Sender, reply)

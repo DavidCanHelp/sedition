@@ -18,13 +18,27 @@ import (
 
 // Transaction represents a transaction in the blockchain
 type Transaction struct {
-	ID        string                 `json:"id"`
+	Hash      string                 `json:"hash"`
 	From      string                 `json:"from"`
 	To        string                 `json:"to"`
-	Amount    *big.Int               `json:"amount"`
+	Value     *big.Int               `json:"value"`
+	Nonce     uint64                 `json:"nonce"`
+	GasLimit  uint64                 `json:"gas_limit"`
+	GasPrice  *big.Int               `json:"gas_price"`
+	Data      []byte                 `json:"data,omitempty"`
 	Timestamp time.Time              `json:"timestamp"`
-	Data      map[string]interface{} `json:"data,omitempty"`
 	Signature []byte                 `json:"signature"`
+
+	// Legacy fields for compatibility
+	ID        string                 `json:"id,omitempty"`
+	Amount    *big.Int               `json:"amount,omitempty"`
+}
+
+// VerifySignature verifies the transaction signature
+func (tx *Transaction) VerifySignature() bool {
+	// TODO: Implement actual signature verification
+	// For now, return true if signature exists
+	return len(tx.Signature) > 0
 }
 
 // BlockHeader contains the metadata of a block
@@ -45,6 +59,18 @@ type BlockData struct {
 	Signatures   []Signature   `json:"signatures"`
 }
 
+// Block represents a simplified block structure for compatibility
+type Block struct {
+	Height       uint64          `json:"height"`
+	PreviousHash string          `json:"previous_hash"`
+	Timestamp    time.Time       `json:"timestamp"`
+	Proposer     string          `json:"proposer"`
+	StateRoot    string          `json:"state_root"`
+	TxRoot       string          `json:"tx_root"`
+	Hash         string          `json:"hash"`
+	Transactions []*Transaction  `json:"transactions"`
+}
+
 // Signature represents a validator's signature on a block
 type Signature struct {
 	ValidatorID string `json:"validator_id"`
@@ -59,6 +85,7 @@ type ChainState struct {
 	LastBlockTime    time.Time                 `json:"last_block_time"`
 	ValidatorSet     map[string]*validator.Validator `json:"validator_set"`
 	AccountBalances  map[string]*big.Int       `json:"account_balances"`
+	AccountNonces    map[string]uint64         `json:"account_nonces"`
 	TotalSupply      *big.Int                  `json:"total_supply"`
 }
 
@@ -159,6 +186,7 @@ func (bc *Blockchain) initializeChainState() error {
 		LastBlockTime:   time.Now(),
 		ValidatorSet:    make(map[string]*validator.Validator),
 		AccountBalances: make(map[string]*big.Int),
+		AccountNonces:   make(map[string]uint64),
 		TotalSupply:     big.NewInt(0),
 	}
 
@@ -244,7 +272,42 @@ func (bc *Blockchain) CreateBlock(proposer string) (*BlockData, error) {
 }
 
 // AddBlock adds a new block to the blockchain
-func (bc *Blockchain) AddBlock(block *BlockData) error {
+func (bc *Blockchain) AddBlock(block interface{}) error {
+	// Handle both Block and BlockData types
+	var blockData *BlockData
+
+	switch b := block.(type) {
+	case *Block:
+		// Convert Block to BlockData
+		txs := make([]Transaction, len(b.Transactions))
+		for i, tx := range b.Transactions {
+			txs[i] = *tx
+		}
+
+		blockData = &BlockData{
+			Header: BlockHeader{
+				Height:       b.Height,
+				PreviousHash: b.PreviousHash,
+				Timestamp:    b.Timestamp,
+				Proposer:     b.Proposer,
+				StateRoot:    b.StateRoot,
+				TxRoot:       b.TxRoot,
+			},
+			Transactions: txs,
+			Hash:         b.Hash,
+			Signatures:   []Signature{},
+		}
+	case *BlockData:
+		blockData = b
+	default:
+		return fmt.Errorf("invalid block type")
+	}
+
+	return bc.addBlockData(blockData)
+}
+
+// addBlockData is the internal method that adds a BlockData to the blockchain
+func (bc *Blockchain) addBlockData(block *BlockData) error {
 	bc.mu.Lock()
 	defer bc.mu.Unlock()
 
@@ -326,12 +389,39 @@ func (bc *Blockchain) GetBlock(height uint64) (*BlockData, error) {
 }
 
 // GetLatestBlock returns the latest block
-func (bc *Blockchain) GetLatestBlock() (*BlockData, error) {
+func (bc *Blockchain) GetLatestBlock() *Block {
 	bc.mu.RLock()
 	height := bc.currentState.Height
 	bc.mu.RUnlock()
 
-	return bc.GetBlock(height)
+	block, err := bc.GetBlock(height)
+	if err != nil {
+		return nil
+	}
+
+	// Convert BlockData to Block for compatibility
+	txs := make([]*Transaction, len(block.Transactions))
+	for i := range block.Transactions {
+		txs[i] = &block.Transactions[i]
+	}
+
+	return &Block{
+		Height:       block.Header.Height,
+		PreviousHash: block.Header.PreviousHash,
+		Timestamp:    block.Header.Timestamp,
+		Proposer:     block.Header.Proposer,
+		StateRoot:    block.Header.StateRoot,
+		TxRoot:       block.Header.TxRoot,
+		Hash:         block.Hash,
+		Transactions: txs,
+	}
+}
+
+// GetLatestBlockHash returns the hash of the latest block
+func (bc *Blockchain) GetLatestBlockHash() string {
+	bc.mu.RLock()
+	defer bc.mu.RUnlock()
+	return bc.currentState.LastBlockHash
 }
 
 // GetChainState returns the current chain state
@@ -405,43 +495,82 @@ func (bc *Blockchain) validateBlock(block *BlockData) error {
 // validateTransaction validates a transaction
 func (bc *Blockchain) validateTransaction(tx Transaction) error {
 	// Check basic fields
-	if tx.ID == "" || tx.From == "" || tx.To == "" {
+	if tx.Hash == "" || tx.From == "" || tx.To == "" {
 		return fmt.Errorf("invalid transaction fields")
 	}
 
-	// Check amount
-	if tx.Amount == nil || tx.Amount.Sign() < 0 {
-		return fmt.Errorf("invalid transaction amount")
+	// Check value (using Value field instead of Amount)
+	if tx.Value == nil || tx.Value.Sign() < 0 {
+		return fmt.Errorf("invalid transaction value")
 	}
+
+	// Calculate total cost (value + gas)
+	gasCost := new(big.Int).Mul(tx.GasPrice, big.NewInt(int64(tx.GasLimit)))
+	totalCost := new(big.Int).Add(tx.Value, gasCost)
 
 	// Check balance
 	balance, exists := bc.currentState.AccountBalances[tx.From]
 	if !exists || balance == nil {
+		// For coinbase transactions from null address, allow it
+		if tx.From == "0x0000000000000000000000000000000000000000" {
+			return nil
+		}
 		return fmt.Errorf("account not found or zero balance")
 	}
-	if balance.Cmp(tx.Amount) < 0 {
-		return fmt.Errorf("insufficient balance")
+	if balance.Cmp(totalCost) < 0 {
+		return fmt.Errorf("insufficient balance for transaction plus gas")
 	}
 
-	// TODO: Verify signature
+	// Check nonce
+	expectedNonce := bc.currentState.AccountNonces[tx.From]
+	if tx.Nonce != expectedNonce {
+		return fmt.Errorf("invalid nonce: expected %d, got %d", expectedNonce, tx.Nonce)
+	}
+
+	// Verify signature
+	if !tx.VerifySignature() {
+		return fmt.Errorf("invalid transaction signature")
+	}
 
 	return nil
 }
 
 // applyTransaction applies a transaction to the state
 func (bc *Blockchain) applyTransaction(tx Transaction) {
-	// Update balances
+	// Special handling for coinbase transactions
+	if tx.From == "0x0000000000000000000000000000000000000000" {
+		// Coinbase transaction - only credit the recipient
+		if toBalance, exists := bc.currentState.AccountBalances[tx.To]; exists {
+			newBalance := new(big.Int).Add(toBalance, tx.Value)
+			bc.currentState.AccountBalances[tx.To] = newBalance
+		} else {
+			bc.currentState.AccountBalances[tx.To] = new(big.Int).Set(tx.Value)
+		}
+		return
+	}
+
+	// Calculate total cost (value + gas)
+	gasCost := new(big.Int).Mul(tx.GasPrice, big.NewInt(int64(tx.GasLimit)))
+	totalCost := new(big.Int).Add(tx.Value, gasCost)
+
+	// Update sender balance
 	if fromBalance, exists := bc.currentState.AccountBalances[tx.From]; exists {
-		newBalance := new(big.Int).Sub(fromBalance, tx.Amount)
+		newBalance := new(big.Int).Sub(fromBalance, totalCost)
 		bc.currentState.AccountBalances[tx.From] = newBalance
 	}
 
+	// Update recipient balance
 	if toBalance, exists := bc.currentState.AccountBalances[tx.To]; exists {
-		newBalance := new(big.Int).Add(toBalance, tx.Amount)
+		newBalance := new(big.Int).Add(toBalance, tx.Value)
 		bc.currentState.AccountBalances[tx.To] = newBalance
 	} else {
-		bc.currentState.AccountBalances[tx.To] = new(big.Int).Set(tx.Amount)
+		bc.currentState.AccountBalances[tx.To] = new(big.Int).Set(tx.Value)
 	}
+
+	// Update nonce
+	bc.currentState.AccountNonces[tx.From] = tx.Nonce + 1
+
+	// TODO: In production, gas fees would go to the block producer
 }
 
 // calculateBlockHash calculates the hash of a block
@@ -508,6 +637,14 @@ func (bc *Blockchain) GetBalance(address string) *big.Int {
 	}
 
 	return big.NewInt(0)
+}
+
+// GetNonce returns the nonce of an account
+func (bc *Blockchain) GetNonce(address string) uint64 {
+	bc.mu.RLock()
+	defer bc.mu.RUnlock()
+
+	return bc.currentState.AccountNonces[address]
 }
 
 // GetHeight returns the current blockchain height

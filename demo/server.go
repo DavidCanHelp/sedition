@@ -638,7 +638,7 @@ func (s *Server) tryProduceBlock() {
 	// Broadcast block to network
 	blockData, _ := json.Marshal(block)
 	msg := &network.Message{
-		Type:    network.MessageTypeBlockProposal,
+		Type:    network.LegacyMessageTypeBlockProposal,
 		Payload: blockData,
 	}
 	s.node.BroadcastMessage(msg)

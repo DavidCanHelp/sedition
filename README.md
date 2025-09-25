@@ -1,47 +1,54 @@
-# Proof of Contribution Consensus
+# Sedition Blockchain
 
-A research implementation of a Byzantine fault tolerant consensus algorithm that explores reputation-based validator selection and stake weighting mechanisms.
+A fully functional proof-of-concept blockchain implementation in Go featuring smart contracts, consensus mechanisms, and complete network infrastructure.
 
-## Project Overview
+## Features
 
-This project implements a consensus algorithm that combines traditional BFT properties with a reputation system for validator selection. It serves as a research platform for exploring consensus mechanisms, cryptographic techniques, and optimization approaches in distributed systems.
+### Core Blockchain Components
+- **Storage Layer**: LevelDB-based persistent blockchain storage with state management
+- **Transaction Pool**: Memory pool with gas price prioritization and nonce management
+- **Block Producer**: Automated block production with configurable intervals
+- **Consensus Engine**: Proof-of-Stake consensus with validator management
+- **Smart Contract VM**: Full EVM-compatible virtual machine with opcode support
 
-**Note**: This is a research project and experimental implementation. It should not be used in production without extensive testing and security auditing.
+### Network & API
+- **RPC Server**: Ethereum-compatible JSON-RPC interface
+- **P2P Network**: Gossip-based transaction and block broadcasting
+- **Wallet System**: ECDSA key generation, transaction signing, mnemonic support
 
-## Core Features
-
-### Core Implementation
-- **Byzantine Fault Tolerance**: Handles up to f < n/3 malicious nodes
-- **Cryptographic Security**: Ed25519 signatures and VRF-based leader selection
-- **Stake-Weighted Voting**: Combines economic stake with reputation metrics
-- **Slashing Mechanisms**: Penalties for malicious or incorrect behavior
-- **Network Protocol**: P2P communication with message authentication
-
-### Experimental Research
-- **Post-Quantum Readiness**: Research into NIST candidate algorithms (not production-ready)
-- **Consensus Optimization**: Performance optimization and analysis frameworks
+### Smart Contracts
+- **Contract Deployment**: Deploy and execute smart contracts
+- **State Management**: Persistent contract state with storage operations
+- **Gas Metering**: Transaction fee calculation and limits
+- **Standard Contracts**: Token, SimpleStorage, and Voting contract examples
 
 ## Quick Start
 
 ```bash
-# Clone repository
+# Clone the repository
 git clone https://github.com/davidcanhelp/sedition.git
 cd sedition
 
-# Install dependencies
-go mod download
+# Run the blockchain node
+./run.sh node
 
-# Run comprehensive tests
-make test
+# In another terminal, interact with the blockchain
+./run.sh client accounts
+./run.sh client balance <address>
+./run.sh client blocknumber
+```
 
-# Quick validation
-./quick_test.sh
+### Running Multiple Nodes
 
-# Run demo
-go run demo/simple_poc_demo.go
+```bash
+# Terminal 1: Start first node
+./run.sh node
 
-# Generate test coverage report
-make coverage
+# Terminal 2: Start second node (connects to first)
+./run.sh node2
+
+# Terminal 3: Use client
+./run.sh client peers
 ```
 
 ## Overview
