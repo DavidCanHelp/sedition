@@ -78,7 +78,9 @@ type ZKPConfig struct {
 // NetworkConfig holds network configuration
 type NetworkConfig struct {
 	MaxPeers          int           `json:"max_peers"`
+	MinPeers          int           `json:"min_peers"`
 	ConnectionTimeout time.Duration `json:"connection_timeout"`
+	PeerTimeout       time.Duration `json:"peer_timeout"`
 	HeartbeatInterval time.Duration `json:"heartbeat_interval"`
 	MessageBufferSize int           `json:"message_buffer_size"`
 }
@@ -141,8 +143,22 @@ func DefaultZKPConfig() *ZKPConfig {
 func DefaultNetworkConfig() *NetworkConfig {
 	return &NetworkConfig{
 		MaxPeers:          50,
+		MinPeers:          5,
 		ConnectionTimeout: 30 * time.Second,
+		PeerTimeout:       2 * time.Minute,
 		HeartbeatInterval: 10 * time.Second,
 		MessageBufferSize: 1000,
+	}
+}
+
+// TestNetworkConfig returns network configuration for testing
+func TestNetworkConfig() *NetworkConfig {
+	return &NetworkConfig{
+		MaxPeers:          10,
+		MinPeers:          2,
+		ConnectionTimeout: 5 * time.Second,
+		PeerTimeout:       30 * time.Second,
+		HeartbeatInterval: 5 * time.Second,
+		MessageBufferSize: 100,
 	}
 }

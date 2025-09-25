@@ -1,0 +1,140 @@
+# Alert rules for PoC Blockchain monitoring
+
+groups:
+  - name: blockchain_alerts
+    interval: 30s
+    rules:
+      # Block production alerts
+      - alert: BlockProductionStopped
+        expr: rate(poc_blocks_created_total[5m]) == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Block production has stopped"
+          description: "No new blocks have been created in the last 5 minutes"
+
+      - alert: BlockHeightStagnant
+        expr: poc_block_height == poc_block_height offset 5m
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Block height not increasing"
+          description: "Block height has not changed for 5 minutes on {{ $labels.instance }}"
+
+      # Network alerts
+      - alert: InsufficientPeers
+        expr: poc_peers_connected < 2
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Node has insufficient peers"
+          description: "Node {{ $labels.instance }} has only {{ $value }} peers connected"
+
+      - alert: NetworkPartition
+        expr: poc_peers_connected == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Node is isolated from network"
+          description: "Node {{ $labels.instance }} has no connected peers"
+
+      # Transaction alerts
+      - alert: HighPendingTransactions
+        expr: poc_pending_transactions > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of pending transactions"
+          description: "{{ $value }} transactions pending on {{ $labels.instance }}"
+
+      - alert: TransactionProcessingRate
+        expr: rate(poc_transactions_added_total[5m]) < 0.1
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: "Low transaction processing rate"
+          description: "Transaction processing rate is {{ $value }} tx/sec on {{ $labels.instance }}"
+
+      # Consensus alerts
+      - alert: ConsensusRoundFailures
+        expr: increase(poc_consensus_failures_total[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Multiple consensus round failures"
+          description: "{{ $value }} consensus failures in last 5 minutes on {{ $labels.instance }}"
+
+      - alert: ValidatorOffline
+        expr: up{role="validator"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Validator node is offline"
+          description: "Validator {{ $labels.name }} is offline"
+
+      # Performance alerts
+      - alert: HighAPILatency
+        expr: histogram_quantile(0.99, rate(poc_api_response_time_seconds_bucket[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API response time"
+          description: "99th percentile API latency is {{ $value }}s on {{ $labels.instance }}"
+
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes > 1e9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Process memory usage is {{ humanize $value }} on {{ $labels.instance }}"
+
+      # Storage alerts
+      - alert: StorageSpaceRunningOut
+        expr: node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} < 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Storage space running out"
+          description: "Less than 10% disk space remaining on {{ $labels.instance }}"
+
+      - alert: DatabaseWriteErrors
+        expr: increase(leveldb_write_errors_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database write errors detected"
+          description: "{{ $value }} database write errors in last 5 minutes"
+
+  - name: availability_alerts
+    interval: 30s
+    rules:
+      - alert: NodeDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Node is down"
+          description: "Node {{ $labels.instance }} has been down for more than 1 minute"
+
+      - alert: HighErrorRate
+        expr: rate(poc_api_errors_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High API error rate"
+          description: "API error rate is {{ $value | humanizePercentage }} on {{ $labels.instance }}"

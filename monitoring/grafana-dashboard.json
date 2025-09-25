@@ -1,0 +1,122 @@
+{
+  "dashboard": {
+    "title": "PoC Blockchain Monitoring",
+    "tags": ["blockchain", "consensus", "monitoring"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "Block Height",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "poc_block_height",
+            "legendFormat": "{{ instance }}"
+          }
+        ]
+      },
+      {
+        "title": "Block Production Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(poc_blocks_created_total[5m])",
+            "legendFormat": "{{ instance }}"
+          }
+        ]
+      },
+      {
+        "title": "Connected Peers",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "poc_peers_connected",
+            "legendFormat": "{{ instance }}"
+          }
+        ]
+      },
+      {
+        "title": "Transaction Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(poc_transactions_added_total[5m])",
+            "legendFormat": "{{ instance }}"
+          }
+        ]
+      },
+      {
+        "title": "API Response Time (p99)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.99, rate(poc_api_response_time_seconds_bucket[5m]))",
+            "legendFormat": "{{ instance }} - {{ endpoint }}"
+          }
+        ]
+      },
+      {
+        "title": "Consensus Rounds",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "rate(poc_consensus_rounds_total[5m])",
+            "legendFormat": "{{ instance }}"
+          }
+        ]
+      },
+      {
+        "title": "Network Messages",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "rate(network_messages_sent_total[5m])",
+            "legendFormat": "Sent - {{ instance }}"
+          },
+          {
+            "expr": "rate(network_messages_received_total[5m])",
+            "legendFormat": "Received - {{ instance }}"
+          }
+        ]
+      },
+      {
+        "title": "System Metrics",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes",
+            "legendFormat": "Memory - {{ instance }}"
+          },
+          {
+            "expr": "rate(process_cpu_seconds_total[5m])",
+            "legendFormat": "CPU - {{ instance }}"
+          }
+        ]
+      },
+      {
+        "title": "Node Status",
+        "type": "table",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32},
+        "targets": [
+          {
+            "expr": "up",
+            "format": "table",
+            "instant": true
+          }
+        ]
+      }
+    ],
+    "refresh": "10s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  }
+}

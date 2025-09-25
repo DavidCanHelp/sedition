@@ -1,0 +1,74 @@
+# Prometheus configuration for PoC Blockchain monitoring
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'poc-blockchain'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load rules files
+rule_files:
+  - "alerts.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Blockchain nodes
+  - job_name: 'blockchain-nodes'
+    static_configs:
+      - targets:
+        - 'localhost:8080'
+        - 'localhost:8081'
+        - 'localhost:8082'
+        labels:
+          group: 'production'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Consensus metrics
+  - job_name: 'consensus'
+    static_configs:
+      - targets: ['localhost:8080']
+        labels:
+          role: 'validator'
+          name: 'alice'
+      - targets: ['localhost:8081']
+        labels:
+          role: 'validator'
+          name: 'bob'
+      - targets: ['localhost:8082']
+        labels:
+          role: 'observer'
+          name: 'observer1'
+
+  # Network metrics
+  - job_name: 'network'
+    static_configs:
+      - targets: ['localhost:8080', 'localhost:8081', 'localhost:8082']
+        labels:
+          component: 'p2p'
+
+  # Storage metrics
+  - job_name: 'storage'
+    static_configs:
+      - targets: ['localhost:8080', 'localhost:8081', 'localhost:8082']
+        labels:
+          component: 'leveldb'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Node exporter for system metrics
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+        labels:
+          alias: 'blockchain-host'

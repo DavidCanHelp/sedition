@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"math"
 	"math/big"
+	"sync"
 	"time"
 
 	"github.com/davidcanhelp/sedition/config"
@@ -15,6 +16,7 @@ import (
 
 // Engine represents the main PoC consensus engine
 type Engine struct {
+	mu                sync.RWMutex // Protects all fields below
 	validators        map[string]*validator.Validator
 	qualityAnalyzer   *contribution.QualityAnalyzer
 	reputationTracker *validator.ReputationTracker
@@ -47,6 +49,9 @@ func NewEngine(cfg *config.ConsensusConfig) *Engine {
 
 // RegisterValidator registers a new validator in the network
 func (e *Engine) RegisterValidator(address string, tokenStake *big.Int) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
 	if tokenStake.Cmp(e.config.MinStakeRequired) < 0 {
 		return errors.NewConsensusError(
 			errors.ErrInsufficientStake,
@@ -74,6 +79,9 @@ func (e *Engine) RegisterValidator(address string, tokenStake *big.Int) error {
 
 // SubmitContribution processes a new contribution from a validator
 func (e *Engine) SubmitContribution(validatorAddr string, contrib contribution.Contribution) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
 	v, exists := e.validators[validatorAddr]
 	if !exists {
 		return errors.NewConsensusError(
@@ -262,6 +270,9 @@ func (e *Engine) getActiveValidators() map[string]*validator.Validator {
 
 // SlashValidator slashes a validator for malicious behavior
 func (e *Engine) SlashValidator(addr string, reason validator.SlashingReason, evidence string) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
 	v, exists := e.validators[addr]
 	if !exists {
 		return errors.NewConsensusError(

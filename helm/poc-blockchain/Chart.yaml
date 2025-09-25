@@ -1,0 +1,30 @@
+apiVersion: v2
+name: poc-blockchain
+description: Proof of Contribution Blockchain - Production-Ready Helm Chart
+type: application
+version: 1.0.0
+appVersion: "2.0.0"
+keywords:
+  - blockchain
+  - consensus
+  - poc
+  - distributed
+home: https://github.com/davidcanhelp/sedition
+sources:
+  - https://github.com/davidcanhelp/sedition
+maintainers:
+  - name: davidcanhelp
+    email: admin@poc-blockchain.io
+dependencies:
+  - name: prometheus
+    version: "15.x.x"
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: monitoring.enabled
+  - name: grafana
+    version: "6.x.x"
+    repository: https://grafana.github.io/helm-charts
+    condition: monitoring.enabled
+  - name: postgresql
+    version: "12.x.x"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled

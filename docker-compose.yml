@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+  # Validator Node 1 (Alice)
+  node1:
+    build: .
+    container_name: poc-node1
+    command: >
+      /app/server
+      --validator
+      --name alice
+      --stake 10000
+      --http :8080
+      --p2p :8545
+      --data /data
+    ports:
+      - "8080:8080"
+      - "8545:8545"
+    volumes:
+      - node1-data:/data
+    networks:
+      - poc-network
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  # Validator Node 2 (Bob)
+  node2:
+    build: .
+    container_name: poc-node2
+    command: >
+      /app/server
+      --validator
+      --name bob
+      --stake 20000
+      --http :8080
+      --p2p :8545
+      --bootstrap node1:8545
+      --data /data
+    ports:
+      - "8081:8080"
+      - "8546:8545"
+    volumes:
+      - node2-data:/data
+    networks:
+      - poc-network
+    depends_on:
+      - node1
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  # Observer Node
+  node3:
+    build: .
+    container_name: poc-node3
+    command: >
+      /app/server
+      --http :8080
+      --p2p :8545
+      --bootstrap node1:8545
+      --data /data
+    ports:
+      - "8082:8080"
+      - "8547:8545"
+    volumes:
+      - node3-data:/data
+    networks:
+      - poc-network
+    depends_on:
+      - node1
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: poc-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml
+      - prometheus-data:/prometheus
+    networks:
+      - poc-network
+    restart: unless-stopped
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: poc-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana-dashboard.json:/var/lib/grafana/dashboards/dashboard.json
+      - ./monitoring/grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    networks:
+      - poc-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # Alertmanager
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: poc-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager-data:/alertmanager
+    networks:
+      - poc-network
+    restart: unless-stopped
+
+  # Node Exporter for system metrics
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: poc-node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - poc-network
+    restart: unless-stopped
+
+networks:
+  poc-network:
+    driver: bridge
+
+volumes:
+  node1-data:
+  node2-data:
+  node3-data:
+  prometheus-data:
+  grafana-data:
+  alertmanager-data:

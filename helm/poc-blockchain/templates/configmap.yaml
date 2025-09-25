@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "poc-blockchain.fullname" . }}-config
+  labels:
+    {{- include "poc-blockchain.labels" . | nindent 4 }}
+data:
+  config.json: |
+    {
+      "consensus": {
+        "blockTime": {{ .Values.consensus.blockTime }},
+        "minValidators": {{ .Values.consensus.minValidators }},
+        "blockSize": {{ .Values.consensus.blockSize }},
+        "consensusTimeout": {{ .Values.consensus.consensusTimeout }}
+      },
+      "network": {
+        "listenAddress": "0.0.0.0:{{ .Values.service.p2pPort }}",
+        "maxPeers": {{ .Values.network.maxPeers }},
+        "dialTimeout": {{ .Values.network.dialTimeout }},
+        "heartbeatInterval": {{ .Values.network.heartbeatInterval }}
+      },
+      "api": {
+        "port": {{ .Values.service.port }},
+        "enableAuth": {{ .Values.api.enableAuth }},
+        "enableRateLimit": {{ .Values.api.enableRateLimit }},
+        "rateLimit": {{ .Values.api.rateLimit }},
+        "rateBurst": {{ .Values.api.rateBurst }},
+        "enableCORS": {{ .Values.api.enableCORS }},
+        "corsOrigins": {{ .Values.api.corsOrigins | toJson }}
+      },
+      "storage": {
+        "dataDir": "/data",
+        "blockCacheSize": {{ .Values.storage.blockCacheSize }},
+        "writeCacheSize": {{ .Values.storage.writeCacheSize }},
+        "stateCheckpoint": {{ .Values.storage.stateCheckpoint }}
+      },
+      "monitoring": {
+        "metricsEnabled": {{ .Values.metrics.enabled }},
+        "metricsPort": {{ .Values.metrics.port }},
+        "logLevel": "{{ .Values.logging.level }}",
+        "logFormat": "{{ .Values.logging.format }}"
+      }
+    }
+
+  bootstrap-peers.txt: |
+    {{- range .Values.network.bootstrapPeers }}
+    {{ . }}
+    {{- end }}
+
+  validator-keys.json: |
+    {{- if .Values.validator.enabled }}
+    {
+      "address": "{{ .Values.validator.address }}",
+      "stake": {{ .Values.validator.stake }}
+    }
+    {{- else }}
+    {}
+    {{- end }}

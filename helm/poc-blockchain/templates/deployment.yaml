@@ -1,0 +1,138 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "poc-blockchain.fullname" . }}
+  labels:
+    {{- include "poc-blockchain.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "poc-blockchain.fullname" . }}-headless
+  selector:
+    matchLabels:
+      {{- include "poc-blockchain.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
+      labels:
+        {{- include "poc-blockchain.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "poc-blockchain.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init-config
+          image: busybox:1.35
+          command: ['sh', '-c']
+          args:
+            - |
+              echo "Initializing node configuration..."
+              cp /configmap/* /config/
+              if [ ! -f /data/initialized ]; then
+                echo "First time initialization..."
+                touch /data/initialized
+              fi
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: config-genesis
+              mountPath: /configmap
+            - name: data
+              mountPath: /data
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /app/server
+          args:
+            {{- if .Values.node.validator.enabled }}
+            - --validator
+            - --name={{ .Values.node.validator.name }}-{{ .Replica }}
+            - --stake={{ .Values.node.validator.stake }}
+            {{- end }}
+            - --http=:{{ .Values.node.network.httpPort }}
+            - --p2p=:{{ .Values.node.network.p2pPort }}
+            - --data=/data
+            {{- if gt (int .Values.replicaCount) 1 }}
+            - --bootstrap={{ include "poc-blockchain.fullname" . }}-0.{{ include "poc-blockchain.fullname" . }}-headless:{{ .Values.node.network.p2pPort }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.node.network.httpPort }}
+              protocol: TCP
+            - name: p2p
+              containerPort: {{ .Values.node.network.p2pPort }}
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          env:
+            {{- toYaml .Values.env | nindent 12 }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            {{- if .Values.security.authentication.enabled }}
+            - name: AUTH_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "poc-blockchain.fullname" . }}-auth
+                  key: secret-key
+            {{- end }}
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.node.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: config-genesis
+          configMap:
+            name: {{ include "poc-blockchain.fullname" . }}-genesis
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "{{ .Values.persistence.accessMode }}" ]
+        storageClassName: {{ .Values.persistence.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}

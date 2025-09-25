@@ -1,0 +1,240 @@
+# Default values for poc-blockchain
+
+replicaCount: 3
+
+image:
+  repository: poc-blockchain/node
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Node configuration
+node:
+  # Node types: validator, observer
+  type: validator
+
+  validator:
+    enabled: true
+    name: "validator"
+    stake: 10000
+
+  network:
+    p2pPort: 8545
+    httpPort: 8080
+
+  storage:
+    size: 10Gi
+    storageClass: "fast-ssd"
+
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 1
+      memory: 2Gi
+
+# Service configuration
+service:
+  type: ClusterIP
+  httpPort: 8080
+  p2pPort: 8545
+  metricsPort: 9090
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/websocket-services: "true"
+  hosts:
+    - host: blockchain.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: blockchain-tls
+      hosts:
+        - blockchain.example.com
+
+# Security configuration
+security:
+  enabled: true
+  authentication:
+    enabled: true
+    secretKey: "change-this-secret-key-in-production"
+  rateLimit:
+    enabled: true
+    requestsPerSecond: 100
+    burst: 200
+  networkPolicy:
+    enabled: true
+  podSecurityPolicy:
+    enabled: true
+  rbac:
+    create: true
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      interval: 30s
+  grafana:
+    enabled: true
+    dashboards:
+      enabled: true
+    adminPassword: "admin"
+
+# Autoscaling configuration
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Persistence
+persistence:
+  enabled: true
+  storageClass: "fast-ssd"
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+
+# PostgreSQL configuration (optional)
+postgresql:
+  enabled: false
+  auth:
+    username: blockchain
+    password: "change-me"
+    database: blockchain
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod annotations
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "9090"
+  prometheus.io/path: "/metrics"
+
+# Pod Security Context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+# Security Context
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Liveness and Readiness Probes
+livenessProbe:
+  httpGet:
+    path: /api/status
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /api/status
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - poc-blockchain
+        topologyKey: kubernetes.io/hostname
+
+# Update strategy
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+
+# Environment variables
+env:
+  - name: NODE_ENV
+    value: "production"
+  - name: LOG_LEVEL
+    value: "info"
+
+# Config maps
+configMaps:
+  genesis:
+    enabled: true
+    data:
+      genesis.json: |
+        {
+          "validators": [
+            {
+              "address": "validator1",
+              "stake": 10000
+            }
+          ],
+          "timestamp": 1700000000
+        }
+
+# Secrets
+secrets:
+  apiKeys:
+    enabled: true
+    data:
+      admin-key: "base64-encoded-key"
+
+# Jobs
+jobs:
+  init:
+    enabled: true
+    image: "poc-blockchain/init"
+    command: ["/bin/sh", "-c", "echo 'Initializing blockchain...'"]
+
+# Backup configuration
+backup:
+  enabled: false
+  schedule: "0 2 * * *"
+  retention: 30
+  s3:
+    enabled: false
+    bucket: "blockchain-backups"
+    region: "us-east-1"
