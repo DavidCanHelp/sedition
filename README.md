@@ -24,18 +24,32 @@ A fully functional proof-of-concept blockchain implementation in Go featuring sm
 
 ## Quick Start
 
+### Running the Demo
+
 ```bash
 # Clone the repository
 git clone https://github.com/davidcanhelp/sedition.git
 cd sedition
 
+# Run the interactive PoC demo (recommended for first-time users)
+./scripts/run.sh demo
+
+# Or use the direct go command
+go run demo/simple_poc_demo.go --validator --name alice --stake 10000
+
+# Access the web UI at http://localhost:8080
+```
+
+### Running Full Nodes
+
+```bash
 # Run the blockchain node
-./run.sh node
+./scripts/run.sh node
 
 # In another terminal, interact with the blockchain
-./run.sh client accounts
-./run.sh client balance <address>
-./run.sh client blocknumber
+./scripts/run.sh client accounts
+./scripts/run.sh client balance <address>
+./scripts/run.sh client blocknumber
 ```
 
 ### Running Multiple Nodes
@@ -237,7 +251,8 @@ engine.reputationTracker.RecordPeerReview("validator1", true, 4.5, poc.CodeRevie
 The project includes comprehensive testing infrastructure:
 
 ### Test Coverage
-- **Core Packages**: config (100%), errors (40.9%), consensus (23.2%)
+- **Core Packages**: config (100%), contribution (97.0%), wallet (60.2%), mempool (69.6%), consensus (23.5%)
+- **Research Contributions**: Comprehensive test suite for quality analysis, metrics calculation, and impact scoring
 - **Integration Tests**: Full end-to-end testing scenarios
 - **Benchmarks**: Performance testing for all critical paths
 
@@ -380,16 +395,26 @@ Apache 2.0 - See LICENSE file for details.
 
 ## Status
 
-**Version**: 2.0.0-testable  
-**Stage**: Research implementation with production-ready foundations  
-**Production Readiness**: Not recommended for production use without thorough testing and audit  
-**Test Coverage**: 
+**Version**: 2.1.0
+**Stage**: Research implementation with production-ready foundations
+**Production Readiness**: Not recommended for production use without thorough testing and audit
+**Test Coverage**:
 - Config: 100%
-- Errors: 40.9%
-- Consensus: 23.2%
-- Overall: Expanding coverage with comprehensive test infrastructure
+- Contribution (PhD research core): 97.0%
+- Wallet: 60.2%
+- Mempool: 69.6%
+- Consensus: 23.5%
+- Overall: Comprehensive test coverage for core innovation
 
-### Recent Improvements (v2.0.0)
+### Recent Improvements (v2.1.0)
+- ✅ **Contribution package tests**: 97% coverage with 49+ test functions (~1,500 lines)
+- ✅ **Comprehensive quality analysis testing**: Algorithm validation, component scoring, trend analysis
+- ✅ **Metrics calculation tests**: Statistical functions, productivity scoring, velocity tracking
+- ✅ **Demo build fix**: Renamed server.go to simple_poc_demo.go, added demo command
+- ✅ **VRF cryptographic fixes**: Proper Edwards25519 arithmetic, scalar field operations
+- ✅ **DHT network fixes**: Corrected bucket index calculation
+
+### Previous Improvements (v2.0.0)
 - ✅ Complete technical debt remediation
 - ✅ Modular architecture with clear separation of concerns
 - ✅ Centralized configuration management

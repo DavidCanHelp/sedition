@@ -1,10 +1,13 @@
 package wallet
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/x509"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -14,6 +17,7 @@ import (
 	"time"
 
 	"github.com/davidcanhelp/sedition/storage"
+	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/crypto/ripemd160"
 )
 
@@ -21,14 +25,17 @@ var (
 	ErrInvalidPrivateKey = errors.New("invalid private key")
 	ErrInvalidAddress    = errors.New("invalid address")
 	ErrWalletLocked      = errors.New("wallet is locked")
+	ErrInvalidPassword   = errors.New("invalid password")
 )
 
 // Wallet manages private keys and transaction signing
 type Wallet struct {
-	privateKey *ecdsa.PrivateKey
-	publicKey  *ecdsa.PublicKey
-	address    string
-	locked     bool
+	privateKey       *ecdsa.PrivateKey
+	publicKey        *ecdsa.PublicKey
+	address          string
+	locked           bool
+	encryptedPrivKey []byte // Encrypted private key (if password protected)
+	salt             []byte // Salt for key derivation
 }
 
 // NewWallet creates a new wallet with a randomly generated private key
@@ -114,16 +121,100 @@ func (w *Wallet) GetPrivateKey() (string, error) {
 	return hex.EncodeToString(w.privateKey.D.Bytes()), nil
 }
 
+// SetPassword encrypts the wallet with a password
+func (w *Wallet) SetPassword(password string) error {
+	if w.privateKey == nil {
+		return ErrInvalidPrivateKey
+	}
+
+	// Generate random salt
+	salt := make([]byte, 32)
+	if _, err := rand.Read(salt); err != nil {
+		return fmt.Errorf("failed to generate salt: %w", err)
+	}
+
+	// Derive encryption key from password using PBKDF2
+	key := pbkdf2.Key([]byte(password), salt, 100000, 32, sha256.New)
+
+	// Marshal private key to bytes
+	privKeyBytes, err := x509.MarshalECPrivateKey(w.privateKey)
+	if err != nil {
+		return fmt.Errorf("failed to marshal private key: %w", err)
+	}
+
+	// Encrypt private key using AES-256-GCM
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return fmt.Errorf("failed to create cipher: %w", err)
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return fmt.Errorf("failed to create GCM: %w", err)
+	}
+
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err := rand.Read(nonce); err != nil {
+		return fmt.Errorf("failed to generate nonce: %w", err)
+	}
+
+	// Encrypt and store
+	w.encryptedPrivKey = gcm.Seal(nonce, nonce, privKeyBytes, nil)
+	w.salt = salt
+
+	return nil
+}
+
 // Lock locks the wallet, preventing access to the private key
 func (w *Wallet) Lock() {
 	w.locked = true
+	// Optionally clear decrypted private key from memory for security
+	// w.privateKey = nil (commented out to maintain compatibility)
 }
 
-// Unlock unlocks the wallet
+// Unlock unlocks the wallet with a password
 func (w *Wallet) Unlock(password string) error {
-	// TODO: Implement password-based encryption/decryption
-	// For now, just unlock
+	// If wallet doesn't have encrypted key, just unlock
+	if len(w.encryptedPrivKey) == 0 {
+		w.locked = false
+		return nil
+	}
+
+	// Derive decryption key from password using same parameters
+	key := pbkdf2.Key([]byte(password), w.salt, 100000, 32, sha256.New)
+
+	// Decrypt private key using AES-256-GCM
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return fmt.Errorf("failed to create cipher: %w", err)
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return fmt.Errorf("failed to create GCM: %w", err)
+	}
+
+	nonceSize := gcm.NonceSize()
+	if len(w.encryptedPrivKey) < nonceSize {
+		return ErrInvalidPassword
+	}
+
+	nonce, ciphertext := w.encryptedPrivKey[:nonceSize], w.encryptedPrivKey[nonceSize:]
+	privKeyBytes, err := gcm.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		return ErrInvalidPassword
+	}
+
+	// Parse private key
+	privateKey, err := x509.ParseECPrivateKey(privKeyBytes)
+	if err != nil {
+		return fmt.Errorf("failed to parse private key: %w", err)
+	}
+
+	w.privateKey = privateKey
+	w.publicKey = &privateKey.PublicKey
 	w.locked = false
+
 	return nil
 }
 

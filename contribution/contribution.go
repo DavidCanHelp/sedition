@@ -67,8 +67,12 @@ func NewContribution(id string, contribType Type) Contribution {
 
 // CalculateImpact calculates the impact score of a contribution
 func (c *Contribution) CalculateImpact() float64 {
-	// Base impact from lines changed
-	linesImpact := float64(c.LinesAdded+c.LinesModified) * 0.1
+	// Base impact from lines changed (handle negative values gracefully)
+	totalLines := c.LinesAdded + c.LinesModified
+	if totalLines < 0 {
+		totalLines = 0
+	}
+	linesImpact := float64(totalLines) * 0.1
 
 	// Type multiplier
 	var typeMultiplier float64

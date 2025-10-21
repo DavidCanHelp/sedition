@@ -1,1 +1,13 @@
 demo/demo
+
+# Binary executables
+sedition
+sedition-client
+sedition-demo
+sedition-node
+
+# Test binaries
+*.test
+
+# Data directory
+data/

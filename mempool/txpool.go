@@ -130,6 +130,8 @@ func (p *TxPool) AddTransaction(tx *storage.Transaction) error {
 	} else {
 		// Transaction is for the future
 		p.addToQueue(from, tx)
+		// Check if this transaction fills a gap and enables promotion
+		p.promoteQueuedTransactions(from)
 	}
 
 	// Notify subscribers
@@ -304,12 +306,16 @@ func (p *TxPool) promoteQueuedTransactions(from string) {
 		}
 	}
 
-	// Try to promote transactions
-	for nonce, tx := range queued {
-		if nonce == expectedNonce {
+	// Try to promote transactions in a loop until no more can be promoted
+	// This handles the case where queued transactions form a continuous sequence
+	promoted := true
+	for promoted {
+		promoted = false
+		if tx, exists := queued[expectedNonce]; exists {
 			p.addToPending(from, tx)
-			delete(queued, nonce)
+			delete(queued, expectedNonce)
 			expectedNonce++
+			promoted = true
 		}
 	}
 
@@ -331,12 +337,14 @@ func (p *TxPool) revalidateTransactions() {
 		for nonce, tx := range txs {
 			if nonce < expectedNonce {
 				toRemove = append(toRemove, tx.Hash)
+				delete(txs, nonce)
 				continue
 			}
 
 			totalCost := new(big.Int).Add(tx.Value, new(big.Int).Mul(tx.GasPrice, big.NewInt(int64(tx.GasLimit))))
 			if balance.Cmp(totalCost) < 0 {
 				toRemove = append(toRemove, tx.Hash)
+				delete(txs, nonce)
 				continue
 			}
 
@@ -346,9 +354,14 @@ func (p *TxPool) revalidateTransactions() {
 				delete(txs, nonce)
 			}
 		}
+
+		// Clean up empty maps
+		if len(txs) == 0 {
+			delete(p.pending, addr)
+		}
 	}
 
-	// Remove invalid transactions
+	// Remove invalid transactions from all map
 	for _, hash := range toRemove {
 		delete(p.all, hash)
 	}

@@ -98,11 +98,7 @@ func TestBroadcastTransaction(t *testing.T) {
 	require.NoError(t, err)
 	defer broadcaster.Stop()
 
-	// Add mock peers
-	peer1 := &PeerConnection{ID: "peer1"}
-	peer2 := &PeerConnection{ID: "peer2"}
-
-	// We need to use the actual peer structure for this test
+	// TODO: Add mock peers for comprehensive broadcast testing
 	// For now, we'll test the broadcast method directly
 
 	// Create test transaction

@@ -492,7 +492,16 @@ func (dht *DHT) getBucketIndex(distance *big.Int) int {
 		return 0 // Distance is 0
 	}
 
-	return dht.bucketNum - bitLen
+	// Bucket index is based on the position of the most significant bit
+	// bitLen - 1 gives us the 0-indexed position
+	bucketIndex := bitLen - 1
+
+	// Cap at maximum bucket index to prevent out of bounds
+	if bucketIndex >= dht.bucketNum {
+		bucketIndex = dht.bucketNum - 1
+	}
+
+	return bucketIndex
 }
 
 // replaceNode replaces an old node with a new one in a bucket

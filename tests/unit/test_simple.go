@@ -3,14 +3,16 @@ package poc
 import (
 	"math/big"
 	"testing"
-	"time"
+
+	"github.com/davidcanhelp/sedition/config"
+	"github.com/davidcanhelp/sedition/consensus"
 )
 
 func TestSimpleConsensus(t *testing.T) {
 	// Create basic consensus engine
-	minStake := big.NewInt(1000000)
-	blockTime := time.Second
-	engine := NewConsensusEngine(minStake, blockTime)
+	cfg := config.DefaultConsensusConfig()
+	cfg.MinStakeRequired = big.NewInt(1000000)
+	engine := consensus.NewEngine(cfg)
 
 	// Register validators
 	validators := []string{"alice", "bob", "carol", "dave"}

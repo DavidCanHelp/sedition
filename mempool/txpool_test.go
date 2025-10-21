@@ -44,6 +44,14 @@ func (m *MockStateReader) SetNonce(address string, nonce uint64) {
 }
 
 func createTestTransaction(from, to string, nonce uint64, value, gasPrice *big.Int) *storage.Transaction {
+	// Create a transaction with a valid signature format (64 bytes for ECDSA)
+	// In a real test, you'd use a wallet to sign, but for now we'll create
+	// a signature that passes format validation
+	signature := make([]byte, 64)
+	// Set r and s to small positive values within curve order
+	signature[31] = 1 // r is just "1"
+	signature[63] = 1 // s is just "1"
+
 	return &storage.Transaction{
 		Hash:      fmt.Sprintf("tx_%s_%d", from, nonce),
 		From:      from,
@@ -53,7 +61,7 @@ func createTestTransaction(from, to string, nonce uint64, value, gasPrice *big.I
 		GasLimit:  21000,
 		GasPrice:  gasPrice,
 		Timestamp: time.Now(),
-		Signature: []byte("test_signature"),
+		Signature: signature,
 	}
 }
 
@@ -254,7 +262,8 @@ func TestTxPoolEviction(t *testing.T) {
 	assert.NotNil(t, pool.GetTransaction(tx3.Hash))
 
 	// Try to add transaction with lower gas price - should fail
-	tx4 := createTestTransaction("bob", "charlie", 1, big.NewInt(1000), big.NewInt(500000000))
+	// Gas price must be above MinGasPrice (1 Gwei) but lower than tx2/tx3 in pool
+	tx4 := createTestTransaction("bob", "charlie", 1, big.NewInt(1000), big.NewInt(1500000000))
 	err = pool.AddTransaction(tx4)
 	assert.Equal(t, ErrPoolFull, err)
 }

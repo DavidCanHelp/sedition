@@ -2,6 +2,7 @@
 package storage
 
 import (
+	"crypto/elliptic"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -36,9 +37,33 @@ type Transaction struct {
 
 // VerifySignature verifies the transaction signature
 func (tx *Transaction) VerifySignature() bool {
-	// TODO: Implement actual signature verification
-	// For now, return true if signature exists
-	return len(tx.Signature) > 0
+	if len(tx.Signature) == 0 {
+		return false
+	}
+
+	// Parse signature (expecting 64 bytes: 32 for r, 32 for s)
+	if len(tx.Signature) != 64 {
+		return false
+	}
+
+	r := new(big.Int).SetBytes(tx.Signature[:32])
+	s := new(big.Int).SetBytes(tx.Signature[32:])
+
+	// Validate signature components
+	// Check that r and s are valid (non-zero and within curve order)
+	curve := elliptic.P256()
+	if r.Sign() <= 0 || s.Sign() <= 0 {
+		return false
+	}
+	if r.Cmp(curve.Params().N) >= 0 || s.Cmp(curve.Params().N) >= 0 {
+		return false
+	}
+
+	// Note: Full ECDSA verification requires the public key
+	// In production, implement public key recovery from signature (ECDSA recovery)
+	// or include public key in transaction structure
+	// For now, we verify signature format is valid
+	return true
 }
 
 // BlockHeader contains the metadata of a block

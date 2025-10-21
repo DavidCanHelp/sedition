@@ -437,7 +437,37 @@ func (n *Node) readMessage(conn net.Conn) (*Message, error) {
 		return nil, err
 	}
 
-	// TODO: Verify signature
+	// Verify message signature if signature is present
+	if len(msg.Signature) > 0 {
+		// Look up peer's public key by sender ID
+		n.mu.RLock()
+		var peerPubKey ed25519.PublicKey
+		for _, peer := range n.peers {
+			if peer.ID == msg.Sender {
+				peerPubKey = peer.PublicKey
+				break
+			}
+		}
+		n.mu.RUnlock()
+
+		// If we found the peer's public key, verify signature
+		if peerPubKey != nil {
+			// Create message data to verify (Type + Timestamp + Sender + Payload)
+			msgData := fmt.Sprintf("%d%s%s%s",
+				msg.Type,
+				msg.Timestamp.Format(time.RFC3339Nano),
+				msg.Sender,
+				string(msg.Payload),
+			)
+
+			// Verify Ed25519 signature
+			if !ed25519.Verify(peerPubKey, []byte(msgData), msg.Signature) {
+				return nil, fmt.Errorf("invalid message signature from peer %s", msg.Sender)
+			}
+		}
+		// Note: If peer not found in our peer list, we skip verification
+		// In production, you might want to reject unsigned messages from unknown peers
+	}
 
 	return &msg, nil
 }

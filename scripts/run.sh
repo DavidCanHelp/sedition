@@ -64,6 +64,11 @@ case $COMMAND in
         echo "Cleanup complete!"
         ;;
 
+    demo)
+        echo "Running Sedition PoC demo..."
+        ./sedition --validator --name demo-validator --stake 10000
+        ;;
+
     test)
         echo "Running tests..."
         go test ./... -v
@@ -75,6 +80,7 @@ case $COMMAND in
         echo "Usage: ./run.sh [command]"
         echo ""
         echo "Commands:"
+        echo "  demo          Run the PoC demo (interactive blockchain demonstration)"
         echo "  node          Start the main node with mining"
         echo "  node-genesis  Start node and initialize genesis block"
         echo "  node2         Start a second node (for testing P2P)"

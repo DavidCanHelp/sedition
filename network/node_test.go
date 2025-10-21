@@ -146,7 +146,7 @@ func TestNode_BroadcastMessage(t *testing.T) {
 
 	// Node1 broadcasts a message
 	testMessage := &Message{
-		Type:    MessageTypeConsensusMessage,
+		Type:    LegacyMessageTypeConsensusMessage,
 		Payload: []byte("test broadcast"),
 	}
 
@@ -210,7 +210,7 @@ func TestNode_MessageHandling(t *testing.T) {
 
 	// Test ping message
 	pingMsg := &Message{
-		Type:    MessageTypePing,
+		Type:    LegacyMessageTypePing,
 		Sender:  "test-peer",
 		Payload: []byte(fmt.Sprintf("%d", time.Now().Unix())),
 	}
@@ -219,7 +219,7 @@ func TestNode_MessageHandling(t *testing.T) {
 
 	// Test peer request
 	peerReqMsg := &Message{
-		Type:   MessageTypePeerRequest,
+		Type:   LegacyMessageTypePeerRequest,
 		Sender: "test-peer",
 	}
 
@@ -229,7 +229,7 @@ func TestNode_MessageHandling(t *testing.T) {
 	peerList := []string{"peer1:8545", "peer2:8545"}
 	peerData, _ := json.Marshal(peerList)
 	peerRespMsg := &Message{
-		Type:    MessageTypePeerResponse,
+		Type:    LegacyMessageTypePeerResponse,
 		Sender:  "test-peer",
 		Payload: peerData,
 	}
@@ -267,7 +267,7 @@ func TestNode_ConcurrentOperations(t *testing.T) {
 					return
 				default:
 					msg := &Message{
-						Type:    MessageTypePing,
+						Type:    LegacyMessageTypePing,
 						Payload: []byte(fmt.Sprintf("ping-%d", id)),
 					}
 					node.BroadcastMessage(msg)
@@ -304,7 +304,7 @@ func BenchmarkNode_BroadcastMessage(b *testing.B) {
 	}
 
 	msg := &Message{
-		Type:    MessageTypeConsensusMessage,
+		Type:    LegacyMessageTypeConsensusMessage,
 		Payload: []byte("benchmark message"),
 	}
 
@@ -323,7 +323,7 @@ func BenchmarkNode_HandleMessage(b *testing.B) {
 	defer node.Stop()
 
 	msg := &Message{
-		Type:    MessageTypePing,
+		Type:    LegacyMessageTypePing,
 		Sender:  "benchmark-peer",
 		Payload: []byte("1234567890"),
 	}

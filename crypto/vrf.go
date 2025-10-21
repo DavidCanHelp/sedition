@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"golang.org/x/crypto/curve25519"
+	"filippo.io/edwards25519"
 )
 
 // VRF implements Verifiable Random Functions using Ed25519
@@ -87,7 +87,7 @@ func (v *VRF) Prove(message []byte) (*VRFOutput, error) {
 	hk := v.scalarMult(h, k)
 
 	c := v.challengeHash(v.publicKey, h, gamma, gk, hk)
-	s := v.scalarSub(k, v.scalarMult(c, v.privateKey[:32]))
+	s := v.scalarSub(k, v.scalarFieldMult(c, v.privateKey[:32]))
 
 	// Encode proof
 	proof := v.encodeProof(gamma, c, s)
@@ -150,51 +150,102 @@ func (v *VRFOutput) GetRandomness() *big.Int {
 	return new(big.Int).SetBytes(v.Value[:])
 }
 
-// hashToCurve hashes a message to a curve point (simplified)
+// hashToCurve hashes a message to a valid Edwards25519 curve point
 func (v *VRF) hashToCurve(message []byte) []byte {
+	// Use hash-to-curve following RFC 9380 approach (simplified)
 	h := sha512.New()
 	h.Write([]byte("VRF-HASH-TO-CURVE"))
 	h.Write(message)
 	hash := h.Sum(nil)
 
-	// Reduce modulo curve order
-	var point [32]byte
-	copy(point[:], hash[:32])
-	point[31] &= 127 // Clear high bit for valid curve point
+	// Create a scalar from the hash and multiply by generator
+	// This ensures we get a valid point on the curve
+	scalar := new(edwards25519.Scalar)
+	scalar.SetUniformBytes(hash)
 
-	return point[:]
+	point := new(edwards25519.Point).ScalarBaseMult(scalar)
+	return point.Bytes()
 }
 
-// scalarMult performs scalar multiplication on curve25519
+// scalarMult performs scalar multiplication on edwards25519
 func (v *VRF) scalarMult(point, scalar []byte) []byte {
-	var p, s [32]byte
-	copy(p[:], point[:32])
-	copy(s[:], scalar[:32])
+	// Convert point bytes to Edwards25519 point
+	p := new(edwards25519.Point)
+	if _, err := p.SetBytes(point); err != nil {
+		return make([]byte, 32)
+	}
 
-	var result [32]byte
-	curve25519.ScalarMult(&result, &s, &p)
-	return result[:]
+	// Convert scalar bytes to edwards25519 Scalar
+	// First try canonical (for scalars computed by scalarSub/scalarFieldMult)
+	var scalarBytes [32]byte
+	copy(scalarBytes[:], scalar[:32])
+	s := new(edwards25519.Scalar)
+	if _, err := s.SetCanonicalBytes(scalarBytes[:]); err != nil {
+		// If not canonical (e.g., hash output), reduce modulo curve order
+		s.SetUniformBytes(scalar)
+	}
+
+	// Perform scalar multiplication
+	result := new(edwards25519.Point).ScalarMult(s, p)
+	return result.Bytes()
 }
 
 // scalarBaseMult performs scalar multiplication with base point
 func (v *VRF) scalarBaseMult(scalar []byte) []byte {
-	var s [32]byte
-	copy(s[:], scalar[:32])
+	// Convert scalar bytes to edwards25519 Scalar
+	// First try canonical (for scalars computed by scalarSub/scalarFieldMult)
+	var scalarBytes [32]byte
+	copy(scalarBytes[:], scalar[:32])
+	s := new(edwards25519.Scalar)
+	if _, err := s.SetCanonicalBytes(scalarBytes[:]); err != nil {
+		// If not canonical (e.g., hash output), reduce modulo curve order
+		s.SetUniformBytes(scalar)
+	}
 
-	var result [32]byte
-	curve25519.ScalarBaseMult(&result, &s)
-	return result[:]
+	// Perform scalar multiplication with generator
+	result := new(edwards25519.Point).ScalarBaseMult(s)
+	return result.Bytes()
 }
 
-// pointAdd adds two curve points (simplified)
+// pointAdd adds two Edwards25519 curve points
 func (v *VRF) pointAdd(p1, p2 []byte) []byte {
-	// Simplified point addition using XOR (not cryptographically correct)
-	// In production, use proper elliptic curve addition
-	result := make([]byte, 32)
-	for i := 0; i < 32; i++ {
-		result[i] = p1[i] ^ p2[i]
+	// Convert bytes to Edwards25519 points
+	point1 := new(edwards25519.Point)
+	if _, err := point1.SetBytes(p1); err != nil {
+		// If conversion fails, return zero point
+		return make([]byte, 32)
 	}
-	return result
+
+	point2 := new(edwards25519.Point)
+	if _, err := point2.SetBytes(p2); err != nil {
+		// If conversion fails, return zero point
+		return make([]byte, 32)
+	}
+
+	// Add the points
+	result := new(edwards25519.Point).Add(point1, point2)
+	return result.Bytes()
+}
+
+// scalarFieldMult performs scalar multiplication in the field modulo curve order
+func (v *VRF) scalarFieldMult(a, b []byte) []byte {
+	aInt := new(big.Int).SetBytes(a)
+	bInt := new(big.Int).SetBytes(b)
+
+	// Curve25519 order
+	order := new(big.Int)
+	order.SetString("7237005577332262213973186563042994240857116359379907606001950938285454250989", 10)
+
+	result := new(big.Int).Mul(aInt, bInt)
+	result.Mod(result, order)
+
+	resultBytes := result.Bytes()
+	if len(resultBytes) < 32 {
+		padded := make([]byte, 32)
+		copy(padded[32-len(resultBytes):], resultBytes)
+		return padded
+	}
+	return resultBytes[:32]
 }
 
 // scalarSub performs scalar subtraction modulo curve order
